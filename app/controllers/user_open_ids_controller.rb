@@ -83,7 +83,7 @@ class UserOpenIdsController < ApplicationController
       trusted = open_id_response.endpoint.server_url =~ /^https:\/\/www.google.com\// ||
         open_id_response.endpoint.server_url =~ /^https:\/\/me.yahoo.com\//
 
-      email = data[:email]
+      email = data[:email].downcase
       user_open_id = UserOpenId.where(url: open_id_response.display_identifier).first
 
       if trusted && user_open_id.nil? && user = User.where(email: email).first
