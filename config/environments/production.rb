@@ -40,5 +40,15 @@ Discourse::Application.configure do
   config.ember.ember_location = "#{Rails.root}/app/assets/javascripts/external_production/ember.js"
   config.ember.handlebars_location = "#{Rails.root}/app/assets/javascripts/external/handlebars-1.0.rc.2.js"
   config.handlebars.precompile = true
+  
+  config.action_mailer.default_url_options = { :host => 'your.websitedomain.com' }
+  ActionMailer::Base.smtp_settings = {
+    :address        => "smtp.sendgrid.net",
+    :port           => "25",
+    :authentication => :plain,
+    :user_name      => ENV['SENDGRID_USERNAME'],
+    :password       => ENV['SENDGRID_PASSWORD'],
+    :domain         => ENV['SENDGRID_DOMAIN']
+  }
 
 end
