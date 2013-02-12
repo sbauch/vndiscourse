@@ -56,7 +56,7 @@ module RailsMultisite
     end
 
     def self.current_hostname
-      ActiveRecord::Base.connection_pool.spec.config[:host_names].first
+      ActiveRecord::Base.connection_pool.spec.config[:host]
     end
 
 
