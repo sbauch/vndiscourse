@@ -1,7 +1,7 @@
 class UsernameValidator
 
   def initialize(username)
-    @username = username
+    @username = username.downcase
     @errors = []
   end
   attr_accessor :errors
