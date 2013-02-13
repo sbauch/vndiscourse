@@ -41,6 +41,12 @@ PATH
     discourse_plugin (0.0.1)
 
 PATH
+  remote: vendor/gems/discourse_user_directory
+  specs:
+    discourse_user_directory (0.0.1)
+      rails (~> 3.2.12)
+
+PATH
   remote: vendor/gems/message_bus
   specs:
     message_bus (0.0.1)
@@ -381,6 +387,7 @@ DEPENDENCIES
   coffee-script
   discourse_emoji!
   discourse_plugin!
+  discourse_user_directory!
   em-redis
   ember-rails!
   eventmachine
