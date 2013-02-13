@@ -1,4 +1,3 @@
-DiscourseUserDirectory::Engine.routes.draw do
-  get "/directory" => 'directories#index'
-
+Rails.application.routes.draw do |map|
+    get "/directory" => 'directories#index'
 end

@@ -43,6 +43,11 @@ class DiscoursePlugin
     return unless self.respond_to?(event_name)    
     DiscourseEvent.on(event_name, &self.method(event_name))
   end
-
+  
+  def add_route(method, path, controller, action)
+    Rails.application.routes.draw do |map|
+        method path => "#{controller}##{action}"
+      end
+  end
 end
 
