@@ -7,7 +7,6 @@ require_dependency 'admin_constraint'
 USERNAME_ROUTE_FORMAT = /[A-Za-z0-9\._]+/
 
 Discourse::Application.routes.draw do
-  mount DiscourseUserDirectory::Engine, at: "/directory"
   match "/404", :to => "exceptions#not_found"
 
   mount Sidekiq::Web => '/sidekiq', constraints: AdminConstraint.new
