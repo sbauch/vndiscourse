@@ -44,10 +44,10 @@ class DiscoursePlugin
     DiscourseEvent.on(event_name, &self.method(event_name))
   end
   
-  def add_route(path, controller, action)
-    Discourse::Application.routes.draw do 
-        resources :directories
-      end
-  end
+  # def add_route(path, controller, action)
+  #     Discourse::Application.routes.draw do 
+  #         resources :directories
+  #       end
+  #   end
 end
 
