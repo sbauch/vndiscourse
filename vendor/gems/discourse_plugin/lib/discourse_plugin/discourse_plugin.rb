@@ -45,7 +45,7 @@ class DiscoursePlugin
   end
   
   def add_route(path, controller, action)
-    Rails.application.routes.draw do |map|
+    Rails.application.routes.draw do 
         resources :directories
       end
   end

@@ -43,7 +43,7 @@ PATH
 PATH
   remote: vendor/gems/discourse_user_directory
   specs:
-    discourse_user_directory (0.0.3)
+    discourse_user_directory (0.0.4)
       rails (~> 3.2.12)
 
 PATH
