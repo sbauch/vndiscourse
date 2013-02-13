@@ -6,7 +6,7 @@ module DiscourseUserDirectory
   class Plugin < DiscoursePlugin
 
     def setup
-      add_route('get', 'directory', 'directories', 'index')
+      add_route(get, 'directory', 'directories', 'index')
       
       # Add our Assets
       # register_js('discourse_user_directory')
