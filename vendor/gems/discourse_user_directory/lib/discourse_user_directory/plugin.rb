@@ -6,6 +6,9 @@ module DiscourseUserDirectory
   class Plugin < DiscoursePlugin
 
     def setup
+      Rails.application.routes.draw do |map|
+        get '/directory' => 'directories#index'
+      end
       # Add our Assets
       # register_js('discourse_user_directory')
       # register_css('discourse_user_directory')
