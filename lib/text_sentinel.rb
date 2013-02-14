@@ -47,15 +47,15 @@ class TextSentinel
     # return false if @opts[:min_entropy].present? and (entropy < @opts[:min_entropy])
 
     # We don't have a comprehensive list of symbols, but this will eliminate some noise
-    non_symbols = @text.gsub(TextSentinel.non_symbols_regexp, '').size
-    return false if non_symbols == 0
+    # non_symbols = @text.gsub(TextSentinel.non_symbols_regexp, '').size
+    # return false if non_symbols == 0
 
     # Don't allow super long strings without spaces
 
     return false if @opts[:max_word_length] and @text =~ /\w{#{@opts[:max_word_length]},}(\s|$)/
 
     # We don't allow all upper case content
-    return false if @text == @text.upcase
+    # return false if @text == @text.upcase
 
     true
   end
