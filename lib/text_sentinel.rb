@@ -44,7 +44,7 @@ class TextSentinel
     return false if @text.blank?
 
     # Entropy check if required
-    return false if @opts[:min_entropy].present? and (entropy < @opts[:min_entropy])
+    # return false if @opts[:min_entropy].present? and (entropy < @opts[:min_entropy])
 
     # We don't have a comprehensive list of symbols, but this will eliminate some noise
     non_symbols = @text.gsub(TextSentinel.non_symbols_regexp, '').size
