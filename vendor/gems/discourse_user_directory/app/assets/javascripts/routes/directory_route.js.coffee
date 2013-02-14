@@ -1,2 +1,2 @@
-Discourse.AdminUsersListActiveRoute = Discourse.Route.extend
+Discourse.DirectoryRoute = Discourse.Route.extend
   setupController: (c) -> @controllerFor('/directory')

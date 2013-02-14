@@ -12,7 +12,9 @@ Discourse.buildRoutes ->
   @route 'faq', path: '/faq'
   @route 'tos', path: '/tos'
   @route 'privacy', path: '/privacy'
-
+  
+  @route 'directory', path: '/directory'
+    
   @resource 'list', path: '/', ->
     router = @
     # Generate routes for all our filters
@@ -33,5 +35,6 @@ Discourse.buildRoutes ->
       @route 'email', path: '/email'
     @route 'privateMessages', path: '/private-messages'
     @route 'invited', path: 'invited'
+    
 
 

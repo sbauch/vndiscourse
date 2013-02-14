@@ -6,7 +6,7 @@ NEW_PRIVATE_MESSAGE = "12"
 GOT_PRIVATE_MESSAGE = "13"
 
 window.Discourse.User = Discourse.Model.extend Discourse.Presence,
-
+  
   avatarLarge: (->
     Discourse.Utilities.avatarUrl(@get('username'), 'large', @get('avatar_template'))
   ).property('username')
@@ -196,3 +196,16 @@ window.Discourse.User.reopenClass
       dataType: 'json'
       data: {name: name, email: email, password: password, username: username, password_confirmation: passwordConfirm, challenge: challenge}
       type: 'POST'
+  
+   create: (result) ->
+    result = @_super(result)
+    result
+    
+  findAll: (query, filter)->
+    result = Em.A()
+    $.ajax
+      url: "/admin/users/list/#{query}.json"
+      data: {filter: filter}
+      success: (users) ->
+        users.each (u) -> result.pushObject(Discourse.AdminUser.create(u))
+    result

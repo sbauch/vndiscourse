@@ -1,6 +1,6 @@
 # closure wrapping means this does not leak into global context
-validNavNames = ['read','popular','categories', 'favorited', 'category', 'unread', 'new', 'posted']
-validAnon = ['popular', 'category', 'categories']
+validNavNames = ['read','popular','categories', 'favorited', 'category', 'unread', 'new', 'posted', 'directory']
+validAnon = ['popular', 'category', 'categories', 'directory']
 
 window.Discourse.NavItem = Em.Object.extend
 

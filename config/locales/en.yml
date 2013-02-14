@@ -945,6 +945,9 @@ en:
     categories_list: "Categories List"
 
     filters:
+      directory:
+        title: "Directory"
+        help: "User Directory"
       popular: 
         title: "Popular"
         help: "the most popular recent topics"
