@@ -34,7 +34,7 @@ class TextSentinel
 
   # Entropy is a number of how many unique characters the string needs. 
   def entropy
-    return 100 # if @text.blank?
+    return 0 # if @text.blank?
     #     @entropy ||= @text.each_char.to_a.uniq.size
   end
 
