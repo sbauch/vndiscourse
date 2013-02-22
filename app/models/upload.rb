@@ -85,7 +85,7 @@ class Upload < ActiveRecord::Base
                                   public: true,
                                   content_type: file.content_type)
     upload.width, upload.height = ImageSizer.resize(*image_info.size)
-    upload.url = "https://s3.amazonaws.com/vaynermedia-vaynernet-gifs-development/#{path}/#{remote_filename}"
+    upload.url = "https://s3.amazonaws.com/vaynermedia-vaynernet-gifs-development#{path}/#{remote_filename}"
     upload.save
 
     upload
