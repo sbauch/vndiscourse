@@ -1,0 +1,19 @@
+production: 
+  port: 9531
+  host: barreleye.redistogo.com
+  password: 611f8c35965c4409db1c52d29bcbded1
+test: 
+  port: 6379
+  host: localhost
+  db: 1
+staging: 
+  port: 6379
+  host: localhost
+defaults: 
+  port: 6379
+  host: localhost
+development: 
+  port: 6379
+  host: localhost
+  db: 0
+  cache_db: 2

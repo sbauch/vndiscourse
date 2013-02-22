@@ -20,7 +20,7 @@ dump.rdb
 /coverage/*
 
 config/database.yml
-config/redis.yml
+# config/redis.yml
 
 # Ignore the default SQLite database and db dumps
 /db/*.sqlite3
