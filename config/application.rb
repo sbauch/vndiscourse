@@ -98,8 +98,6 @@ module Discourse
     config.action_dispatch.rack_cache =  nil
     
     # config.assets.initialize_on_precompile = false
-    
-    config.action_controller.asset_host =  "//#{ENV['FOG_DIRECTORY']}.s3.amazonaws.com"
 
     
     # So open id logs somewhere sane
