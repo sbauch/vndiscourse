@@ -1,4 +1,3 @@
-require 'coffee_script'
 require 'v8'
 require 'nokogiri'
 
@@ -91,8 +90,8 @@ module PrettyText
     @ctx.eval("var Discourse = {}; Discourse.SiteSettings = #{SiteSetting.client_settings_json};")
     @ctx.eval("var window = {}; window.devicePixelRatio = 2;") # hack to make code think stuff is retina
 
-    @ctx.eval(CoffeeScript.compile(File.read(app_root + "app/assets/javascripts/discourse/components/bbcode.js.coffee")))
-    @ctx.eval(CoffeeScript.compile(File.read(app_root + "app/assets/javascripts/discourse/components/utilities.coffee")))
+    @ctx.load(app_root + "app/assets/javascripts/discourse/components/bbcode.js")
+    @ctx.load(app_root + "app/assets/javascripts/discourse/components/utilities.js")
 
     # Load server side javascripts
     if DiscoursePluginRegistry.server_side_javascripts.present?
@@ -216,6 +215,18 @@ module PrettyText
     doc.css("a").each do |l|
       links << l.attributes["href"].to_s
     end
+
+    doc.css("aside.quote").each do |a|
+      topic_id = a.attributes['data-topic']
+      
+      url = "/t/topic/#{topic_id}"
+      if post_number = a.attributes['data-post']
+        url << "/#{post_number}"
+      end
+
+      links << url
+    end
+
     links
   end
 

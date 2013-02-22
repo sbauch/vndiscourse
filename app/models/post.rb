@@ -4,7 +4,6 @@ require_dependency 'rate_limiter'
 require_dependency 'post_revisor'
 
 require 'archetype'
-require 'hpricot'
 require 'digest/sha1'
 
 class Post < ActiveRecord::Base
@@ -15,12 +14,10 @@ class Post < ActiveRecord::Base
     FLAG_THRESHOLD_REACHED_AGAIN = 2
   end
 
-
   versioned
-
   rate_limit
-
   acts_as_paranoid
+
   after_recover :update_flagged_posts_count
   after_destroy :update_flagged_posts_count
 
@@ -32,7 +29,7 @@ class Post < ActiveRecord::Base
   has_many :post_actions
 
   validates_presence_of :raw, :user_id, :topic_id
-  validates :raw, length: {in: SiteSetting.min_post_length..SiteSetting.max_post_length}
+  validates :raw, stripped_length: {in: SiteSetting.min_post_length..SiteSetting.max_post_length}
   validate :raw_quality
   validate :max_mention_validator
   validate :max_images_validator
@@ -58,10 +55,6 @@ class Post < ActiveRecord::Base
 
   after_create do
     TopicUser.auto_track(self.user_id, self.topic_id, TopicUser::NotificationReasons::CREATED_POST)
-  end
-
-  before_validation do
-    self.raw.strip! if self.raw.present?
   end
 
   def raw_quality
@@ -215,7 +208,7 @@ class Post < ActiveRecord::Base
     # We only filter quotes when there is exactly 1
     return cooked unless (quote_count == 1)
 
-    parent_raw = parent_post.raw.sub(/\[quote.+\/quote\]/m, '').strip
+    parent_raw = parent_post.raw.sub(/\[quote.+\/quote\]/m, '')
 
     if raw[parent_raw] or (parent_raw.size < SHORT_POST_CHARS)
       return cooked.sub(/\<aside.+\<\/aside\>/m, '')

@@ -1,7 +1,8 @@
 class SiteCustomization < ActiveRecord::Base
 
   ENABLED_KEY = '7e202ef2-56d7-47d5-98d8-a9c8d15e57dd'
-  CACHE_PATH = 'stylesheet-cache'
+  # placing this in uploads to ease deployment rules
+  CACHE_PATH = 'uploads/stylesheet-cache'
   @lock = Mutex.new
 
   before_create do
@@ -106,7 +107,7 @@ footer:after{ content: '#{error}' }"
 
     @lock.synchronize do
       style = self.where(key: key).first
-      style.ensure_stylesheet_on_disk!
+      style.ensure_stylesheet_on_disk! if style
       @cache[key] = style
     end
   end

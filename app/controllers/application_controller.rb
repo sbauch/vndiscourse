@@ -1,4 +1,5 @@
 require 'current_user'
+require 'canonical_url'
 require_dependency 'discourse'
 require_dependency 'custom_renderer'
 require 'archetype'
@@ -6,6 +7,8 @@ require_dependency 'rate_limiter'
 
 class ApplicationController < ActionController::Base
   include CurrentUser
+  
+  include CanonicalURL::ControllerExtensions
 
   serialization_scope :guardian
 
@@ -114,7 +117,7 @@ class ApplicationController < ActionController::Base
       user.auth_token = SecureRandom.hex(16)
       user.save!
     end
-    cookies.permanent[:_t] = user.auth_token
+    cookies.permanent.signed[:_t] = { :value => user.auth_token, :httponly => true }
   end
 
   # This is odd, but it seems that in Rails `render json: obj` is about

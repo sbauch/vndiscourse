@@ -29,9 +29,13 @@ class SiteSetting < ActiveRecord::Base
   client_setting(:min_topic_title_length, 5)
   client_setting(:max_topic_title_length, 255)
   client_setting(:flush_timings_secs, 5)
+  client_setting(:supress_reply_directly_below, true)
+  client_setting(:email_domains_blacklist, 'mailinator.com')
+  client_setting(:version_checks, true)
 
   # settings only available server side
-  setting(:auto_track_topics_after, 60000)
+  setting(:auto_track_topics_after, 300000)
+  setting(:new_topic_duration_minutes, 60 * 48)
   setting(:long_polling_interval, 15000)
   setting(:flags_required_to_hide_post, 3)
   setting(:cooldown_minutes_after_hiding_posts, 10)
@@ -51,13 +55,13 @@ class SiteSetting < ActiveRecord::Base
   setting(:imgur_api_key, '')
   setting(:imgur_endpoint, "http://api.imgur.com/2/upload.json")
   setting(:max_image_width, 690)
-  setting(:category_featured_topics, 6)
+  client_setting(:category_featured_topics, 6)
   setting(:topics_per_page, 30)
   setting(:posts_per_page, 20)
   setting(:invite_expiry_days, 14)
   setting(:active_user_rate_limit_secs, 60)
   setting(:previous_visit_timeout_hours, 1)
-  setting(:favicon_url, '/assets/favicon.ico')
+  setting(:favicon_url, '/assets/default-favicon.png')
 
   setting(:ninja_edit_window, 5.minutes.to_i)
   setting(:post_undo_action_window_mins, 10)
@@ -78,7 +82,7 @@ class SiteSetting < ActiveRecord::Base
   setting(:max_flags_per_day, 20)
   setting(:max_edits_per_day, 30)
   setting(:max_favorites_per_day, 20)
-
+  setting(:auto_link_images_wider_than, 50)
 
   setting(:email_time_window_mins, 5)
 
@@ -125,7 +129,7 @@ class SiteSetting < ActiveRecord::Base
 
   # Trust related
   setting(:basic_requires_topics_entered, 5)
-  setting(:basic_requires_read_posts, 100)
+  setting(:basic_requires_read_posts, 50)
   setting(:basic_requires_time_spent_mins, 30)
 
   # Entropy checks
@@ -133,10 +137,13 @@ class SiteSetting < ActiveRecord::Base
   setting(:body_min_entropy, 7)
   setting(:max_word_length, 30)
 
-  # Ways to catch griefers and other nasties
-  setting(:email_blacklist_regexp, '')
+  setting(:new_user_period_days, 2)
 
-  def self.call_mothership?
+  setting(:title_fancy_entities, true)
+
+  client_setting(:educate_until_posts, 2)
+
+  def self.call_discourse_hub?
     self.enforce_global_nicknames? and self.discourse_org_access_key.present?
   end
 

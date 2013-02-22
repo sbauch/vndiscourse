@@ -155,6 +155,14 @@ describe TopicQuery do
         topics.should == [new_topic]
       end
 
+      it "contains no new topics for a user that has missed the window" do
+        user.new_topic_duration_minutes = 5 
+        user.save
+        new_topic.created_at = 10.minutes.ago
+        new_topic.save
+        topics.should == []
+      end
+
       context "muted topics" do
         before do
           new_topic.notify_muted!(user)
@@ -212,8 +220,19 @@ describe TopicQuery do
 
       it "should return the new topic" do
         TopicQuery.new.list_suggested_for(topic).topics.should == [new_topic]  
-      end
+      end      
+    end
 
+    context "anonymously browswing with invisible, closed and archived" do
+      let!(:topic) { Fabricate(:topic) }
+      let!(:regular_topic) { Fabricate(:post, user: creator).topic }
+      let!(:closed_topic) { Fabricate(:topic, user: creator, closed: true) }
+      let!(:archived_topic) { Fabricate(:topic, user: creator, archived: true) }
+      let!(:invisible_topic) { Fabricate(:topic, user: creator, visible: false) }
+
+      it "should omit the closed/archived/invisbiel topics from suggested" do
+        TopicQuery.new.list_suggested_for(topic).topics.should == [regular_topic]  
+      end
     end
 
     context 'when logged in' do
@@ -229,6 +248,9 @@ describe TopicQuery do
         let!(:partially_read) { Fabricate(:post, user: creator).topic }
         let!(:new_topic) { Fabricate(:post, user: creator).topic }
         let!(:fully_read) { Fabricate(:post, user: creator).topic }     
+        let!(:closed_topic) { Fabricate(:topic, user: creator, closed: true) }
+        let!(:archived_topic) { Fabricate(:topic, user: creator, archived: true) }
+        let!(:invisible_topic) { Fabricate(:topic, user: creator, visible: false) }
 
         before do
           user.auto_track_topics_after_msecs = 0

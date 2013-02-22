@@ -1,7 +1,6 @@
 require File.expand_path('../boot', __FILE__)
-
 require 'rails/all'
-require "redis-store" # HACK
+require 'redis-store' # HACK
 
 # Plugin related stuff
 require './lib/discourse_plugin_registry'
@@ -30,7 +29,9 @@ module Discourse
 
     config.assets.paths += %W(#{config.root}/config/locales)
 
-    config.assets.precompile += ['admin.js', 'admin.css', 'shiny/shiny.css', 'preload_store.js', 'jquery.js']
+    config.assets.precompile += [
+      'admin.js', 'admin.css', 'shiny/shiny.css', 'preload_store.js', 'jquery.js', 'defer/html-sanitizer-bundle.js'
+    ]
 
     # Activate observers that should always be running.
     config.active_record.observers = [
@@ -50,7 +51,7 @@ module Discourse
     # config.i18n.default_locale = :de
 
     # Configure the default encoding used in templates for Ruby 1.9.
-    config.encoding = "utf-8"
+    config.encoding = 'utf-8'
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]

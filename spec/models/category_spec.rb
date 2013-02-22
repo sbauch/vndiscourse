@@ -1,7 +1,10 @@
+# encoding: utf-8
+
 require 'spec_helper'
 
 describe Category do
 
+  it { should validate_presence_of :user_id }
   it { should validate_presence_of :name }
 
   it 'validates uniqueness of name' do
@@ -57,6 +60,16 @@ describe Category do
       Site.expects(:invalidate_cache).once
       cat.destroy
     end
+  end
+
+  describe 'non-english characters' do
+
+    let(:category) { Fabricate(:category, name: "電車男") }
+
+    it "creates a blank slug, this is OK." do
+      category.slug.should be_blank
+    end
+
   end
 
   describe 'after create' do
@@ -145,31 +158,57 @@ describe Category do
   end
 
   describe 'update_stats' do
-
-    # We're going to test with one topic. That's enough for stats!
+    
     before do
       @category = Fabricate(:category)
-
-      # Create a non-invisible category to make sure count is 1
-      @topic = Fabricate(:topic, user: @category.user, category: @category)     
-
-      Category.update_stats
-      @category.reload
     end
+    
+    context 'with regular topics' do
 
-    it 'updates topics_week' do
-      @category.topics_week.should == 1
+      before do
+        @category.topics << Fabricate(:topic, 
+                                      user: @category.user)     
+        Category.update_stats
+        @category.reload
+      end
+
+      it 'updates topics_week' do
+        @category.topics_week.should == 1
+      end
+
+      it 'updates topics_month' do
+        @category.topics_month.should == 1
+      end
+
+      it 'updates topics_year' do
+        @category.topics_year.should == 1
+      end
+    
     end
+    
+    context 'with deleted topics' do
 
-    it 'updates topics_month' do
-      @category.topics_month.should == 1
-    end
+      before do
+        @category.topics << Fabricate(:deleted_topic, 
+                                      user: @category.user)
+        Category.update_stats
+        @category.reload
+      end
 
-    it 'updates topics_year' do
-      @category.topics_year.should == 1
+      it 'does not count deleted topics for topics_week' do
+        @category.topics_week.should == 0
+      end
+
+      it 'does not count deleted topics for topics_month' do
+        @category.topics_month.should == 0
+      end
+
+      it 'does not count deleted topics for topics_year' do
+        @category.topics_year.should == 0
+      end
+
     end
 
   end
 
 end
-

@@ -2,7 +2,6 @@
 
 require 'spec_helper'
 require 'text_sentinel'
-require 'iconv'
 
 describe TextSentinel do
 
@@ -30,13 +29,13 @@ describe TextSentinel do
       TextSentinel.new("evil trout is evil").entropy.should == 10
     end
 
+    it "Works on foreign characters" do
+      TextSentinel.new("去年十社會警告").entropy.should == 7
+    end
+
   end
 
   context "cleaning up" do
-
-    it "strips leading or trailing whitespace" do
-      TextSentinel.new("   \t  test \t  ").text.should == "test"
-    end
 
     it "allows utf-8 chars" do
       TextSentinel.new("йȝîûηыეமிᚉ⠛").text.should == "йȝîûηыეமிᚉ⠛"
@@ -45,15 +44,37 @@ describe TextSentinel do
     context "interior spaces" do
 
       let(:spacey_string) { "hello     there's weird     spaces here." }
+      let(:unspacey_string) { "hello there's weird spaces here." }
 
       it "ignores intra spaces by default" do
         TextSentinel.new(spacey_string).text.should == spacey_string
       end
 
       it "fixes intra spaces when enabled" do
-        TextSentinel.new(spacey_string, remove_interior_spaces: true).text.should == "hello there's weird spaces here."
-      end      
+        TextSentinel.new(spacey_string, remove_interior_spaces: true).text.should == unspacey_string
+      end
 
+      it "fixes intra spaces in titles" do
+        TextSentinel.title_sentinel(spacey_string).text.should == unspacey_string
+      end
+
+    end
+
+    context "stripping whitespace" do
+      let(:spacey_string) { "   \t  test \t  " }
+      let(:unspacey_string) { "test" }
+
+      it "does not strip leading and trailing whitespace by default" do
+        TextSentinel.new(spacey_string).text.should == spacey_string
+      end
+
+      it "strips leading and trailing whitespace when enabled" do
+        TextSentinel.new(spacey_string, strip: true).text.should == unspacey_string
+      end
+
+      it "strips leading and trailing whitespace in titles" do
+        TextSentinel.title_sentinel(spacey_string).text.should == unspacey_string
+      end
     end
 
   end
@@ -78,9 +99,12 @@ describe TextSentinel do
       TextSentinel.new(valid_string, min_entropy: 17).should_not be_valid
     end
 
+    it "allows all foreign characters" do
+      TextSentinel.new("去年十二月，北韓不顧國際社會警告").should be_valid
+    end
+
     it "doesn't allow a long alphanumeric string with no spaces" do
-      TextSentinel.new("jfewjfoejwfojeojfoejofjeo38493824jfkjewfjeoifijeoijfoejofjeojfoewjfo834988394032jfiejoijofijeojfeojfojeofjewojfojeofjeowjfojeofjeojfoe3898439849032jfeijfwoijfoiewj",
-                      max_word_length: 30).should_not be_valid
+      TextSentinel.new("jfewjfoejwfojeojfoejofjeo3" * 5, max_word_length: 30).should_not be_valid
     end
 
     it "doesn't except junk symbols as a string" do

@@ -9,7 +9,7 @@ class CategoryList
                     .includes(:featured_users)
                     .order('topics_week desc, topics_month desc, topics_year desc')
                     .to_a
-
+                  
     # Support for uncategorized topics
     uncategorized_topics = Topic
                       .listable_topics
@@ -30,7 +30,7 @@ class CategoryList
 
 
       uncategorized = Category.new({name: SiteSetting.uncategorized_name,
-                                   slug: SiteSetting.uncategorized_name,
+                                   slug: Slug.for(SiteSetting.uncategorized_name),
                                    featured_topics: uncategorized_topics}.merge(totals))
 
       # Find the appropriate place to insert it:
@@ -45,8 +45,10 @@ class CategoryList
       @categories.insert(insert_at || @categories.size, uncategorized)
     end
 
-    # Remove categories with no featured topics
-    @categories.delete_if {|c| c.featured_topics.blank? }
+    # Remove categories with no featured topics unless we have the ability to edit one
+    unless Guardian.new(current_user).can_create?(Category)
+      @categories.delete_if {|c| c.featured_topics.blank? }
+    end
 
     # Get forum topic user records if appropriate
     if current_user.present?

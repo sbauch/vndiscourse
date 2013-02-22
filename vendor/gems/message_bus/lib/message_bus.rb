@@ -9,6 +9,7 @@ require "message_bus/reliable_pub_sub"
 require "message_bus/client"
 require "message_bus/connection_manager"
 require "message_bus/message_handler"
+require "message_bus/diagnostics"
 require "message_bus/rack/middleware"
 require "message_bus/rack/diagnostics"
 
@@ -19,6 +20,18 @@ end
 
 module MessageBus; end
 module MessageBus::Implementation
+
+  def cache_assets=(val)
+    @cache_assets = val
+  end
+
+  def cache_assets
+    if defined? @cache_assets
+      @cache_assets
+    else
+      true
+    end
+  end
 
   def logger=(logger)
     @logger = logger
@@ -111,6 +124,10 @@ module MessageBus::Implementation
 
   def reliable_pub_sub
     @reliable_pub_sub ||= MessageBus::ReliablePubSub.new redis_config
+  end
+
+  def enable_diagnostics
+    MessageBus::Diagnostics.enable
   end
 
   def publish(channel, data, opts = nil) 

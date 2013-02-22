@@ -49,6 +49,22 @@ describe Topic do
 
   end
 
+  context 'slug' do
+
+    let(:title) { "hello world topic" }
+    let(:slug) { "hello-world-slug" }
+
+    it "returns a Slug for a title" do
+      Slug.expects(:for).with(title).returns(slug)
+      Fabricate.build(:topic, title: title).slug.should == slug
+    end
+
+    it "returns 'topic' when the slug is empty (say, non-english chars)" do
+      Slug.expects(:for).with(title).returns("")
+      Fabricate.build(:topic, title: title).slug.should == "topic"
+    end
+
+  end
 
   context 'topic title uniqueness' do
 
@@ -90,6 +106,41 @@ describe Topic do
         new_topic.should be_valid
       end
     end    
+
+  end
+
+  context 'html in title' do
+    let(:topic) { Fabricate(:topic, title: "<script>alert('title')</script> is my topic title" ) } 
+
+    it "should escape the HTML" do
+      topic.title.should == "is my topic title"
+    end
+
+  end
+
+  context 'fancy title' do
+    let(:topic) { Fabricate(:topic, title: "\"this topic\" -- has ``fancy stuff''" ) } 
+
+    context 'title_fancy_entities disabled' do
+      before do
+        SiteSetting.stubs(:title_fancy_entities).returns(false)
+      end
+
+      it "doesn't change the title to add entities" do
+        topic.fancy_title.should == topic.title
+      end
+    end
+
+    context 'title_fancy_entities enabled' do
+      before do
+        SiteSetting.stubs(:title_fancy_entities).returns(true)
+      end
+
+      it "converts the title to have fancy entities" do
+        topic.fancy_title.should == "&ldquo;this topic&rdquo; &ndash; has &ldquo;fancy stuff&rdquo;"
+      end
+    end
+
 
   end
 
