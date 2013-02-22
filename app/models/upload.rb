@@ -15,7 +15,7 @@ class Upload < ActiveRecord::Base
     # TODO: Need specs/tests for this functionality
     return create_on_imgur(user, file, topic_id) if SiteSetting.enable_imgur?
     return create_on_s3(user, file, topic_id) if SiteSetting.enable_s3_uploads?
-    return create_locally(user, file, topic_id)
+    # return create_locally(user, file, topic_id)
   end
 
   # Store uploads on s3
@@ -85,7 +85,7 @@ class Upload < ActiveRecord::Base
                                   public: true,
                                   content_type: file.content_type)
     upload.width, upload.height = ImageSizer.resize(*image_info.size)
-    upload.url = "https://s3.amazonaws.com/vaynermedia-vaynernet-gifs-development#{path}/#{remote_filename}"
+    upload.url = "https://s3.amazonaws.com/vaynermedia-vaynernet-gifs-development/#{path}/#{remote_filename}"
     upload.save
 
     upload
