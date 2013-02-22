@@ -55,12 +55,15 @@ module RailsMultisite
       @@config_filename ||= File.absolute_path(Rails.root.to_s + "/" + RailsMultisite::ConnectionManagement::CONFIG_FILE)
     end
 
-    def self.current_hostname
+   def self.current_hostname 
+    if Rails.env == 'production' 
       ActiveRecord::Base.connection_pool.spec.config[:host]
+    else
+      ActiveRecord::Base.connection_pool.spec.config[:host_names].first
     end
-
-
-    def self.clear_settings!
+  end 
+  
+  def self.clear_settings!
       @@db_spec_cache = nil
       @@host_spec_cache = nil
       @@default_spec = nil

@@ -84,8 +84,13 @@ module Discourse
 
     # Use redis for our cache
     redis_config = YAML::load(File.open("#{Rails.root}/config/redis.yml"))[Rails.env]
-    redis_store = ActiveSupport::Cache::RedisStore.new "redis://redistogo:#{redis_config['password']}@#{redis_config['host']}:#{redis_config['port']}"
-    redis_store.options[:namespace] = -> { DiscourseRedis.namespace }
+    if Rails.env == "production"
+			redis_store = ActiveSupport::Cache::RedisStore.new "redis://redistogo:#{redis_config["password"]}@#{redis_config["host"]}:#{redis_config["port"]}"
+		else
+			redis_store = ActiveSupport::Cache::RedisStore.new "redis://#{redis_config["host"]}:#{redis_config["port"]}/#{redis_config["cache_db"]}"
+		end
+
+   redis_store.options[:namespace] = -> { DiscourseRedis.namespace }
     config.cache_store = redis_store
 
     # Test with rack::cache disabled. Nginx does this for us

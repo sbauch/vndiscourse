@@ -5,7 +5,11 @@ class DiscourseRedis
   
   def initialize
     @config = YAML::load(File.open("#{Rails.root}/config/redis.yml"))[Rails.env]
-    redis_opts = {:host => @config['host'], :port => @config['port'], :db => @config['db']}
+    if Rails.env == 'production'
+      redis_opts = {:host => @config['host'], :port => @config['port'], :password => @config['password']}
+    else
+      redis_opts = {:host => @config['host'], :port => @config['port'], :db => @config['db']}
+    end
     @redis = Redis.new(redis_opts)    
   end
 
@@ -35,8 +39,12 @@ class DiscourseRedis
     RailsMultisite::ConnectionManagement.current_db
   end
 
-  def url
-    "redis://#{@config['host']}:#{@config['port']}/#{@config['db']}"
-  end
+  def url 
+    if Rails.env == 'production' 
+      "redis://redistogo:#{@config['password']}@#{@config['host']}:#{@config['port']}"
+    else
+      "redis://#{@config['host']}:#{@config['port']}/#{@config['db']}"
+    end
+  end 
 
 end
