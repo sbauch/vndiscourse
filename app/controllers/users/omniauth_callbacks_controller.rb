@@ -127,7 +127,7 @@ class Users::OmniauthCallbacksController < ApplicationController
     data = auth_token[:info]
     identity_url = auth_token[:extra][:identity_url]
 
-    email = data[:email]
+    email = data[:email].downcase
 
     # If the auth supplies a name / username, use those. Otherwise start with email.
     name = data[:name] || data[:email]
