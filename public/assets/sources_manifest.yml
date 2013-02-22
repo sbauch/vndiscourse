@@ -35,7 +35,7 @@ vmlogo-wide.png: 6dc35bdc12158d738fc010a7c29c983b
 wmd-buttons.png: d364c7fabd67ed0059d621483fb6424c
 wmd-quote-post.gif: ac178818aa6190d45850d502885e6932
 admin.js: ad9271dcd9d59c6772c4075fe425f00a
-application.js: 51bd5fa7d7d58a98d56972c8edce6849
+application.js: 85de3590e3d8e72409bcbef54904dce2
 defer/html-sanitizer-bundle.js: cb0a548fb85a63efdaec9468607cbbea
 discourse/templates/application.js: af829cf403ec6cf993f5bc0e1eb87496
 docs/yuidoc.json: 8f6685944eebb5e039e5d3648bbe331d
@@ -1712,7 +1712,7 @@ emoji/zzz.png: 575beadef81a7f683f5e6a97a544a9e3
 discourse_user_directory/application.js: 85d608f9f25b926606f26dd014fe8650
 discourse_user_directory/application.css: 720d6c2f59753892b542cf064ef843ef
 jquery.min.map: a469a328728c107b462ce9a148684d1a
-client.en.yml: 3cbfdeaae2240813689f565a33603ad6
+client.en.yml: 7e9a485de3d516866c761c0d9ea34f85
 client.fr.yml: 03b60259214d244825ad618a320566d2
 client.nl.yml: 1c93e41c00e85be718ec7b842c509318
 nl.yml.working: 77110a871012158033241ce123fddcbf

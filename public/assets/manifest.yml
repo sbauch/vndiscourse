@@ -71,8 +71,8 @@ wmd-quote-post.gif: wmd-quote-post-ac178818aa6190d45850d502885e6932.gif
 wmd-quote-post/index.gif: wmd-quote-post-ac178818aa6190d45850d502885e6932.gif
 admin.js: admin-d20863264af9d14d893cbd8ff3c0d2f8.js
 admin/index.js: admin-d20863264af9d14d893cbd8ff3c0d2f8.js
-application.js: application-08cdd91aae51b370010777b8ae6c50bc.js
-application/index.js: application-08cdd91aae51b370010777b8ae6c50bc.js
+application.js: application-f70625e00f4aad0d2248daf838341170.js
+application/index.js: application-f70625e00f4aad0d2248daf838341170.js
 defer/html-sanitizer-bundle.js: defer/html-sanitizer-bundle-0d7d015010d73c5ddca51b9496b28431.js
 defer/html-sanitizer-bundle/index.js: defer/html-sanitizer-bundle-0d7d015010d73c5ddca51b9496b28431.js
 discourse/templates/application.js: discourse/templates/application-f32734c4912ae4eff81ba1503945ad1d.js
@@ -3425,8 +3425,8 @@ discourse_user_directory/application.css: discourse_user_directory/application-4
 discourse_user_directory/application/index.css: discourse_user_directory/application-4d1fcf2b5c4e77e1e0726145dc2af6e7.css
 jquery.min.map: jquery.min-a469a328728c107b462ce9a148684d1a.map
 jquery/index.min.map: jquery.min-a469a328728c107b462ce9a148684d1a.map
-client.en.yml: client.en-3cbfdeaae2240813689f565a33603ad6.yml
-client/index.en.yml: client.en-3cbfdeaae2240813689f565a33603ad6.yml
+client.en.yml: client.en-7e9a485de3d516866c761c0d9ea34f85.yml
+client/index.en.yml: client.en-7e9a485de3d516866c761c0d9ea34f85.yml
 client.fr.yml: client.fr-03b60259214d244825ad618a320566d2.yml
 client/index.fr.yml: client.fr-03b60259214d244825ad618a320566d2.yml
 client.nl.yml: client.nl-1c93e41c00e85be718ec7b842c509318.yml
