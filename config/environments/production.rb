@@ -51,6 +51,4 @@ Discourse::Application.configure do
     :password       => ENV['SENDGRID_PASSWORD'],
     :domain => 'heroku.com'
   }
-  
-
 end

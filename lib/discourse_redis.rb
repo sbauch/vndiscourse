@@ -5,11 +5,7 @@ class DiscourseRedis
   
   def initialize
     @config = YAML::load(File.open("#{Rails.root}/config/redis.yml"))[Rails.env]
-    if Rails.env == 'production'
-      redis_opts = {:host => @config['host'], :port => @config['port'], :password => @config['password']}
-    else
-      redis_opts = {:host => @config['host'], :port => @config['port'], :db => @config['db']}
-    end  
+    redis_opts = {:host => @config['host'], :port => @config['port'], :db => @config['db']}
     @redis = Redis.new(redis_opts)    
   end
 
@@ -40,11 +36,7 @@ class DiscourseRedis
   end
 
   def url
-    if Rails.env == 'production'
-      "redis://redistogo:#{@config['password']}@#{@config['host']}:#{@config['port']}"
-    else
-      "redis://#{@config['host']}:#{@config['port']}/#{@config['db']}"
-    end  
+    "redis://#{@config['host']}:#{@config['port']}/#{@config['db']}"
   end
 
 end

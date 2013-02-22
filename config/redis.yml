@@ -1,24 +1,20 @@
-#redis://redistogo:611f8c35965c4409db1c52d29bcbded1@barreleye.redistogo.com:9531/
-defaults: &defaults
-  host: localhost
+--- 
+staging: 
   port: 6379
-
-development:
   host: localhost
+test: 
+  port: 6379
+  db: 1
+  host: localhost
+production: 
+  port: 9531
+  password: 611f8c35965c4409db1c52d29bcbded1
+  host: barreleye.redistogo.com
+defaults: 
+  port: 6379
+  host: localhost
+development: 
   port: 6379
   db: 0
   cache_db: 2
-
-
-test:
-  <<: *defaults 
-  db: 1
-
-staging:
-  <<: *defaults
-
-production:
-  host: barreleye.redistogo.com
-  password: 611f8c35965c4409db1c52d29bcbded1
-  port: 9531
-  
+  host: localhost
