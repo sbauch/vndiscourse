@@ -298,6 +298,22 @@
         },
         type: 'POST'
       });
+    },
+    findAll: function(query, filter) {
+      var result;
+      result = Em.A();
+      jQuery.ajax({
+        url: "/directory.json",
+        data: {
+          filter: filter
+        },
+        success: function(users) {
+          return users.each(function(u) {
+            return result.pushObject(Discourse.AdminUser.create(u));
+          });
+        }
+      });
+      return result;
     }
   });
 

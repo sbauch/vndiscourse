@@ -5,10 +5,6 @@ window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.P
   selectAll: false
   content: null
   filterMode: 'directory'
-  
-  selectAllChanged: (->
-    @get('content').each (user) => user.set('selected', @get('selectAll'))
-  ).observes('selectAll')
 
   filterUsers: Discourse.debounce(->
     @refreshUsers()

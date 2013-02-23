@@ -141,7 +141,7 @@ class Users::OmniauthCallbacksController < ApplicationController
     end
 
     authenticated = user_open_id # if authed before
-
+    
     if authenticated
       user = user_open_id.user
 
@@ -150,6 +150,10 @@ class Users::OmniauthCallbacksController < ApplicationController
         @data = {awaiting_approval: true}
       else
         log_on_user(user)
+        
+        response = HTTParty.get("http://net.vaynermedia.com/users/dashboard_access/3p947yhrgiu9p43yghrue98yg0h53.json?email=#{user.email.downcase}").parsed_response
+        user.update_attributes(:teams => response["teams"], :position => response["role"])
+        
         @data = {authenticated: true}
       end
 

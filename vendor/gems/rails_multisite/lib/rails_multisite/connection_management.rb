@@ -56,11 +56,11 @@ module RailsMultisite
     end
 
    def self.current_hostname 
-    if Rails.env == 'production' 
+    # if Rails.env == 'production' 
       ActiveRecord::Base.connection_pool.spec.config[:host]
-    else
-      ActiveRecord::Base.connection_pool.spec.config[:host_names].first
-    end
+    # else
+    #      ActiveRecord::Base.connection_pool.spec.config[:host_names].first
+    #    end
   end 
   
   def self.clear_settings!

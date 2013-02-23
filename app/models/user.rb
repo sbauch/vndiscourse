@@ -3,7 +3,7 @@ require_dependency 'trust_level'
 
 class User < ActiveRecord::Base
 
-  attr_accessible :name, :username, :password, :email, :bio_raw, :website
+  attr_accessible :name, :username, :password, :email, :bio_raw, :website, :teams, :position
 
   has_many :posts
   has_many :notifications

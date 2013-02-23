@@ -10,10 +10,12 @@ staging:
   port: 6379
   host: localhost
 defaults: 
-  port: 6379
   host: localhost
+  port: 6379
+  db: 0
+  cache_db: 2
 development: 
-  port: 6379
   host: localhost
+  port: 6379
   db: 0
   cache_db: 2
