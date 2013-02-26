@@ -97,7 +97,7 @@ module Discourse
     # Test with rack::cache disabled. Nginx does this for us
     config.action_dispatch.rack_cache =  nil
     
-    # config.assets.initialize_on_precompile = false
+    config.assets.initialize_on_precompile = false
 
     
     # So open id logs somewhere sane
