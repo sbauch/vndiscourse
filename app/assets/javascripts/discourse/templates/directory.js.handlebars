@@ -4,17 +4,46 @@
       {{#each controller.availableNavItems}}
         {{view Discourse.NavItemView contentBinding="this"}}
       {{/each}}
-  <div class='username controls'>
-    {{view Discourse.TextField valueBinding="controller.username"  placeholder="Search for a user by name, position, or team..."}}
-  </div>
   </ul>
+  
+  <section class="category-column first">
+    {{view Discourse.TextField valueBinding="controller.username"  styleKey='width:300px;' placeholder="Search for a user by name, position, team, or email..."}}
+  </section>
 
-<section class="category-column first">
-  {{#each content}}
-  <table id='topic-list'>
+  <section class="category-column first">
+      {{#each contentOdd}}
+
+  <table id='topic-list' style='margin-bottom:12px;'>
     <tr>
       <th>
-        <a href="/users/{{unbound username_lower}}">{{avatar this imageSize="small"}} {{unbound name}}</a>
+        <a href="/users/{{unbound username}}">
+          {{avatar this imageSize="small"}} 
+          {{unbound name}}
+        </a>
+      </th>
+    </tr>
+    <tr>
+      <td class='main-link'> <a href="mailto:{{unbound email}}">{{unbound email}}</a></td>
+   </tr>
+   <tr>
+     <td>
+           wtf?   
+     </td>
+   </tr>  
+ </table>
+  {{/each}}
+</section>
+
+  <section class="category-column">
+    {{#each contentEven}}
+
+  <table id='topic-list' style='margin-bottom:12px;'>
+    <tr>
+      <th>
+        <a href="/users/{{unbound username_lower}}">
+          {{avatar this imageSize="small"}}
+           {{unbound name}} 
+        </a>
       </th>
     </tr>
     <tr>
@@ -26,9 +55,7 @@
      </td>
    </tr>  
  </table>
-     
-     <footer class="clearfix">
-       </footer>  
+ 
   {{/each}}
 </section>
 

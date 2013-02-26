@@ -4,7 +4,11 @@
     attributeBindings: ['autocorrect', 'autocapitalize'],
     placeholder: (function() {
       return Em.String.i18n(this.get('placeholderKey'));
-    }).property('placeholderKey')
+    }).property('placeholderKey'),
+ 		style: (function() {
+      return Em.String.i18n(this.get('styleKey'));
+    }).property('styleKey')
   });
+
 
 }).call(this);

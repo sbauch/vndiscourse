@@ -94,6 +94,7 @@ group :test, :development do
   gem 'shoulda'
   gem 'simplecov', require: false
   gem 'terminal-notifier-guard', require: RUBY_PLATFORM.include?('darwin') && 'terminal-notifier-guard'
+  gem 'railroady'
 end
 
 group :development do 

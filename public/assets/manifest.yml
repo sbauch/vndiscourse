@@ -71,8 +71,8 @@ wmd-quote-post.gif: wmd-quote-post-ac178818aa6190d45850d502885e6932.gif
 wmd-quote-post/index.gif: wmd-quote-post-ac178818aa6190d45850d502885e6932.gif
 admin.js: admin-d20863264af9d14d893cbd8ff3c0d2f8.js
 admin/index.js: admin-d20863264af9d14d893cbd8ff3c0d2f8.js
-application.js: application-2847208105efd247f83e7396327ebc05.js
-application/index.js: application-2847208105efd247f83e7396327ebc05.js
+application.js: application-41fd7a075c40c825fc9fc6d45b4ddaaf.js
+application/index.js: application-41fd7a075c40c825fc9fc6d45b4ddaaf.js
 defer/html-sanitizer-bundle.js: defer/html-sanitizer-bundle-0d7d015010d73c5ddca51b9496b28431.js
 defer/html-sanitizer-bundle/index.js: defer/html-sanitizer-bundle-0d7d015010d73c5ddca51b9496b28431.js
 discourse/templates/application.js: discourse/templates/application-f32734c4912ae4eff81ba1503945ad1d.js
@@ -85,8 +85,8 @@ preload_store.js: preload_store-96c20ce6dcb01e831c9341a919251ad7.js
 preload_store/index.js: preload_store-96c20ce6dcb01e831c9341a919251ad7.js
 admin.css: admin-3e1c55bbc6e6c852de730238d2920202.css
 admin/index.css: admin-3e1c55bbc6e6c852de730238d2920202.css
-application.css: application-9e8c63be4ea8613b82bca3a96c3e22cf.css
-application/index.css: application-9e8c63be4ea8613b82bca3a96c3e22cf.css
+application.css: application-924a0c32b234828866439a0bd3977ec2.css
+application/index.css: application-924a0c32b234828866439a0bd3977ec2.css
 emoji/+1.png: emoji/+1-a7e6bbc986659f6aecfeb96ea9fda0d1.png
 emoji/+1/index.png: emoji/+1-a7e6bbc986659f6aecfeb96ea9fda0d1.png
 emoji/-1.png: emoji/-1-c0f3a9e787fd117a8a69dcf685cf4504.png

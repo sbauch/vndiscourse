@@ -14,21 +14,6 @@ window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.P
     @refreshUsers()
   ).observes('query')
 
-  showApproval: (->
-    return false unless Discourse.SiteSettings.must_approve_users
-    return true if @get('query') is 'new'
-    return true if @get('query') is 'pending'
-  ).property('query')
-
-  selectedCount: (->
-    return 0 if @blank('content')
-    @get('content').filterProperty('selected').length
-  ).property('content.@each.selected')
-
-  hasSelection: (->
-    @get('selectedCount') > 0
-  ).property('selectedCount')
-
   refreshUsers: ->
     @set 'content', Discourse.User.findAll(@get('query'), @get('username'))
 
@@ -37,9 +22,6 @@ window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.P
       @refreshUsers()
     else
       @set('query', term)
-
-  approveUsers: ->
-    Discourse.AdminUser.bulkApprove(@get('content').filterProperty('selected'))
   
   availableNavItems: (->
     summary = @get('filterSummary')
@@ -53,3 +35,16 @@ window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.P
     ).filter((i)-> i != null)
 
   ).property('filterSummary')
+  
+  contentEven: (->
+    return Em.A()  if @blank("content")
+    @get("content").filter (item, index) ->
+      ((index + 1) % 2) is 0
+    ).property("content.@each")
+    
+  contentOdd: (->
+    return Em.A()  if @blank("content")
+    @get("content").filter (item, index) ->
+      ((index + 1) % 2) is 1
+    ).property("content.@each")  
+  
