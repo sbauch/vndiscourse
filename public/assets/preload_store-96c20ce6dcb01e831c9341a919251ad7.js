@@ -1,0 +1,3 @@
+/* We can insert data into the PreloadStore when the document is loaded.
+   The data can be accessed once by a key, after which it is removed */
+(function(){window.PreloadStore={data:{},store:function(e,t){this.data[e]=t},get:function(e,t){var n,r;return n=new RSVP.Promise,this.data[e]?(n.resolve(this.data[e]),delete this.data[e]):t?(r=t(),r.then?r.then(function(e){return n.resolve(e)},function(e){return n.reject(e)}):n.resolve(r)):n.resolve(void 0),n},contains:function(e){return this.data[e]!==void 0},getStatic:function(e){var t;return t=this.data[e],delete this.data[e],t}}}).call(this);
