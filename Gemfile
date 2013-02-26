@@ -53,6 +53,7 @@ gem 'therubyracer', require: 'v8'
 gem 'thin'
 gem 'discourse_user_directory', path: 'vendor/gems/discourse_user_directory'
 gem 'httparty'
+gem 'handlebars_assets'
 
 # Gem that enables support for plugins. It is required.
 gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
