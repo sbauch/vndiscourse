@@ -39,7 +39,7 @@ Discourse::Application.configure do
   config.ember.variant = :development
   config.ember.ember_location = "#{Rails.root}/app/assets/javascripts/external_production/ember.js"
   config.ember.handlebars_location = "#{Rails.root}/app/assets/javascripts/external/handlebars-1.0.rc.3.js"
-  config.handlebars.precompile = true
+  config.handlebars.precompile = false
   
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.default_url_options = { :host => 'vaynermedia.com' }
