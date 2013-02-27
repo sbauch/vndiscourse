@@ -313,6 +313,7 @@
           });
         }
       });
+			console.log(result);
       return result;
     }
   });

@@ -35,7 +35,7 @@ vmlogo-wide.png: 6dc35bdc12158d738fc010a7c29c983b
 wmd-buttons.png: d364c7fabd67ed0059d621483fb6424c
 wmd-quote-post.gif: ac178818aa6190d45850d502885e6932
 admin.js: ad9271dcd9d59c6772c4075fe425f00a
-application.js: db35aad9248bb1b3239e85504414cd6d
+application.js: af29b1b0c7166a5f20b18221cd3fd095
 defer/html-sanitizer-bundle.js: cb0a548fb85a63efdaec9468607cbbea
 discourse/templates/application.js: af829cf403ec6cf993f5bc0e1eb87496
 docs/yuidoc.json: 8f6685944eebb5e039e5d3648bbe331d
