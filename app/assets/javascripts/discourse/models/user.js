@@ -309,7 +309,7 @@
         },
         success: function(users) {
           return users.each(function(u) {
-            return result.pushObject(Discourse.AdminUser.create(u));
+            return result.pushObject(Discourse.User.create(u));
           });
         }
       });
