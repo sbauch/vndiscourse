@@ -478,6 +478,7 @@ DEPENDENCIES
   binding_of_caller
   certified
   clockwork
+  coffee-rails
   discourse_emoji!
   discourse_plugin!
   discourse_user_directory!
