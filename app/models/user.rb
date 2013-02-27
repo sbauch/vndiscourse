@@ -509,7 +509,7 @@ class User < ActiveRecord::Base
       if (setting = SiteSetting.email_domains_blacklist).present?
         domains = setting.gsub('.', '\.')
         regexp = Regexp.new("@(#{domains})", true)
-        if self.email =~ regexp
+        unless self.email =~ regexp
           return errors.add(:email, I18n.t(:'user.email.not_allowed'))
         end
       end

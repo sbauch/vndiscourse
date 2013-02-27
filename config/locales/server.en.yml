@@ -434,7 +434,7 @@ en:
       blank: "must be present"
       must_begin_with_alphanumeric: "must begin with a letter or number"
     email:
-      not_allowed: "is not allowed from that email provider. Please use another email address."
+      not_allowed: "must be an @vaynermedia.com address. You will need to confirm you own the address before you gain access."
 
   invite_mailer:
     subject_template: "[%{site_name}] %{invitee_name} invited you to join a discussion on %{site_name}"
