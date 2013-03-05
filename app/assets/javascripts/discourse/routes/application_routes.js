@@ -38,9 +38,6 @@
     this.route('privacy', {
       path: '/privacy'
     });
-    this.route('directory', {
-      path: '/directory'
-    });
     this.resource('list', {
       path: '/'
     }, function() {

@@ -72,7 +72,6 @@ group :assets do
   gem 'sass-rails'
   gem 'turbo-sprockets-rails3'
   gem 'uglifier'
-  gem 'coffee-rails'
 end
 
 group :test do
