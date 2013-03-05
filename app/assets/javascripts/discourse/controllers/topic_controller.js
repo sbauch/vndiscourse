@@ -405,5 +405,3 @@ Discourse.TopicController = Discourse.ObjectController.extend({
     return post["delete"]();
   }
 });
-
-
