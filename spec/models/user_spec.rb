@@ -87,7 +87,7 @@ describe User do
 
   end
 
-  describe '.approve!' do
+  describe '.approve' do
     let(:user) { Fabricate(:user) }
     let(:admin) { Fabricate(:admin) }
 
@@ -123,19 +123,19 @@ describe User do
 
     it "creates a bookmark with the true parameter" do
       lambda {
-        PostAction.act(@post.user, @post, PostActionType.Types[:bookmark])
+        PostAction.act(@post.user, @post, PostActionType.types[:bookmark])
       }.should change(PostAction, :count).by(1)
     end
 
     describe 'when removing a bookmark' do
       before do
-        PostAction.act(@post.user, @post, PostActionType.Types[:bookmark])
+        PostAction.act(@post.user, @post, PostActionType.types[:bookmark])
       end
 
       it 'reduces the bookmark count of the post' do
         active = PostAction.where(deleted_at: nil)
         lambda {
-          PostAction.remove_act(@post.user, @post, PostActionType.Types[:bookmark])
+          PostAction.remove_act(@post.user, @post, PostActionType.types[:bookmark])
         }.should change(active, :count).by(-1)
       end
     end
@@ -170,8 +170,8 @@ describe User do
 
   end
 
-  describe 'delete posts' do 
-    before do 
+  describe 'delete posts' do
+    before do
       @post1 = Fabricate(:post)
       @user = @post1.user
       @post2 = Fabricate(:post, topic: @post1.topic, user: @user)
@@ -180,7 +180,7 @@ describe User do
       @guardian = Guardian.new(Fabricate(:admin))
     end
 
-    it 'allows moderator to delete all posts' do 
+    it 'allows moderator to delete all posts' do
       @user.delete_all_posts!(@guardian)
       @posts.each do |p|
         p.reload
@@ -224,14 +224,14 @@ describe User do
   end
 
   describe "trust levels" do
-    let(:user) { Fabricate(:user, trust_level: TrustLevel.Levels[:new]) }
+    let(:user) { Fabricate(:user, trust_level: TrustLevel.levels[:new]) }
 
     it "sets to the default trust level setting" do
-      SiteSetting.expects(:default_trust_level).returns(TrustLevel.Levels[:advanced])
-      User.new.trust_level.should == TrustLevel.Levels[:advanced]
+      SiteSetting.expects(:default_trust_level).returns(TrustLevel.levels[:advanced])
+      User.new.trust_level.should == TrustLevel.levels[:advanced]
     end
 
-    describe 'has_trust_level' do
+    describe 'has_trust_level?' do
 
       it "raises an error with an invalid level" do
         lambda { user.has_trust_level?(:wat) }.should raise_error
@@ -246,12 +246,12 @@ describe User do
       end
 
       it "is true if you exceed the level" do
-        user.trust_level = TrustLevel.Levels[:advanced]
+        user.trust_level = TrustLevel.levels[:advanced]
         user.has_trust_level?(:basic).should be_true
       end
 
       it "is true for an admin even with a low trust level" do
-        user.trust_level = TrustLevel.Levels[:new]
+        user.trust_level = TrustLevel.levels[:new]
         user.admin = true
         user.has_trust_level?(:advanced).should be_true
       end
@@ -264,7 +264,7 @@ describe User do
       end
 
       it "is a moderator if the user level is moderator" do
-        user.trust_level = TrustLevel.Levels[:moderator]
+        user.trust_level = TrustLevel.levels[:moderator]
         user.has_trust_level?(:moderator).should be_true
       end
 
@@ -652,9 +652,6 @@ describe User do
       end
 
     end
-
-
-
   end
 
   describe '#create_for_email' do
@@ -687,6 +684,52 @@ describe User do
         user.email_tokens.each {|t| t.destroy}
         user.reload
         user.email_confirmed?.should be_true
+      end
+    end
+  end
+
+
+  describe 'update_time_read!' do
+    let(:user) { Fabricate(:user) }
+
+    it 'makes no changes if nothing is cached' do
+      $redis.expects(:get).with("user-last-seen:#{user.id}").returns(nil)
+      user.update_time_read!
+      user.reload
+      user.time_read.should == 0
+    end
+
+    it 'makes a change if time read is below threshold' do
+      $redis.expects(:get).with("user-last-seen:#{user.id}").returns(Time.now - 10.0)
+      user.update_time_read!
+      user.reload
+      user.time_read.should == 10
+    end
+
+    it 'makes no change if time read is above threshold' do
+      t = Time.now - 1 - User::MAX_TIME_READ_DIFF
+      $redis.expects(:get).with("user-last-seen:#{user.id}").returns(t)
+      user.update_time_read!
+      user.reload
+      user.time_read.should == 0
+    end
+
+  end
+
+  describe '#readable_name' do
+    context 'when name is missing' do
+      it 'returns just the username' do
+        Fabricate(:user, username: 'foo', name: nil).readable_name.should == 'foo'
+      end
+    end
+    context 'when name and username are identical' do
+      it 'returns just the username' do
+        Fabricate(:user, username: 'foo', name: 'foo').readable_name.should == 'foo'
+      end
+    end
+    context 'when name and username are not identical' do
+      it 'returns the name and username' do
+        Fabricate(:user, username: 'foo', name: 'Bar Baz').readable_name.should == 'Bar Baz (foo)'
       end
     end
   end

@@ -26,7 +26,7 @@ module Oneboxer
 
         @template = 'user'
       when 'topics'
-        if route[:post_number].present? and route[:post_number].to_i > 1
+        if route[:post_number].present? && route[:post_number].to_i > 1
           # Post Link
           post = Post.where(topic_id: route[:topic_id], post_number: route[:post_number].to_i).first
           Guardian.new.ensure_can_see!(post)
@@ -36,20 +36,20 @@ module Oneboxer
 
           excerpt = post.excerpt(SiteSetting.post_onebox_maxlength)
           excerpt.gsub!("\n"," ")
-          # hack to make it render for now 
+          # hack to make it render for now
           excerpt.gsub!("[/quote]", "[quote]")
           quote = "[quote=\"#{post.user.username}, topic:#{topic.id}, slug:#{slug}, post:#{post.post_number}\"]#{excerpt}[/quote]"
-          
+
           cooked = PrettyText.cook(quote)
-          return cooked 
+          return cooked
 
         else
           # Topic Link
-          topic = Topic.where(id: route[:topic_id].to_i).includes(:user).first   
+          topic = Topic.where(id: route[:topic_id].to_i).includes(:user).first
           post = topic.posts.first
           Guardian.new(nil).ensure_can_see!(topic)
 
-          posters = topic.posters_summary.map do |p| 
+          posters = topic.posters_summary.map do |p|
             {username: p[:user][:username],
              avatar: PrettyText.avatar_img(p[:user][:username], 'tiny'),
              description: p[:description],
@@ -58,8 +58,7 @@ module Oneboxer
 
           category = topic.category
           if category
-            category = "<a href=\"/category/#{category.name}\" class=\"badge badge-category excerptable\" data-excerpt-size=\"medium\" style=\"background-color: ##{category.color}\">#{category.name}</a>"
- 
+            category = "<a href=\"/category/#{category.name}\" class=\"badge badge-category\" style=\"background-color: ##{category.color}\">#{category.name}</a>"
           end
 
           quote = post.excerpt(SiteSetting.post_onebox_maxlength)
@@ -76,7 +75,7 @@ module Oneboxer
 
           @template = 'topic'
         end
-        
+
       end
 
       return nil unless @template

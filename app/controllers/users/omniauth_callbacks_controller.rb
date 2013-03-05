@@ -1,8 +1,14 @@
 # -*- encoding : utf-8 -*-
 require_dependency 'email'
+require_dependency 'enum'
+
 class Users::OmniauthCallbacksController < ApplicationController
 
   layout false
+
+  def self.types
+    @types ||= Enum.new(:facebook, :twitter, :google, :yahoo, :github, :persona)
+  end
 
   # need to be able to call this
   skip_before_filter :check_xhr
@@ -11,14 +17,19 @@ class Users::OmniauthCallbacksController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => :complete
 
   def complete
-    auth_token = env["omniauth.auth"]
-    case params[:provider]
-    when "facebook"
-      create_or_sign_on_user_using_facebook(auth_token)
-    when "twitter"
-      create_or_sign_on_user_using_twitter(auth_token)
-    when "google", "yahoo"
-      create_or_sign_on_user_using_openid(auth_token)
+    # Make sure we support that provider
+    provider = params[:provider]
+    raise Discourse::InvalidAccess.new unless self.class.types.include?(provider.to_sym)
+
+    # Check if the provider is enabled
+    raise Discourse::InvalidAccess.new("provider is not enabled") unless SiteSetting.send("enable_#{provider}_logins?")
+
+    # Call the appropriate logic
+    send("create_or_sign_on_user_using_#{provider}", request.env["omniauth.auth"])
+
+    respond_to do |format|
+      format.html
+      format.json { render :json => @data }
     end
   end
 
@@ -70,7 +81,6 @@ class Users::OmniauthCallbacksController < ApplicationController
 
 
     username = User.suggest_username(name)
-
 
     session[:authentication] = {
       facebook: {
@@ -146,7 +156,7 @@ class Users::OmniauthCallbacksController < ApplicationController
       user = user_open_id.user
 
       # If we have to approve users
-      if SiteSetting.must_approve_users? and !user.approved?
+      if SiteSetting.must_approve_users? && !user.approved?
         @data = {awaiting_approval: true}
       else
         log_on_user(user)
@@ -171,6 +181,72 @@ class Users::OmniauthCallbacksController < ApplicationController
         openid_url: identity_url
       }
     end
+
+  end
+
+  alias_method :create_or_sign_on_user_using_yahoo, :create_or_sign_on_user_using_openid
+  alias_method :create_or_sign_on_user_using_google, :create_or_sign_on_user_using_openid
+
+  def create_or_sign_on_user_using_github(auth_token)
+
+    data = auth_token[:info]
+    screen_name = data["nickname"]
+    github_user_id = auth_token["uid"]
+
+    session[:authentication] = {
+      github_user_id: github_user_id,
+      github_screen_name: screen_name
+    }
+
+    user_info = GithubUserInfo.where(:github_user_id => github_user_id).first
+
+    @data = {
+      username: screen_name,
+      auth_provider: "Github"
+    }
+
+    if user_info
+      if user_info.user.active
+        log_on_user(user_info.user)
+        @data[:authenticated] = true
+      else
+        @data[:awaiting_activation] = true
+        # send another email ?
+      end
+    else
+      @data[:name] = screen_name
+    end
+
+  end
+
+  def create_or_sign_on_user_using_persona(auth_token)
+
+    email = auth_token[:info][:email]
+
+    user = User.find_by_email(email)
+
+    if user
+      if SiteSetting.must_approve_users? && !user.approved?
+        @data = {awaiting_approval: true}
+      else
+        log_on_user(user)
+        @data = {authenticated: true}
+      end
+    else
+      @data = {
+        email: email,
+        email_valid: true,
+        name: User.suggest_name(email),
+        username: User.suggest_username(email),
+        auth_provider: params[:provider].try(:capitalize)
+      }
+
+      session[:authentication] = {
+        email: email,
+        email_valid: true,
+      }
+    end
+
   end
 
 end

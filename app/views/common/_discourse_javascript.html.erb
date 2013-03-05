@@ -7,19 +7,22 @@
     };
 
     var assetPath = function(asset){
-      return map[asset]; 
+      return map[asset];
     };
 
     return assetPath;
   })();
 </script>
 
+<%# load the selected locale before any other scripts %>
+<%= javascript_include_tag "locales/#{I18n.locale}" %>
+
 <%- if mini_profiler_enabled? %>
   <%- Rack::MiniProfiler.step "application" do %>
     <%= javascript_include_tag "application" %>
   <%-end%>
 
-  <%- Rack::MiniProfiler.step "admin" do %> 
+  <%- Rack::MiniProfiler.step "admin" do %>
     <%= javascript_include_tag "admin"%>
   <%-end%>
 <%- else %>

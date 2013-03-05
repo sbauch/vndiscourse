@@ -1,6 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-# See https://github.com/discourse/core/blob/master/DEVELOPMENT.md
+# See https://github.com/discourse/discourse/blob/master/docs/VAGRANT.md
 #
 Vagrant::Config.run do |config|
   config.vm.box = 'discourse-pre'
@@ -25,7 +25,7 @@ Vagrant::Config.run do |config|
   config.vm.forward_port 3000, 4000
   config.vm.forward_port 1080, 4080 # Mailcatcher
 
-  nfs_setting = RUBY_PLATFORM =~ /darwin/ ? true : false
+  nfs_setting = RUBY_PLATFORM =~ /darwin/ || RUBY_PLATFORM =~ /linux/
   config.vm.share_folder("v-root", "/vagrant", ".", :nfs => nfs_setting)
 
   chef_cookbooks_path = ["chef/cookbooks"]
@@ -48,6 +48,6 @@ Vagrant::Config.run do |config|
     chef.add_recipe "recipe[apt]"
     chef.add_recipe "recipe[build-essential]"
     chef.add_recipe "recipe[phantomjs]"
-    chef.add_recipe "recipe[vim]"    
+    chef.add_recipe "recipe[vim]"
   end
 end

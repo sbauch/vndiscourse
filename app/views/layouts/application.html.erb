@@ -19,6 +19,8 @@
 
 
     <%=csrf_meta_tags%>
+
+    <%= yield :head %>
   </head>
 
   <body>
@@ -32,13 +34,15 @@
               <div class="row">
                 <div class="title span13">
                   <a href="/"><img src="<%=SiteSetting.logo_url%>" alt="<%=SiteSetting.title%>" id="site-logo"></a>
-                </div>      
+                </div>
               </div>
             </div>
           </div>
         </header>
         <div id="main-outlet" class="container">
+          <!-- preload-content: -->
           <%= yield %>
+          <!-- :preload-content -->
         </div>
       </noscript>
     </section>
@@ -48,16 +52,18 @@
       <%- @preloaded.each do |key, json| %>
         PreloadStore.store("<%= key %>", <%= raw json %>)
       <% end %>
-      </script>      
+      </script>
     <%- end %>
 
     <%= yield :data %>
-    
+
     <footer id='bottom'></footer>
 
     <%= render :partial => "common/discourse_javascript" %>
+    <%= render :partial => "common/persona_javascript" if SiteSetting.enable_persona_logins %>
     <%= render_google_analytics_code %>
 
+    <!-- Discourse Version: <%= Discourse::VERSION::STRING %> -->
     <!-- Git Version: <%= Discourse.git_version %> -->
   </body>
 </html>

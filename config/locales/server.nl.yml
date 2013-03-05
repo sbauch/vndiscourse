@@ -66,7 +66,7 @@ nl:
   trust_levels:
     new:
       title: "nieuwe gebruiker"
-    basic: 
+    basic:
       title: "basisgebruiker"
     regular:
       title: "gemiddelde gebruiker"
@@ -91,7 +91,7 @@ nl:
 
   datetime:
     distance_in_words:
-      half_a_minute: "< 1m"   
+      half_a_minute: "< 1m"
       less_than_x_seconds:
         one:   "< 1s"
         other: "< %{count}s"
@@ -127,7 +127,7 @@ nl:
         other: "%{count}j"
 
     distance_in_words_verbose:
-      half_a_minute: "een halve minuut geleden"   
+      half_a_minute: "een halve minuut geleden"
       less_than_x_seconds:
         one:   "nu"
         other: "nu"
@@ -182,7 +182,7 @@ nl:
     approval_required: "Een moderator moet je nieuwe account handmatig goedkeuren voordat je toegang krijgt tot dit forum. Je krijgt een e-mail van ons wanneer je account is goedgekeurd!"
 
   post_action_types:
-    
+
     off_topic:
       title: 'Off-Topic'
       description: 'Deze post wijkt erg af van het onderwerp van deze discussie, en moet wellicht naar een ander topic worden verplaatst.'
@@ -213,7 +213,7 @@ nl:
     user_must_edit: '<p>Gemelde inhoud verborgen.</p>'
 
   archetypes:
-    regular: 
+    regular:
       title: "Standaard-topic"
 
   unsubscribed:
@@ -239,8 +239,6 @@ nl:
     discourse_org_access_key: "De toegangscode voor het discourse.org nickname-register"
 
     title: "titel van deze website"
-    secret_token: "geheim token om cookies te beveiligen"
-    restrict_access: "beperk forumtoegang aan gebruikers tenzij dit wachtwoord door hen is ingevuld"
     access_password: "restrict_access (Beperk Toegang) staat aan. Zorg ervoor dat dit wachtwoord staat ingevuld"
     queue_jobs: "zet verschillende taken in een queue binnen sidekiq, als ongeldige queues zich op dezelfde lijn bevinden"
     crawl_images: "zet het ophalen van afbeeldingen van externe bronnen aan"
@@ -250,12 +248,10 @@ nl:
     imgur_endpoint: "endpoint voor het uploaden van imgur.com-afbeeldingen"
     max_image_width: "maximale breedte voor een afbeelding in een post"
     category_featured_topics: "aantal topics die worden weergegeven in de categorie-lijst"
-    popup_delay: "Lengte van tijd in ms voordat popups zich tonen op het scherm"
     add_rel_nofollow_to_user_content: "Voeg 'rel nofollow' toe aan alle gebruikers-content behalve voor interne links (inclusief parent domeinen). NB: Als je dit verandert moet je ook alle 'baked markdown'  updaten"
     exclude_rel_nofollow_domains: "Een commagescheiden lijst van domeinen waar 'nofollow' niet is toegevoegd. (voorbeelddomein.com zal automatisch sub.voorbeelddomein.com toestaan)"
     post_excerpt_maxlength: "Maximale lengte in karakters van een post-uittreksel."
     post_onebox_maxlength: "Maximale lengte van een 'oneboxed' discourse post."
-    category_post_template: "De post-template die verschijnt wanneer je een categorie aanmaakt"
     new_topics_rollup: "Hoeveel topics er aan een topic-lijst kunnen worden toegevoegd voordat de lijst oprolt."
     onebox_max_chars: "Het maximaal aantal karakters dat een 'onebox' zal importeren in een lap tekst."
     logo_url: "Het logo van je site bijv: http://xyz.com/x.png"
@@ -286,7 +282,6 @@ nl:
     ga_tracking_code: "Google analytics tracking code, zie: http://google.com/analytics"
     top_menu: "De volgorde van de item in het hoofdmenu. Bijvoorbeeld populiar|gelezen|favorieten|ongelezen|nieuw|gepost|categorieën"
     post_menu: "De volgorde van de items in het post menu."
-    max_length_show_reply: "Ingevoegde reacties op posts zullen niet worden weergegeven als ze direct onder de post gemaakt zijn en niet langer zijn dan deze lengte."
     track_external_right_clicks: "Houd bij welke externe links met de rechtermuisknop worden aangeklikt (bijv: open in nieuwe tab). Dit staat standaard uit, gezien het de URLs moet herschrijven, waardoor het gebruiksgemak afneemt"
     topics_per_page: "Hoeveel topics er moeten worden weergegeven op de topiclijst-pagina."
     posts_per_page: "Hoeveel posts er worden weergeven op een topic-pagina"
@@ -348,7 +343,7 @@ nl:
 
     new_user_period_days: "Hoe lang een gebruiker als nieuw wordt aangetoond, in dagen."
 
-  
+
 
   notification_types:
     mentioned: "%{display_username} heeft je genoemd in %{link}"
@@ -364,13 +359,13 @@ nl:
 
   # This section is exported to the javascript for i18n
   js:
-    
+
 
   search:
     types:
       category: 'Categorieën'
       topic: 'Topics'
-      user: 'Gebruikers'   
+      user: 'Gebruikers'
 
   youve_posted: "Jij Hebt Dit Gepost"
   original_poster: "Originele Poster"
@@ -404,7 +399,7 @@ nl:
     edited: "bewerkte"
 
   move_posts:
-    moderator_post: 
+    moderator_post:
       one: "Ik heb een post naar een nieuw topic verplaatst: %{topic_link}"
       other: "Ik heb %{count} posts naar een nieuw topic verplaatst: %{topic_link}"
 
@@ -418,7 +413,7 @@ nl:
     visible_enabled: "Dit topic is nu zichtbaar; het zal weer worden weergegeven in topiclijsten."
     visible_disabled: "Dit topic is nu onzichtbaar; het zal niet worden weergegeven in topiclijsten, en kan alleen via een directe link worden bezocht."
 
-  login: 
+  login:
     not_approved: "Je account is nog niet goedgekeurd. Je zal via de mail een bericht van ons ontvangen wanneer je klaar bent om in te kunnen loggen."
     incorrect_username_email_or_password: "Incorrecte gebruikersnaam, e-mailadres of wachtwoord"
     wait_approval: "Bedankt voor je inschrijving. We zullen het je laten weten als je account is goedgekeurd."
@@ -505,7 +500,7 @@ nl:
       subject_template: "Bericht van %{site_name}: Je Post is verborgen wegens meldingen uit de site-gemeenschap"
       text_body_template: |
         Hallo,
-        
+
         Dit is een geautomatiseerd bericht van %{site_name} om je te laten weten dat de volgende post is verborgen naar aanleiding van meldingen binnen de site-gemeenschap.
 
         %{base_url}%{url}
@@ -517,7 +512,7 @@ nl:
 
         Je kan je post bewerken na %{edit_delay} minuten, en het zal automatisch weer zichtbaar worden. Dit verhoogt je forum vertrouwensniveau.
 
-        Echter, als de post een tweede keer wordt verborgen door de site-gemeenschap, wordt er een moderator ingelicht. 
+        Echter, als de post een tweede keer wordt verborgen door de site-gemeenschap, wordt er een moderator ingelicht.
 
         Zij kunnen verdere actie ondernemen, waaronder een mogelijke schorsing van je account.
 
@@ -562,9 +557,9 @@ nl:
 
         - Om terug te gaan naar de homepage, kan je op elk moment **op het icoontje in de linker bovenhoek klikken.**
 
-        - Mocht je iets willen opzoeken, naar je gebruikerspagina gaan, of ergens anders toe willen navigeren, klik dan op de icoontjes in de rechter bovenhoek. 
-        - Wanneer je een topic leest, kan je naar boven scrollen door op de topic-titel bovenaan de pagina te klikken. 
-          Om de *onderkant* te bereiken, klik op de pijl naar beneden op de topic voortgangsindicator aan de onderkant van de pagina, 
+        - Mocht je iets willen opzoeken, naar je gebruikerspagina gaan, of ergens anders toe willen navigeren, klik dan op de icoontjes in de rechter bovenhoek.
+        - Wanneer je een topic leest, kan je naar boven scrollen door op de topic-titel bovenaan de pagina te klikken.
+          Om de *onderkant* te bereiken, klik op de pijl naar beneden op de topic voortgangsindicator aan de onderkant van de pagina,
           of klik je op het Laatste Post-veld in de topic-samenvatting onder de eerste post.
 
     welcome_approved:
@@ -602,7 +597,7 @@ nl:
 
         Om nogmaals in te loggen kan je het volgende gebruiken:
 
-        1. Facebook, Google, Twitter, of vele andere ondersteunde logingegevens 
+        1. Facebook, Google, Twitter, of vele andere ondersteunde logingegevens
            -- let er wel op dat dit  **het zelfde e-mailadres** is waarop je je originele uitnodiging hebt gekregen. Anders weten we niet zeker dat jij het bent!
 
         2. Maak een uniek wachtwoord voor %{site_name} aan binnen [je gebruikersprofiel][prefs], en log daarmee in.
@@ -628,7 +623,7 @@ nl:
   unsubscribe_link: "Mocht je deze e-mails niet langer willen ontvangen, bezoek dan [je gebruikersinstellingen](%{user_preferences_url})."
 
   user_notifications:
-    unsubscribe: 
+    unsubscribe:
       title: "Uitschrijven"
       description: "Niet geïnteresseerd in deze e-mails? Geen probleem! Klik hieronder om direct uitgeschreven te worden:"
 
@@ -647,7 +642,7 @@ nl:
         ---
         %{message}
 
-        --- 
+        ---
         Bezoek deze link om te reageren: %{base_url}%{url}
 
     user_quoted:
@@ -658,7 +653,7 @@ nl:
         ---
         %{message}
 
-        --- 
+        ---
         Bezoek deze link om te reageren: %{base_url}%{url}
 
     user_mentioned:
@@ -669,7 +664,7 @@ nl:
         ---
         %{message}
 
-        --- 
+        ---
         Bezoek deze link om te reageren: %{base_url}%{url}
 
 
@@ -695,9 +690,9 @@ nl:
       subject_template: "[%{site_name}] Wachtwoord herstellen"
       text_body_template: |
         Iemand heeft aangegeven je wachtwoord te willen herstellen op [%{site_name}](%{base_url}).
-        
-        Ben jij dit niet, kan je zonder problemen deze e-mail negeren. 
-        
+
+        Ben jij dit niet, kan je zonder problemen deze e-mail negeren.
+
         Klik op de volgende link om een nieuw wachtwoord te kiezen:
         %{base_url}/users/password-reset/%{email_token}
 
@@ -705,14 +700,14 @@ nl:
       subject_template: "[%{site_name}] Bevestig je nieuwe e-mailadres"
       text_body_template: |
         Bevestig je nieuwe e-mailadres voor %{site_name} door op de volgende link te klikken:
-        
+
         %{base_url}/users/authorize-email/%{email_token}
 
     signup:
       subject_template: "[%{site_name}] Activeer je nieuwe account"
       text_body_template: |
         Welkom op %{site_name}!
-        
+
         Klik op de volgende link om je nieuwe account te bevestigen en te activeren:
         %{base_url}/users/activate-account/%{email_token}
 

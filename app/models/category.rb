@@ -1,6 +1,5 @@
 class Category < ActiveRecord::Base
-
-  belongs_to :topic
+  belongs_to :topic, dependent: :destroy
   belongs_to :user
 
   has_many :topics
@@ -18,15 +17,13 @@ class Category < ActiveRecord::Base
   after_save :invalidate_site_cache
   after_destroy :invalidate_site_cache
 
+  scope :popular, lambda { order('topic_count desc') }
+
   def uncategorized_validator
     return errors.add(:name, I18n.t(:is_reserved)) if name == SiteSetting.uncategorized_name
     return errors.add(:slug, I18n.t(:is_reserved)) if slug == SiteSetting.uncategorized_name
   end
 
-  def self.popular
-    order('topic_count desc')
-  end
-  
   # Recalculates `topics_year`, `topics_month`, and `topics_week`
   # for each Category.
   def self.update_stats
@@ -38,23 +35,10 @@ class Category < ActiveRecord::Base
     topics_year = topics.created_since(1.year.ago).to_sql
     topics_month = topics.created_since(1.month.ago).to_sql
     topics_week = topics.created_since(1.week.ago).to_sql
-    
-    Category.update_all("topics_year = (#{topics_year}), 
-                         topics_month = (#{topics_month}), 
-                         topics_week = (#{topics_week})")
-  end
 
-  # Use the first paragraph of the topic's first post as the excerpt
-  def excerpt
-    if topic.present?
-      first_post = topic.posts.order(:post_number).first
-      body = first_post.cooked
-      matches = body.scan(/\<p\>(.*)\<\/p\>/)
-      if matches and matches[0] and matches[0][0]
-        return matches[0][0]
-      end
-    end
-    nil
+    Category.update_all("topics_year = (#{topics_year}),
+                         topics_month = (#{topics_month}),
+                         topics_week = (#{topics_week})")
   end
 
   def topic_url
@@ -67,18 +51,19 @@ class Category < ActiveRecord::Base
 
   after_create do
     topic = Topic.create!(title: I18n.t("category.topic_prefix", category: name), user: user, visible: false)
-    topic.posts.create!(raw: SiteSetting.category_post_template, user: user)
+
+    post_contents = I18n.t("category.post_template", replace_paragraph: I18n.t("category.replace_paragraph"))
+    topic.posts.create!(raw: post_contents, user: user)
     update_column(:topic_id, topic.id)
     topic.update_column(:category_id, self.id)
+  end
+
+  def self.post_template
+    I18n.t("category.post_template", replace_paragraph: I18n.t("category.replace_paragraph"))
   end
 
   # We cache the categories in the site json, so we need to invalidate it when they change
   def invalidate_site_cache
     Site.invalidate_cache
   end
-
-  before_destroy do
-    topic.destroy
-  end
-
 end

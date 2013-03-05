@@ -1,36 +1,33 @@
-/* 
+/*
  * JavaScript probing framework by Sam Saffron
  * MIT license
  *
  *
- * Examples: 
+ * Examples:
  *
-
-someFunction = window.probes.measure(someFunction, {
-  name: "somename" // or function(args) { return "name"; },
-  before: function(data, owner, args) {
-    // if owner is true, we are not in a recursive function call. 
-    //
-    // data contains the bucker of data already measuer 
-    // data.count >= 0 
-    // data.time is the total time measured till now 
-    //
-    // arguments contains the original arguments sent to the function 
-  },
-  after: function(data, owner, args) {
-    // same format as before
-  }
-});
-
-
-// minimal 
-someFunction = window.probes.measure(someFunction, "someFunction");
-
+ *  someFunction = window.probes.measure(someFunction, {
+ *    name: "somename" // or function(args) { return "name"; },
+ *    before: function(data, owner, args) {
+ *      // if owner is true, we are not in a recursive function call. 
+ *      //
+ *      // data contains the bucker of data already measuer 
+ *      // data.count >= 0 
+ *      // data.time is the total time measured till now 
+ *      //
+ *      // arguments contains the original arguments sent to the function 
+ *    },
+ *    after: function(data, owner, args) {
+ *      // same format as before
+ *    }
+ *  });
+ *
+ *
+ *  // minimal 
+ *  someFunction = window.probes.measure(someFunction, "someFunction");
  * 
- *
  * */
 (function(){
-  var measure, clear; 
+  var measure, clear;
 
   clear = function() {
     window.probes = {
@@ -49,14 +46,14 @@ someFunction = window.probes.measure(someFunction, "someFunction");
     if (typeof options === "string") {
       nameParam = options;
     }
-    else 
+    else
     {
       nameParam = options.name;
 
       if (nameParam === "measure" || nameParam === "clear") {
-        throw new Error("can not be called measure or clear"); 
+        throw new Error("can not be called measure or clear");
       }
-      
+
       if (!nameParam)
       {
         throw new Error("you must specify the name option measure(fn, {name: 'some name'})");
@@ -79,7 +76,7 @@ someFunction = window.probes.measure(someFunction, "someFunction");
       }
       var p = window.probes[name];
       var owner = (!start);
-      
+
       if (before) {
         // would like to avoid try catch so its optimised properly by chrome
         before(p, owner, arguments);
@@ -95,14 +92,14 @@ someFunction = window.probes.measure(someFunction, "someFunction");
         start = now();
         callStart = start;
       }
-      else if(after) 
+      else if(after)
       {
         callStart = now();
       }
 
-      var r = fn.apply(this, arguments); 
+      var r = fn.apply(this, arguments);
       if (owner && start) {
-        p.time += now() - start; 
+        p.time += now() - start;
         start = null;
       }
       p.count += 1;

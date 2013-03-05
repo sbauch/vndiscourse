@@ -20,17 +20,16 @@
 
 // The rest of the externals
 //= require_tree ./external
-//= require i18n
-//= require discourse/translations
 
 //= require ./discourse/helpers/i18n_helpers
 //= require ./discourse
 
 // Stuff we need to load first
 //= require_tree ./discourse/mixins
-//= require ./discourse/components/debounce
 //= require ./discourse/views/view
+//= require ./discourse/components/debounce
 //= require ./discourse/controllers/controller
+//= require ./discourse/controllers/object_controller
 //= require ./discourse/views/modal/modal_body_view
 //= require ./discourse/models/model
 //= require ./discourse/routes/discourse_route
@@ -48,5 +47,5 @@
   # Include javascripts
   DiscoursePluginRegistry.javascripts.each do |js|
     require_asset(js)
-  end 
+  end
 %>

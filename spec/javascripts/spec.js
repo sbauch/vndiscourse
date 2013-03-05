@@ -17,8 +17,6 @@
 
 // The rest of the externals
 //= require_tree ../../app/assets/javascripts/external
-//= require i18n
-//= require ../../app/assets/javascripts/discourse/translations
 
 //= require ../../app/assets/javascripts/discourse/helpers/i18n_helpers
 //= require ../../app/assets/javascripts/discourse
@@ -26,7 +24,6 @@
 // Stuff we need to load first
 //= require_tree ../../app/assets/javascripts/discourse/mixins
 //= require ../../app/assets/javascripts/discourse/components/debounce
-//= require ../../app/assets/javascripts/discourse/views/view
 //= require ../../app/assets/javascripts/discourse/controllers/controller
 //= require ../../app/assets/javascripts/discourse/views/modal/modal_body_view
 //= require ../../app/assets/javascripts/discourse/models/model

@@ -7,7 +7,7 @@ require_dependency 'rate_limiter'
 
 class ApplicationController < ActionController::Base
   include CurrentUser
-  
+
   include CanonicalURL::ControllerExtensions
 
   serialization_scope :guardian
@@ -21,6 +21,7 @@ class ApplicationController < ActionController::Base
   before_filter :store_incoming_links
   before_filter :preload_json
   before_filter :check_xhr
+  before_filter :set_locale
 
   rescue_from Exception do |exception|
     unless [ ActiveRecord::RecordNotFound, ActionController::RoutingError,
@@ -77,10 +78,15 @@ class ApplicationController < ActionController::Base
     render file: 'public/403', formats: [:html], layout: false, status: 403
   end
 
+
+  def set_locale
+    I18n.locale = SiteSetting.default_locale
+  end
+
   def store_preloaded(key, json)
     @preloaded ||= {}
-    # I dislike that there is a gsub as opposed to a gsub! 
-    #  but we can not be mucking with user input, I wonder if there is a way 
+    # I dislike that there is a gsub as opposed to a gsub!
+    #  but we can not be mucking with user input, I wonder if there is a way
     #  to inject this safty deeper in the library or even in AM serializer
     @preloaded[key] = json.gsub("</", "<\\/")
   end
@@ -109,15 +115,6 @@ class ApplicationController < ActionController::Base
 
   def guardian
     @guardian ||= Guardian.new(current_user)
-  end
-
-  def log_on_user(user)
-    session[:current_user_id] = user.id
-    unless user.auth_token
-      user.auth_token = SecureRandom.hex(16)
-      user.save!
-    end
-    cookies.permanent.signed[:_t] = { :value => user.auth_token, :httponly => true }
   end
 
   # This is odd, but it seems that in Rails `render json: obj` is about
@@ -149,7 +146,7 @@ class ApplicationController < ActionController::Base
     return false if current_user.present?
 
     # Don't cache if there's restricted access
-    return false if SiteSetting.restrict_access?
+    return false if SiteSetting.access_password.present?
 
     true
   end
@@ -219,14 +216,14 @@ class ApplicationController < ActionController::Base
 
     def check_restricted_access
       # note current_user is defined in the CurrentUser mixin
-      if SiteSetting.restrict_access? && cookies[:_access] != SiteSetting.access_password
+      if SiteSetting.access_password.present? && cookies[:_access] != SiteSetting.access_password
         redirect_to request_access_path(:return_path => request.fullpath)
         return false
       end
     end
 
     def mini_profiler_enabled?
-      defined?(Rack::MiniProfiler) and current_user.try(:admin?)
+      defined?(Rack::MiniProfiler) && current_user.try(:admin?)
     end
 
     def authorize_mini_profiler
@@ -253,8 +250,7 @@ class ApplicationController < ActionController::Base
 
     def check_xhr
       unless (controller_name == 'forums' || controller_name == 'user_open_ids')
-        # render 'default/empty' unless ((request.format && request.format.json?) or request.xhr?)
-        raise RenderEmpty.new unless ((request.format && request.format.json?) or request.xhr?)
+        raise RenderEmpty.new unless ((request.format && request.format.json?) || request.xhr?)
       end
     end
 

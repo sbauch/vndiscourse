@@ -1,50 +1,41 @@
-(function() {
+/**
+  The base route for all routes on Discourse. Includes global enter functionality.
 
-  window.Discourse.Route = Em.Route.extend({
-    /* Called every time we enter a route
-    */
+  @class Route
+  @extends Em.Route
+  @namespace Discourse
+  @module Discourse
+**/
+Discourse.Route = Em.Route.extend({
 
-    enter: function(router, context) {
-      /* Close mini profiler
-      */
+  /**
+    Called every time we enter a route on Discourse.
 
-      var composerController, f, search, shareController;
-      jQuery('.profiler-results .profiler-result').remove();
-      /* Close stuff that may be open
-      */
+    @method enter
+  **/
+  enter: function(router, context) {
+    // Close mini profiler
+    $('.profiler-results .profiler-result').remove();
 
-      jQuery('.d-dropdown').hide();
-      jQuery('header ul.icons li').removeClass('active');
-      jQuery('[data-toggle="dropdown"]').parent().removeClass('open');
-      /* TODO: need to adjust these
-      */
+    // Close some elements that may be open
+    $('.d-dropdown').hide();
+    $('header ul.icons li').removeClass('active');
+    $('[data-toggle="dropdown"]').parent().removeClass('open');
 
-      if (false) {
-        if (shareController = router.get('shareController')) {
-          shareController.close();
-        }
-        /* Hide any searches
-        */
+    var hideDropDownFunction = $('html').data('hide-dropdown');
+    if (hideDropDownFunction) return hideDropDownFunction();
+  }
+});
 
-        if (search = router.get('searchController')) {
-          search.close();
-        }
-        /* get rid of "save as draft stuff"
-        */
 
-        composerController = Discourse.get('router.composerController');
-        if (composerController) {
-          composerController.closeIfCollapsed();
-        }
-      }
-      f = jQuery('html').data('hide-dropdown');
-      if (f) {
-        return f();
-      }
-      /*return @_super(router, context)
-      */
+Discourse.Route.reopenClass({
 
-    }
-  });
+  buildRoutes: function(builder) {
+    var oldBuilder = Discourse.routeBuilder;
+    Discourse.routeBuilder = function() {
+      if (oldBuilder) oldBuilder.call(this);
+      return builder.call(this);
+    };
+  }
 
-}).call(this);
+});

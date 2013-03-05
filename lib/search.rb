@@ -19,10 +19,11 @@ module Search
                   u.username AS title,
                   u.email,
                   NULL AS color
-          FROM users AS u
-          JOIN users_search s on s.id = u.id
-          WHERE s.search_data @@ TO_TSQUERY('english', :query)
-          ORDER BY last_posted_at desc
+    FROM users AS u
+    JOIN users_search s on s.id = u.id
+    WHERE s.search_data @@ TO_TSQUERY(:locale, :query)
+    ORDER BY last_posted_at desc
+    LIMIT :limit
     "
   end
 
@@ -36,17 +37,19 @@ module Search
     FROM topics AS ft
       JOIN posts AS p ON p.topic_id = ft.id AND p.post_number = 1
       JOIN posts_search s on s.id = p.id
-    WHERE s.search_data @@ TO_TSQUERY('english', :query)
+    WHERE s.search_data @@ TO_TSQUERY(:locale, :query)
       AND ft.deleted_at IS NULL
       AND ft.visible
       AND ft.archetype <> '#{Archetype.private_message}'
-    ORDER BY 
-            TS_RANK_CD(TO_TSVECTOR('english', ft.title), TO_TSQUERY('english', :query)) desc,
-            TS_RANK_CD(search_data, TO_TSQUERY('english', :query)) desc,
-            bumped_at desc"
-  end  
+    ORDER BY
+            TS_RANK_CD(TO_TSVECTOR(:locale, ft.title), TO_TSQUERY(:locale, :query)) desc,
+            TS_RANK_CD(search_data, TO_TSQUERY(:locale, :query)) desc,
+            bumped_at desc
+    LIMIT :limit
+    "
+  end
 
-  
+
   def self.post_query_sql
     "SELECT cast('topic' as varchar) AS type,
             CAST(ft.id AS VARCHAR),
@@ -57,15 +60,17 @@ module Search
     FROM topics AS ft
       JOIN posts AS p ON p.topic_id = ft.id AND p.post_number <> 1
       JOIN posts_search s on s.id = p.id
-    WHERE s.search_data @@ TO_TSQUERY('english', :query)
+    WHERE s.search_data @@ TO_TSQUERY(:locale, :query)
       AND ft.deleted_at IS NULL and p.deleted_at IS NULL
       AND ft.visible
       AND ft.archetype <> '#{Archetype.private_message}'
-    ORDER BY 
-            TS_RANK_CD(TO_TSVECTOR('english', ft.title), TO_TSQUERY('english', :query)) desc,
-            TS_RANK_CD(search_data, TO_TSQUERY('english', :query)) desc,
-            bumped_at desc" 
-  end  
+    ORDER BY
+            TS_RANK_CD(TO_TSVECTOR(:locale, ft.title), TO_TSQUERY(:locale, :query)) desc,
+            TS_RANK_CD(search_data, TO_TSQUERY(:locale, :query)) desc,
+            bumped_at desc
+    LIMIT :limit
+    "
+  end
 
   def self.category_query_sql
     "SELECT 'category' AS type,
@@ -76,15 +81,28 @@ module Search
             c.color
     FROM categories AS c
     JOIN categories_search s on s.id = c.id
-    WHERE s.search_data @@ TO_TSQUERY('english', :query)
+    WHERE s.search_data @@ TO_TSQUERY(:locale, :query)
     ORDER BY topics_month desc
+    LIMIT :limit
     "
   end
 
-  def self.query(term, type_filter=nil)    
+  def self.current_locale_long
+    case I18n.locale         # Currently-present in /conf/locales/* only, sorry :-( Add as needed
+      when :ru then 'russian'
+      when :fr then 'french'
+      when :nl then 'dutch'
+      when :sv then 'swedish'
+      else 'english'
+    end
+  end
+
+  def self.query(term, type_filter=nil)
 
     return nil if term.blank?
-    sanitized_term = term.gsub(/[^0-9a-zA-Z_ ]/, '')
+    sanitized_term = PG::Connection.escape_string(term.gsub(/[:()&!]/,'')) # Instead of original term.gsub(/[^0-9a-zA-Z_ ]/, '')
+
+    # We are stripping only symbols taking place in FTS and simply sanitizing the rest.
 
     # really short terms are totally pointless
     return nil if sanitized_term.blank? || sanitized_term.length < self.min_search_term_length
@@ -92,40 +110,39 @@ module Search
     terms = sanitized_term.split
     terms.map! {|t| "#{t}:*"}
 
-    if type_filter.present?      
+    if type_filter.present?
       raise Discourse::InvalidAccess.new("invalid type filter") unless Search.facets.include?(type_filter)
-      sql = Search.send("#{type_filter}_query_sql") << " LIMIT #{Search.per_facet * Search.facets.size}"
-      db_result = ActiveRecord::Base.exec_sql(sql , query: terms.join(" & "))
+      sql = Search.send("#{type_filter}_query_sql")
+      db_result = ActiveRecord::Base.exec_sql(sql , query: terms.join(" & "), locale: current_locale_long, limit: Search.per_facet * Search.facets.size)
     else
 
       db_result = []
       [user_query_sql, category_query_sql, topic_query_sql].each do |sql|
-        sql << " LIMIT " << (Search.per_facet + 1).to_s
-        db_result += ActiveRecord::Base.exec_sql(sql , query: terms.join(" & ")).to_a
+        db_result += ActiveRecord::Base.exec_sql(sql , query: terms.join(" & "), locale: current_locale_long, limit: (Search.per_facet + 1)).to_a
       end
     end
 
     db_result = db_result.to_a
-    
+
     expected_topics = 0
     expected_topics = Search.facets.size unless type_filter.present?
     expected_topics = Search.per_facet * Search.facets.size if type_filter == 'topic'
-    
-    if expected_topics > 0 
+
+    if expected_topics > 0
       db_result.each do |row|
         expected_topics -= 1 if row['type'] == 'topic'
       end
     end
-    
-    if expected_topics > 0 
-      tmp = ActiveRecord::Base.exec_sql "#{post_query_sql} limit :per_facet", 
-        query: terms.join(" & "), per_facet: expected_topics * 3
+
+    if expected_topics > 0
+      tmp = ActiveRecord::Base.exec_sql post_query_sql,
+        query: terms.join(" & "), locale: current_locale_long, limit: expected_topics * 3
 
       topic_ids = Set.new db_result.map{|r| r["id"]}
 
       tmp = tmp.to_a
       tmp = tmp.reject{ |i|
-        if topic_ids.include? i["id"] 
+        if topic_ids.include? i["id"]
           true
         else
           topic_ids << i["id"]
@@ -149,7 +166,7 @@ module Search
       if type == 'user'
         row['avatar_template'] = User.avatar_template(row['email'])
       end
-      row.delete('email') 
+      row.delete('email')
       row.delete('color') unless type == 'category'
 
       grouped[type] ||= []
@@ -159,8 +176,8 @@ module Search
     result = grouped.map do |type, results|
       more = type_filter.blank? && (results.size > Search.per_facet)
       results = results[0..([results.length, Search.per_facet].min - 1)] if type_filter.blank?
-    
-      {type: type, 
+
+      {type: type,
        name: I18n.t("search.types.#{type}"),
        more: more,
        results: results}

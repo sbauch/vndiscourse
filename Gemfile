@@ -21,11 +21,12 @@ gem 'fastimage'
 gem 'fog', require: false
 gem 'has_ip_address'
 gem 'hiredis'
-gem 'i18n-js'
+
 # note: for image_optim to correctly work you need
 # sudo apt-get install -y advancecomp gifsicle jpegoptim libjpeg-progs optipng pngcrush
 gem 'image_optim'
 gem 'jquery-rails'
+gem 'minitest'
 gem 'multi_json'
 gem 'mustache'
 gem 'nokogiri'
@@ -34,6 +35,8 @@ gem "omniauth-openid"
 gem "openid-redis-store"
 gem "omniauth-facebook"
 gem "omniauth-twitter"
+gem "omniauth-github"
+gem "omniauth-browserid", :git => "git://github.com/callahad/omniauth-browserid.git", :branch => "observer_api"
 gem 'oj'
 gem 'pbkdf2'
 gem 'pg'
@@ -89,7 +92,7 @@ group :test, :development do
   gem 'jasminerice'
   gem 'mocha', require: false
   gem 'rb-fsevent'
-  gem 'rb-inotify', '~> 0.8.8', require: RUBY_PLATFORM.include?('linux') && 'rb-inotify'
+  gem 'rb-inotify', '~> 0.9', require: RUBY_PLATFORM.include?('linux') && 'rb-inotify'
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'simplecov', require: false

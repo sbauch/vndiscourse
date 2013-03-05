@@ -12,11 +12,12 @@ class SiteSetting < ActiveRecord::Base
   client_setting(:title, "Discourse")
   client_setting(:logo_url, '/assets/d-logo-sketch.png')
   client_setting(:logo_small_url, '/assets/d-logo-sketch-small.png')
+  setting(:company_full_name, 'My Unconfigured Forum Ltd.')
+  setting(:company_short_name, 'Unconfigured Forum')
+  setting(:company_domain, 'www.example.com')
   client_setting(:traditional_markdown_linebreaks, false)
-  client_setting(:popup_delay, 1500)
   client_setting(:top_menu, 'popular|new|unread|favorited|categories')
   client_setting(:post_menu, 'like|edit|flag|delete|share|bookmark|reply')
-  client_setting(:max_length_show_reply, 1500)
   client_setting(:track_external_right_clicks, false)
   client_setting(:must_approve_users, false)
   client_setting(:ga_tracking_code, "")
@@ -46,8 +47,6 @@ class SiteSetting < ActiveRecord::Base
   setting(:port, Rails.env.development? ? 3000 : '')
   setting(:enable_private_messages, true)
   setting(:use_ssl, false)
-  setting(:secret_token)
-  setting(:restrict_access, false)
   setting(:access_password)
   setting(:queue_jobs, !Rails.env.test?)
   setting(:crawl_images, !Rails.env.test?)
@@ -100,8 +99,6 @@ class SiteSetting < ActiveRecord::Base
   setting(:best_of_score_threshold, 15)
   setting(:best_of_posts_required, 50)
   setting(:best_of_likes_required, 1)
-  setting(:category_post_template,
-          "[Replace this first paragraph with a short description of your new category. Try to keep it below 200 characters.]\n\nUse this space below for a longer description, as well as to establish any rules or discussion!")
 
   # we need to think of a way to force users to enter certain settings, this is a minimal config thing
   setting(:notification_email, 'info@discourse.org')
@@ -110,11 +107,22 @@ class SiteSetting < ActiveRecord::Base
 
   setting(:send_welcome_message, true)
 
+  client_setting(:enable_google_logins, true)
+  client_setting(:enable_yahoo_logins, true)
+
+  client_setting(:enable_twitter_logins, true)
   setting(:twitter_consumer_key, '')
   setting(:twitter_consumer_secret, '')
 
+  client_setting(:enable_facebook_logins, true)
   setting(:facebook_app_id, '')
   setting(:facebook_app_secret, '')
+
+  client_setting(:enable_github_logins, false)
+  setting(:github_client_id, '')
+  setting(:github_client_secret, '')
+
+  client_setting(:enable_persona_logins, false)
 
   setting(:enforce_global_nicknames, true)
   setting(:discourse_org_access_key, '')
@@ -141,10 +149,20 @@ class SiteSetting < ActiveRecord::Base
 
   setting(:title_fancy_entities, true)
 
+  # The default locale for the site
+  setting(:default_locale, 'en')
+
   client_setting(:educate_until_posts, 2)
 
   def self.call_discourse_hub?
-    self.enforce_global_nicknames? and self.discourse_org_access_key.present?
+    self.enforce_global_nicknames? && self.discourse_org_access_key.present?
   end
 
+  def self.topic_title_length
+    min_topic_title_length..max_topic_title_length
+  end
+
+  def self.post_length
+    min_post_length..max_post_length
+  end
 end

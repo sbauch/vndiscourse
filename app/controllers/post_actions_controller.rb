@@ -8,11 +8,11 @@ class PostActionsController < ApplicationController
   def create
     id = params[:post_action_type_id].to_i
     if action = PostActionType.where(id: id).first
-      guardian.ensure_post_can_act!(@post, PostActionType.Types.invert[id])
+      guardian.ensure_post_can_act!(@post, PostActionType.types[id])
 
       post_action = PostAction.act(current_user, @post, action.id, params[:message])
 
-      if post_action.blank? or post_action.errors.present?
+      if post_action.blank? || post_action.errors.present?
         render_json_error(post_action)
       else
         # We need to reload or otherwise we are showing the old values on the front end
@@ -72,7 +72,7 @@ class PostActionsController < ApplicationController
       finder = Post.where(id: params[:id])
 
       # Include deleted posts if the user is a moderator
-      finder = finder.with_deleted if current_user.try(:has_trust_level?, :moderator)      
+      finder = finder.with_deleted if current_user.try(:has_trust_level?, :moderator)
 
       @post = finder.first
       guardian.ensure_can_see!(@post)

@@ -48,14 +48,14 @@ class UserAction < ActiveRecord::Base
     unless guardian.can_see_private_messages?(user_id)
       results = results.where('topics.archetype <> ?', Archetype::private_message)
     end
-    
+
     unless guardian.user && guardian.user.id == user_id
       results = results.where("action_type <> ?", BOOKMARK)
     end
 
     results = results.to_a
 
-    results.sort!{|a,b| ORDER[a.action_type] <=> ORDER[b.action_type]}
+    results.sort! { |a,b| ORDER[a.action_type] <=> ORDER[b.action_type] }
     results.each do |row|
       row.description = self.description(row.action_type, detailed: true)
     end
@@ -64,28 +64,28 @@ class UserAction < ActiveRecord::Base
   end
 
   def self.stream_item(action_id, guardian)
-    stream(action_id:action_id, guardian: guardian)[0]
+    stream(action_id: action_id, guardian: guardian).first
   end
 
   def self.stream(opts={})
     user_id = opts[:user_id]
-    offset = opts[:offset]||0
-    limit = opts[:limit] ||60
+    offset = opts[:offset] || 0
+    limit = opts[:limit] || 60
     action_id = opts[:action_id]
     action_types = opts[:action_types]
     guardian = opts[:guardian]
     ignore_private_messages = opts[:ignore_private_messages]
 
-    # The weird thing is that target_post_id can be null, so it makes everything 
-    #  ever so more complex. Should we allow this, not sure. 
+    # The weird thing is that target_post_id can be null, so it makes everything
+    #  ever so more complex. Should we allow this, not sure.
 
     builder = SqlBuilder.new("
-SELECT 
-  t.title, a.action_type, a.created_at, t.id topic_id, 
-  coalesce(p.post_number, 1) post_number, 
+SELECT
+  t.title, a.action_type, a.created_at, t.id topic_id,
+  coalesce(p.post_number, 1) post_number,
   p.reply_to_post_number,
-  pu.email ,pu.username, pu.name, pu.id user_id, 
-  u.email acting_email, u.username acting_username, u.name acting_name, u.id acting_user_id, 
+  pu.email ,pu.username, pu.name, pu.id user_id,
+  u.email acting_email, u.username acting_username, u.name acting_name, u.id acting_user_id,
   coalesce(p.cooked, p2.cooked) cooked
 FROM user_actions as a
 JOIN topics t on t.id = a.target_topic_id
@@ -102,7 +102,7 @@ JOIN users pu on pu.id = COALESCE(p.user_id, t.user_id)
     unless guardian.can_see_deleted_posts?
       builder.where("p.deleted_at is null and p2.deleted_at is null")
     end
-    
+
     unless guardian.user && guardian.user.id == user_id
       builder.where("a.action_type not in (#{BOOKMARK})")
     end
@@ -198,7 +198,7 @@ JOIN users pu on pu.id = COALESCE(p.user_id, t.user_id)
     require_parameters(hash, :action_type, :user_id, :acting_user_id, :target_topic_id, :target_post_id)
     transaction(requires_new: true) do
       begin
-        action = self.new(hash)
+        action = new(hash)
 
         if hash[:created_at]
           action.created_at = hash[:created_at]
@@ -225,5 +225,4 @@ JOIN users pu on pu.id = COALESCE(p.user_id, t.user_id)
       raise Discourse::InvalidParameters.new(p) if data[p].nil?
     end
   end
-
 end

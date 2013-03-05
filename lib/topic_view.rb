@@ -11,7 +11,7 @@ class TopicView
 
     # Special case: If the topic is private and the user isn't logged in, ask them
     # to log in!
-    if @topic.present? and @topic.private_message? and user.blank?
+    if @topic.present? && @topic.private_message? && user.blank?
       raise Discourse::NotLoggedIn.new
     end
 
@@ -52,7 +52,7 @@ class TopicView
 
   def next_page
     last_post = @posts.last
-    if last_post.present? and (@topic.highest_post_number > last_post.post_number)
+    if last_post.present? && (@topic.highest_post_number > last_post.post_number)
       (@posts[0].post_number / SiteSetting.posts_per_page) + 1
     end
   end
@@ -153,7 +153,7 @@ class TopicView
   end
 
   def all_post_actions
-    @all_post_actions ||= PostAction.counts_for(posts, @user)  
+    @all_post_actions ||= PostAction.counts_for(posts, @user)
   end
 
   def voted_in_topic?
@@ -163,14 +163,14 @@ class TopicView
 
     @voted_in_topic ||= begin
       return false unless all_post_actions.present?
-      all_post_actions.values.flatten.map {|ac| ac.keys}.flatten.include?(PostActionType.Types[:vote])
+      all_post_actions.values.flatten.map {|ac| ac.keys}.flatten.include?(PostActionType.types[:vote])
     end
   end
 
   def post_action_visibility
     @post_action_visibility ||= begin
       result = []
-      PostActionType.Types.each do |k, v|
+      PostActionType.types.each do |k, v|
         result << v if Guardian.new(@user).can_see_post_actors?(@topic, v)
       end
       result
@@ -182,8 +182,8 @@ class TopicView
   end
 
   def link_counts
-    @link_counts ||= TopicLinkClick.counts_for(@topic, posts) 
-  end 
+    @link_counts ||= TopicLinkClick.counts_for(@topic, posts)
+  end
 
   # Binary search for closest value
   def self.closest(array, target, min, max)
@@ -226,12 +226,16 @@ class TopicView
   end
 
   # This is pending a larger refactor, that allows custom orders
-  #  for now we need to look for the highest_post_number in the stream 
-  #  the cache on topics is not correct if there are deleted posts at 
-  #  the end of the stream (for mods), nor is it correct for filtered 
+  #  for now we need to look for the highest_post_number in the stream
+  #  the cache on topics is not correct if there are deleted posts at
+  #  the end of the stream (for mods), nor is it correct for filtered
   #  streams
   def highest_post_number
     @highest_post_number ||= @all_posts.maximum(:post_number)
+  end
+
+  def recent_posts
+    @all_posts.by_newest.with_user.first(25)
   end
 
   protected
@@ -245,7 +249,7 @@ class TopicView
       posts_max = @max > (topic_user.last_read_post_number || 1 ) ? (topic_user.last_read_post_number || 1) : @max
 
       PostTiming.select(:post_number)
-                .where("topic_id = ? AND user_id = ? AND post_number BETWEEN ? AND ?", 
+                .where("topic_id = ? AND user_id = ? AND post_number BETWEEN ? AND ?",
                        @topic.id, @user.id, @min, posts_max)
                 .each {|t| result << t.post_number}
       result

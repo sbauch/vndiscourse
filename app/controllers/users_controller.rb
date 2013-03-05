@@ -89,7 +89,7 @@ class UsersController < ApplicationController
     else
 
       # Contact the Discourse Hub server
-      email_given = (params[:email].present? or current_user.present?)
+      email_given = (params[:email].present? || current_user.present?)
       available_locally = User.username_available?(params[:username])
       global_match = false
       available_globally, suggestion_from_discourse_hub = begin
@@ -101,9 +101,9 @@ class UsersController < ApplicationController
         end
       end
 
-      if available_globally and available_locally
+      if available_globally && available_locally
         render json: {available: true, global_match: (global_match ? true : false)}
-      elsif available_locally and !available_globally
+      elsif available_locally && !available_globally
         if email_given
           # Nickname and email do not match what's registered on the discourse hub.
           render json: {available: false, global_match: false, suggestion: suggestion_from_discourse_hub}
@@ -113,7 +113,7 @@ class UsersController < ApplicationController
           # Don't give a suggestion until we get the email and try to match it with on the discourse hub.
           render json: {available: false}
         end
-      elsif available_globally and !available_locally
+      elsif available_globally && !available_locally
         # Already registered on this site with the matching nickname and email address. Why are you signing up again?
         render json: {available: false, suggestion: User.suggest_username(params[:username])}
       else
@@ -128,7 +128,7 @@ class UsersController < ApplicationController
 
   def create
 
-    if params[:password_confirmation] != honeypot_value or params[:challenge] != challenge_value.try(:reverse)
+    if params[:password_confirmation] != honeypot_value || params[:challenge] != challenge_value.try(:reverse)
       # Don't give any indication that we caught you in the honeypot
       return render(:json => {success: true, active: false, message: I18n.t("login.activate_email", email: params[:email]) })
     end
@@ -143,9 +143,9 @@ class UsersController < ApplicationController
     if auth && auth[:email] == params[:email] && auth[:email_valid]
       user.active = true
     end
-    user.password_required unless auth
+    user.password_required! unless auth
 
-    DiscourseHub.register_nickname( user.username, user.email ) if user.valid? and SiteSetting.call_discourse_hub?
+    DiscourseHub.register_nickname( user.username, user.email ) if user.valid? && SiteSetting.call_discourse_hub?
 
     if user.save
 
@@ -174,8 +174,12 @@ class UsersController < ApplicationController
           TwitterUserInfo.create(:user_id => user.id, :screen_name => auth[:twitter_screen_name], :twitter_user_id => auth[:twitter_user_id])
         end
 
-        if auth[:facebook].present? and FacebookUserInfo.find_by_facebook_user_id(auth[:facebook][:facebook_user_id]).nil?
+        if auth[:facebook].present? && FacebookUserInfo.find_by_facebook_user_id(auth[:facebook][:facebook_user_id]).nil?
           FacebookUserInfo.create!(auth[:facebook].merge(user_id: user.id))
+        end
+
+        if auth[:github_user_id] && auth[:github_screen_name] && GithubUserInfo.find_by_github_user_id(auth[:github_user_id]).nil?
+          GithubUserInfo.create(:user_id => user.id, :screen_name => auth[:github_screen_name], :github_user_id => auth[:github_user_id])
         end
       end
 
@@ -228,11 +232,11 @@ class UsersController < ApplicationController
     if @user.blank?
       flash[:error] = I18n.t('password_reset.no_token')
     else
-      if request.put? and params[:password].present?
+      if request.put? && params[:password].present?
         @user.password = params[:password]
         if @user.save
 
-          if SiteSetting.must_approve_users? and !@user.approved?
+          if SiteSetting.must_approve_users? && !@user.approved?
             @requires_approval = true
             flash[:success] = I18n.t('password_reset.success_unapproved')
           else
@@ -290,6 +294,16 @@ class UsersController < ApplicationController
       flash[:error] = I18n.t('activation.already_done')
     end
     render :layout => 'no_js'
+  end
+
+  def send_activation_email
+    @user = fetch_user_from_params
+    @email_token = @user.email_tokens.unconfirmed.active.first
+    if @user
+      @email_token = @user.email_tokens.create(email: @user.email) if @email_token.nil?
+      Jobs.enqueue(:user_email, type: :signup, user_id: @user.id, email_token: @email_token.token)
+    end
+    render nothing: true
   end
 
   def search_users

@@ -10,11 +10,11 @@ describe Oneboxer::WikipediaOnebox do
     FakeWeb.register_uri(:get, @o.translate_url, :response => fixture_file('oneboxer/wikipedia.response'))
     FakeWeb.register_uri(:get, 'http://en.m.wikipedia.org/wiki/Ruby', :response => fixture_file('oneboxer/wikipedia_redirected.response'))
   end
-  
+
   it "generates the expected onebox for Wikipedia" do
     @o.onebox.should == expected_wikipedia_result
   end
-  
+
 private
   def expected_wikipedia_result
     <<EXPECTED
@@ -22,7 +22,7 @@ private
     <div class='source'>
       <div class='info'>
         <a href='http://en.wikipedia.org/wiki/Ruby' target="_blank">
-          <img class='favicon' src="/assets/favicons/wikipedia.png"> wikipedia.org
+          <img class='favicon' src="/assets/favicons/wikipedia.png"> en.wikipedia.org
         </a>
       </div>
     </div>

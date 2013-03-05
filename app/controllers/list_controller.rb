@@ -1,6 +1,6 @@
 class ListController < ApplicationController
 
-  before_filter :ensure_logged_in, except: [:index, :category]
+  before_filter :ensure_logged_in, except: [:index, :category, :category_feed]
   skip_before_filter :check_xhr
 
   # Create our filters
@@ -10,7 +10,7 @@ class ListController < ApplicationController
       list_opts = {page: params[:page]}
 
       # html format means we need to farm exclude from the site options
-      if params[:format].blank? or params[:format] == "html"
+      if params[:format].blank? || params[:format] == "html"
         #TODO objectify this stuff
         SiteSetting.top_menu.split('|').each do |f|
           s = f.split(",")
@@ -35,20 +35,32 @@ class ListController < ApplicationController
     list = nil
 
     # If they choose uncategorized, return topics NOT in a category
-    if params[:category] == Slug.for(SiteSetting.uncategorized_name) or params[:category] == SiteSetting.uncategorized_name
+    if params[:category] == Slug.for(SiteSetting.uncategorized_name) || params[:category] == SiteSetting.uncategorized_name
       list = query.list_uncategorized
     else
-      category = Category.where("slug = ? or id = ?", params[:category], params[:category].to_i).includes(:featured_users).first
-      guardian.ensure_can_see!(category)
-      list = query.list_category(category)
+      @category = Category.where("slug = ? or id = ?", params[:category], params[:category].to_i).includes(:featured_users).first
+      guardian.ensure_can_see!(@category)
+      list = query.list_category(@category)
     end
 
     list.more_topics_url = url_for(category_path(params[:category], page: next_page, format: "json"))
     respond(list)
   end
 
-  protected
+  def category_feed
+    raise Discourse::InvalidParameters.new('Category RSS of "uncategorized"') if params[:category] == Slug.for(SiteSetting.uncategorized_name) || params[:category] == SiteSetting.uncategorized_name
 
+    @category = Category.where("slug = ?", params[:category]).includes(:featured_users).first
+
+    guardian.ensure_can_see!(@category)
+
+    anonymous_etag(@category) do
+      @topic_list = TopicQuery.new.list_new_in_category(@category)
+      render 'list', formats: [:rss]
+    end
+  end
+
+  protected
 
   def respond(list)
 

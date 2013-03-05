@@ -86,7 +86,7 @@ en:
 
       name:
         title: "Name"
-        instructions: "The longer version of your name; does not need to be unique."
+        instructions: "The longer version of your name; does not need to be unique. Used for alternate @name matching and shown only on your user page."
         too_short: "Your name is too short."
         ok: "Your name looks good."
       username:
@@ -170,7 +170,7 @@ en:
 
       filters:
         all: "All"
-        
+
       stream:
         posted_by: "Posted by"
         sent_by: "Sent by"
@@ -233,6 +233,9 @@ en:
       authenticating: "Authenticating..."
       awaiting_confirmation: "Your account is awaiting activation, use the forgot password link to issue another activation email."
       awaiting_approval: "Your account has not been approved by a moderator yet. You will receive an email when it is approved."
+      not_activated: "You can't log in yet. We previously sent an activation email to you at <b>{{sentTo}}</b>. Please follow the instructions in that email to activate your account."
+      resend_activation_email: "Click here to send the activation email again."
+      sent_activation_email_again: "We sent another activation email to you at <b>{{currentEmail}}</b>. It might take a few minutes for it to arrive; be sure to check your spam folder."
       google:
         title: "Log In with Google"
         message: "Authenticating with Google (make sure pop up blockers are not enabled)"
@@ -245,6 +248,12 @@ en:
       yahoo:
         title: "Log In with Yahoo"
         message: "Authenticating with Yahoo (make sure pop up blockers are not enabled)"
+      github:
+        title: "Log In with Github"
+        message: "Authenticating with Github (make sure pop up blockers are not enabled)"
+      persona:
+        title: "Log In with Mozilla Persona"
+        message: "Authenticating with Persona (make sure pop up blockers are not enabled)"
 
     composer:
       saving_draft_tip: "saving"
@@ -287,6 +296,7 @@ en:
       moved_post: "<i title='moved post' class='icon icon-arrow-right'></i> {{username}} moved post to {{link}}"
 
     image_selector:
+      title: "Insert Image"
       from_my_computer: "From My Device"
       from_the_web: "From The Web"
       add_image: "Add Image"
@@ -338,13 +348,20 @@ en:
       title: 'Topic'
       loading_more: "Loading more Topics..."
       loading: 'Loading topic...'
-      missing: "Topic Not Found"
+      invalid_access:
+        title: "Topic is private"
+        description: "Sorry, you don't have access to that topic!"
+      server_error:
+        title: "Topic failed to load"
+        description: "Sorry, we couldn't load that topic, possibly due to a connection problem. Please try again. If the problem persists, please let us know."
       not_found:
-        title: "Topic Not Found"
-        description: "Sorry, we couldn't find that topic. Perhaps it has been deleted?"
+        title: "Topic not found"
+        description: "Sorry, we couldn't find that topic. Perhaps it was removed by a moderator?"
       unread_posts: "you have {{unread}} unread old posts in this topic"
       new_posts: "there are {{new_posts}} new posts in this topic since you last read it"
-      likes: "there are {{likes}} likes in this topic"
+      likes:
+        one: "there is 1 like in this topic"
+        other: "there are {{count}} likes in this topic"
       back_to_list: "Back to Topic List"
       options: "Topic Options"
       show_links: "show links within this topic"
@@ -354,6 +371,9 @@ en:
       browse_all_categories: Browse all categories
       view_popular_topics: view popular topics
       suggest_create_topic: Why not create a topic?
+      read_position_reset: "Your read position has been reset."
+      jump_reply_up: jump to earlier reply
+      jump_reply_down: jump to later reply
 
       progress:
         title: topic progress
@@ -516,6 +536,7 @@ en:
     category:
       none: '(no category)'
       edit: 'edit'
+      edit_long: "Edit Category"
       view: 'View Topics in Category'
       delete: 'Delete Category'
       create: 'Create Category'
@@ -528,6 +549,8 @@ en:
       color_placeholder: "Any web color"
       delete_confirm: "Are you sure you want to delete that category?"
       list: "List Categories"
+      no_description: "There is no description for this category."
+      change_in_category_topic: "visit category topic to edit the description"
 
     flagging:
       title: 'Why are you flagging this post?'
@@ -563,6 +586,7 @@ en:
     likes: "Likes"
     top_contributors: "Participants"
     category_title: "Category"
+    history: "History"
 
     categories_list: "Categories List"
 
@@ -615,12 +639,13 @@ en:
       dashboard:
         title: "Admin Dashboard"
         welcome: "Welcome to the admin section."
-        version: "Discourse version"
+        version: "Installed version"
         up_to_date: "You are running the latest version of Discourse."
         critical_available: "A critical update is available."
         updates_available: "Updates are available."
         please_upgrade: "Please upgrade!"
         latest_version: "Latest version"
+        update_often: 'Please update often!'
 
       flags:
         title: "Flags"

@@ -3,7 +3,7 @@ class UserEmailObserver < ActiveRecord::Observer
 
   def after_commit(notification)
     if notification.send(:transaction_include_action?, :create)
-      notification_type = Notification.InvertedTypes[notification.notification_type]
+      notification_type = Notification.types[notification.notification_type]
 
       # Delegate to email_user_{{NOTIFICATION_TYPE}} if exists
       email_method = :"email_user_#{notification_type.to_s}"
@@ -16,6 +16,15 @@ class UserEmailObserver < ActiveRecord::Observer
     Jobs.enqueue_in(SiteSetting.email_time_window_mins.minutes,
                    :user_email,
                    type: :user_mentioned,
+                   user_id: notification.user_id,
+                   notification_id: notification.id)
+  end
+
+  def email_user_posted(notification)
+    return unless notification.user.email_direct?
+    Jobs.enqueue_in(SiteSetting.email_time_window_mins.minutes,
+                   :user_email,
+                   type: :user_posted,
                    user_id: notification.user_id,
                    notification_id: notification.id)
   end
@@ -46,5 +55,4 @@ class UserEmailObserver < ActiveRecord::Observer
                    user_id: notification.user_id,
                    notification_id: notification.id)
   end
-
 end
