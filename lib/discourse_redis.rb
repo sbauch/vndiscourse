@@ -56,8 +56,8 @@ class DiscourseRedis
       redis_store = ActiveSupport::Cache::RedisStore.new "redis://#{@config['host']}:#{@config['port']}/#{@config['db']}"
     end
     # "redis://#{redis_config['host']}:#{redis_config['port']}/#{redis_config['cache_db']}"
-    redis_store.options[:namespace] = -> { DiscourseRedis.namespace }
-    redis_store
+    # redis_store.options[:namespace] = -> { DiscourseRedis.namespace }
+    # redis_store
   end
 
 
