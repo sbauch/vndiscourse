@@ -32,4 +32,26 @@ module ApplicationHelper
     current_user.try(:admin?)
   end
 
+  # Creates open graph and twitter card meta data
+  def crawlable_meta_data(opts=nil)
+
+    opts ||= {}
+    opts[:image] ||= "#{Discourse.base_url}#{SiteSetting.logo_small_url}"
+    opts[:url] ||= "#{Discourse.base_url}#{request.fullpath}"
+
+    # Add opengraph tags
+    result =  tag(:meta, property: 'og:site_name', content: SiteSetting.title) << "\n"
+
+    result << tag(:meta, property: 'twitter:card', content: "summary")
+    [:image, :url, :title, :description].each do |property|
+      if opts[property].present?
+        escape = (property != :image)
+        result << tag(:meta, {property: "og:#{property}", content: opts[property]}, nil, escape) << "\n"
+        result << tag(:meta, {property: "twitter:#{property}", content: opts[property]}, nil, escape) << "\n"
+      end
+    end
+
+    result
+  end
+
 end

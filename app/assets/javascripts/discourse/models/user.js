@@ -33,7 +33,7 @@ Discourse.User = Discourse.Model.extend({
   }).property('trust_level'),
 
   changeUsername: function(newUsername) {
-    return jQuery.ajax({
+    return $.ajax({
       url: "/users/" + (this.get('username_lower')) + "/preferences/username",
       type: 'PUT',
       data: {
@@ -43,7 +43,7 @@ Discourse.User = Discourse.Model.extend({
   },
 
   changeEmail: function(email) {
-    return jQuery.ajax({
+    return $.ajax({
       url: "/users/" + (this.get('username_lower')) + "/preferences/email",
       type: 'PUT',
       data: {
@@ -58,7 +58,7 @@ Discourse.User = Discourse.Model.extend({
 
   save: function(finished) {
     var _this = this;
-    return jQuery.ajax("/users/" + this.get('username').toLowerCase(), {
+    return $.ajax("/users/" + this.get('username').toLowerCase(), {
       data: this.getProperties('auto_track_topics_after_msecs',
                                'bio_raw',
                                'website',
@@ -77,7 +77,7 @@ Discourse.User = Discourse.Model.extend({
   changePassword: function(callback) {
     var good;
     good = false;
-    return jQuery.ajax({
+    return $.ajax({
       url: '/session/forgot_password',
       dataType: 'json',
       data: {
@@ -109,7 +109,7 @@ Discourse.User = Discourse.Model.extend({
     var stream,
       _this = this;
     stream = this.get('stream');
-    return jQuery.ajax({
+    return $.ajax({
       url: "/user_actions/" + id + ".json",
       dataType: 'json',
       cache: 'false',
@@ -142,7 +142,7 @@ Discourse.User = Discourse.Model.extend({
       url += "&filter=" + (this.get('streamFilter'));
     }
 
-    return jQuery.ajax({
+    return $.ajax({
       url: url,
       dataType: 'json',
       cache: 'false',
@@ -226,7 +226,7 @@ Discourse.User = Discourse.Model.extend({
 Discourse.User.reopenClass({
 
   checkUsername: function(username, email) {
-    return jQuery.ajax({
+    return $.ajax({
       url: '/users/check_username',
       type: 'GET',
       data: {
@@ -274,38 +274,39 @@ Discourse.User.reopenClass({
     });
   },
 
+  /**
+    Find a user by username
+
+    @method find
+    @param {String} username the username of the user we want to find
+  **/
   find: function(username) {
-    var promise,
-      _this = this;
-    promise = new RSVP.Promise();
-    jQuery.ajax({
-      url: "/users/" + username + '.json',
-      success: function(json) {
-        // todo: decompose to object
-        var user;
-        json.user.stats = _this.groupStats(json.user.stats.map(function(s) {
-          var obj;
-          obj = Em.Object.create(s);
-          obj.isPM = obj.action_type === Discourse.UserAction.NEW_PRIVATE_MESSAGE || obj.action_type === Discourse.UserAction.GOT_PRIVATE_MESSAGE;
-          return obj;
+
+    // Check the preload store first
+    return PreloadStore.get("user_" + username, function() {
+      return $.ajax({ url: "/users/" + username + '.json' });
+    }).then(function (json) {
+
+      // Create a user from the resulting JSON
+      json.user.stats = Discourse.User.groupStats(json.user.stats.map(function(s) {
+        var stat = Em.Object.create(s);
+        stat.set('isPM', stat.get('action_type') === Discourse.UserAction.NEW_PRIVATE_MESSAGE ||
+                         stat.get('action_type') === Discourse.UserAction.GOT_PRIVATE_MESSAGE);
+        return stat;
+      }));
+
+      if (json.user.stream) {
+        json.user.stream = Discourse.UserAction.collapseStream(json.user.stream.map(function(ua) {
+          return Discourse.UserAction.create(ua);
         }));
-        if (json.user.stream) {
-          json.user.stream = Discourse.UserAction.collapseStream(json.user.stream.map(function(ua) {
-            return Discourse.UserAction.create(ua);
-          }));
-        }
-        user = Discourse.User.create(json.user);
-        return promise.resolve(user);
-      },
-      error: function(xhr) {
-        return promise.reject(xhr);
       }
+
+      return Discourse.User.create(json.user);
     });
-    return promise;
   },
 
   createAccount: function(name, email, password, username, passwordConfirm, challenge) {
-    return jQuery.ajax({
+    return $.ajax({
       url: '/users',
       dataType: 'json',
       data: {

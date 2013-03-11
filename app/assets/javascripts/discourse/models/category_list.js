@@ -6,9 +6,9 @@
   @namespace Discourse
   @module Discourse
 **/
-window.Discourse.CategoryList = Discourse.Model.extend({});
+Discourse.CategoryList = Discourse.Model.extend({});
 
-window.Discourse.CategoryList.reopenClass({
+Discourse.CategoryList.reopenClass({
 
   categoriesFrom: function(result) {
     var categories, users;
@@ -34,7 +34,7 @@ window.Discourse.CategoryList.reopenClass({
     var promise,
       _this = this;
     promise = new RSVP.Promise();
-    jQuery.getJSON("/" + filter + ".json").then(function(result) {
+    $.getJSON("/" + filter + ".json").then(function(result) {
       var categoryList;
       categoryList = Discourse.TopicList.create();
       categoryList.set('can_create_category', result.category_list.can_create_category);

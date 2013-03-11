@@ -14,14 +14,16 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
   complete: false,
   accountPasswordConfirm: 0,
   accountChallenge: 0,
+  formSubmitted: false,
 
   submitDisabled: (function() {
+    if (this.get('formSubmitted')) return true;
     if (this.get('nameValidation.failed')) return true;
     if (this.get('emailValidation.failed')) return true;
     if (this.get('usernameValidation.failed')) return true;
     if (this.get('passwordValidation.failed')) return true;
     return false;
-  }).property('nameValidation.failed', 'emailValidation.failed', 'usernameValidation.failed', 'passwordValidation.failed'),
+  }).property('nameValidation.failed', 'emailValidation.failed', 'usernameValidation.failed', 'passwordValidation.failed', 'formSubmitted'),
 
   passwordRequired: (function() {
     return this.blank('authOptions.auth_provider');
@@ -240,7 +242,7 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
 
   fetchConfirmationValue: function() {
     var _this = this;
-    return jQuery.ajax({
+    return $.ajax({
       url: '/users/hp.json',
       success: function(json) {
         _this.set('accountPasswordConfirm', json.value);
@@ -252,6 +254,7 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
   createAccount: function() {
     var challenge, email, name, password, passwordConfirm, username,
       _this = this;
+    this.set('formSubmitted', true);
     name = this.get('accountName');
     email = this.get('accountEmail');
     password = this.get('accountPassword');
@@ -263,16 +266,29 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
         _this.flash(result.message);
         _this.set('complete', true);
       } else {
-        _this.flash(result.message, 'error');
+        _this.flash(result.message || Em.String.i18n('create_account.failed'), 'error');
+        _this.set('formSubmitted', false);
       }
       if (result.active) {
         return window.location.reload();
       }
     }, function() {
+      _this.set('formSubmitted', false);
       return _this.flash(Em.String.i18n('create_account.failed'), 'error');
+    });
+  },
+
+  didInsertElement: function(e) {
+    // allows the submission the form when pressing 'ENTER' on *any* text input field
+    // but only when the submit button is enabled
+    var _this = this;
+    return Em.run.next(function() {
+      return $("input[type='text']").keydown(function(e) {
+        if (_this.get('submitDisabled') === false && e.keyCode === 13) {
+          return _this.createAccount();
+        }
+      });
     });
   }
 
 });
-
-

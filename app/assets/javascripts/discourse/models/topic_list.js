@@ -15,18 +15,24 @@ Discourse.TopicList = Discourse.Model.extend({
     promise = new RSVP.Promise();
     if (moreUrl = this.get('more_topics_url')) {
       Discourse.URL.replaceState("/" + (this.get('filter')) + "/more");
-      jQuery.ajax(moreUrl, {
+      $.ajax(moreUrl, {
         success: function(result) {
-          var newTopics, topicIds, topics;
+          var newTopics, topicIds, topics, topicsAdded = 0;
           if (result) {
+            // the new topics loaded from the server
             newTopics = Discourse.TopicList.topicsFrom(result);
+            // the current topics
             topics = _this.get('topics');
+            // keeps track of the ids of the current topics
             topicIds = [];
             topics.each(function(t) {
               topicIds[t.get('id')] = true;
             });
+            // add new topics to the list of current topics if not already present
             newTopics.each(function(t) {
               if (!topicIds[t.get('id')]) {
+                // highlight the first of the new topics so we can get a visual feedback
+                t.set('highlight', topicsAdded++ === 0);
                 return topics.pushObject(t);
               }
             });
@@ -43,13 +49,11 @@ Discourse.TopicList = Discourse.Model.extend({
   },
 
   insert: function(json) {
-    var newTopic;
-    newTopic = Discourse.TopicList.decodeTopic(json);
-    /* New Topics are always unseen
-    */
-
+    var newTopic  = Discourse.TopicList.decodeTopic(json);
+    // new Topics are always unseen
     newTopic.set('unseen', true);
-    newTopic.set('highlightAfterInsert', true);
+    // and highlighted on the topics list view
+    newTopic.set('highlight', true);
     return this.get('inserted').unshiftObject(newTopic);
   }
 
@@ -108,7 +112,7 @@ Discourse.TopicList.reopenClass({
     promise = new RSVP.Promise();
     found = PreloadStore.contains('topic_list');
     PreloadStore.get("topic_list", function() {
-      return jQuery.getJSON(url);
+      return $.getJSON(url);
     }).then(function(result) {
       topic_list.set('topics', Discourse.TopicList.topicsFrom(result));
       topic_list.set('can_create_topic', result.topic_list.can_create_topic);

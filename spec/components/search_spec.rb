@@ -16,7 +16,7 @@ describe Search do
   context 'post indexing observer' do
     before do
       @category = Fabricate(:category, name: 'america')
-      @topic = Fabricate(:topic, title: 'sam test topic', category: @category)
+      @topic = Fabricate(:topic, title: 'sam saffron test topic', category: @category)
       @post = Fabricate(:post, topic: @topic, raw: 'this <b>fun test</b> <img src="bla" title="my image">')
       @indexed = Topic.exec_sql("select search_data from posts_search where id = #{@post.id}").first["search_data"]
     end
@@ -69,6 +69,11 @@ describe Search do
   it 'returns something blank on a nil search' do
     ActiveRecord::Base.expects(:exec_sql).never
     Search.query(nil).should be_blank
+  end
+
+  it 'does not search when the search term is too small' do
+    ActiveRecord::Base.expects(:exec_sql).never
+    Search.query('evil', nil, 5).should be_blank
   end
 
   it 'escapes non alphanumeric characters' do

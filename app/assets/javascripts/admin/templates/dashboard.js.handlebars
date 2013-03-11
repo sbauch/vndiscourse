@@ -1,5 +1,3 @@
-<h3>{{i18n admin.dashboard.welcome}}</h3>
-
 {{#if Discourse.SiteSettings.version_checks}}
   <div {{bindAttr class=":version-check versionCheck.critical_updates:critical:normal"}}>
     {{#if loading }}
@@ -16,9 +14,15 @@
       <p class="version-notes">
         {{i18n admin.dashboard.latest_version}}: <span class="version-number">{{ versionCheck.latest_version }}</span>
         {{#if versionCheck.upToDate }}
-          <i class='icon icon-ok update-to-date'></i> {{i18n admin.dashboard.up_to_date}}
+          <span class='icon update-to-date'>☻</span> {{i18n admin.dashboard.up_to_date}}
         {{else}}
-          <i {{bindAttr class=":icon :icon-warning-sign versionCheck.critical_updates:critical-updates-available:updates-available"}}></i>
+          <span {{bindAttr class=":icon versionCheck.critical_updates:critical-updates-available:updates-available"}}>
+            {{#if versionCheck.behindByOneVersion}}
+              ☺
+            {{else}}
+              ☹
+            {{/if}}
+          </span>
           <span class="critical-note">{{i18n admin.dashboard.critical_available}}</span>
           <span class="normal-note">{{i18n admin.dashboard.updates_available}}</span>
           {{i18n admin.dashboard.please_upgrade}}
@@ -33,8 +37,26 @@
   </div>
 
   <div class="version-check-right">
-    <iframe src="http://tylerlh.github.com/github-latest-commits-widget/?username=discourse&repo=discourse&limit=10" allowtransparency="true" frameborder="0" scrolling="no" width="502px" height="252px" id="git-commits-widget"></iframe>
+    <iframe src="/commits-widget/index.html?limit=10&height=160" allowtransparency="true" frameborder="0" scrolling="no" width="502px" height="162px"></iframe>
   </div>
 
   <div class='clearfix'></div>
 {{/if}}
+
+<div class="dashboard-stats">
+  <table class="table table-condensed table-hover">
+    <thead>
+      <tr>
+        <th>&nbsp;</th>
+        <th>{{i18n admin.dashboard.reports.today}}</th>
+        <th>{{i18n admin.dashboard.reports.yesterday}}</th>
+        <th>{{i18n admin.dashboard.reports.last_7_days}}</th>
+        <th>{{i18n admin.dashboard.reports.last_30_days}}</th>
+      </tr>
+    </thead>
+    {{ render 'admin_signups' signups }}
+    {{ render 'admin_visits' visits }}
+    {{ render 'admin_topics' topics }}
+    {{ render 'admin_posts' posts }}
+  </table>
+</div>

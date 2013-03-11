@@ -11,6 +11,10 @@ Discourse.VersionCheck = Discourse.Model.extend({
     return this.get('latest_version') === this.get('installed_version');
   }.property('latest_version', 'installed_version'),
 
+  behindByOneVersion: function() {
+    return this.get('missing_versions_count') === 1;
+  }.property('missing_versions_count'),
+
   gitLink: function() {
     return "https://github.com/discourse/discourse/tree/" + this.get('installed_sha');
   }.property('installed_sha'),
@@ -23,7 +27,7 @@ Discourse.VersionCheck = Discourse.Model.extend({
 Discourse.VersionCheck.reopenClass({
   find: function() {
     var promise = new RSVP.Promise();
-    jQuery.ajax({
+    $.ajax({
       url: '/admin/version_check',
       dataType: 'json',
       success: function(json) {

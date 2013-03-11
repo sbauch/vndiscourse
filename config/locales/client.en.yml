@@ -24,6 +24,7 @@ en:
     you: "You"
     ok: "ok"
     or: "or"
+    now: "just now"
 
     suggested_topics:
       title: "Suggested Topics"
@@ -91,7 +92,6 @@ en:
         ok: "Your name looks good."
       username:
         title: "Username"
-        #instructions: "People can mention you as @{{username}}. This is an unregistered nickname. You can register it at <a href='http://discourse.org'>discourse.org</a>."
         instructions: "People can mention you as @{{username}}."
         available: "Your username is available."
         global_match: "Email matches the registered username."
@@ -280,6 +280,33 @@ en:
       show_preview: 'show preview &raquo;'
       hide_preview: '&laquo; hide preview'
 
+      bold_title: "Strong"
+      bold_text: "strong text"
+      italic_title: "Emphasis"
+      italic_text: "emphasized text"
+      link_title: "Hyperlink"
+      link_description: "enter link description here"
+      link_dialog_title: "Insert Hyperlink"
+      link_optional_text: "optional title"
+      quote_title: "Blockquote"
+      quote_text: "Blockquote"
+      code_title: "Code Sample"
+      code_text: "enter code here"
+      image_title: "Image"
+      image_description: "enter image description here"
+      image_dialog_title: "Insert Image"
+      image_optional_text: "optional title"
+      image_hosting_hint: "Need <a href='http://www.google.com/search?q=free+image+hosting' target='_blank'>free image hosting?</a>"
+      olist_title: "Numbered List"
+      ulist_title: "Bulleted List"
+      list_item: "List item"
+      heading_title: "Heading"
+      heading_text: "Heading"
+      hr_title: "Horizontal Rule"
+      undo_title: "Undo"
+      redo_title: "Redo"
+      help: "Markdown Editing Help"
+
     notifications:
       title: "notifications of @name mentions, replies to your posts and topics, private messages, etc"
       none: "You have no notifications right now."
@@ -336,7 +363,6 @@ en:
         unread: "There are no more unread topics to read."
         favorited: "There are no more favorited topics to read."
         category: "There are no more {{category}} topics."
-
 
     topic:
       create_in: 'Create {{categoryName}} Topic'
@@ -425,6 +451,10 @@ en:
       reply:
         title: 'Reply'
         help: 'begin composing a reply to this topic'
+
+      clear_pin:
+        title: "Clear pin"
+        help: "Clear the pinned status of this topic so it no longer appears at the top of your topic list"
 
       share:
         title: 'Share'
@@ -638,7 +668,6 @@ en:
 
       dashboard:
         title: "Admin Dashboard"
-        welcome: "Welcome to the admin section."
         version: "Installed version"
         up_to_date: "You are running the latest version of Discourse."
         critical_available: "A critical update is available."
@@ -646,6 +675,13 @@ en:
         please_upgrade: "Please upgrade!"
         latest_version: "Latest version"
         update_often: 'Please update often!'
+
+        reports:
+          today: "Today"
+          yesterday: "Yesterday"
+          last_7_days: "Last 7 Days"
+          last_30_days: "Last 30 Days"
+          all_time: "All Time"
 
       flags:
         title: "Flags"

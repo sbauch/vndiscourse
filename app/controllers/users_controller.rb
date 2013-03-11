@@ -2,7 +2,7 @@ require_dependency 'discourse_hub'
 
 class UsersController < ApplicationController
 
-  skip_before_filter :check_xhr, only: [:password_reset, :update, :activate_account, :avatar, :authorize_email, :user_preferences_redirect]
+  skip_before_filter :check_xhr, only: [:show, :password_reset, :update, :activate_account, :avatar, :authorize_email, :user_preferences_redirect]
   skip_before_filter :authorize_mini_profiler, only: [:avatar]
   skip_before_filter :check_restricted_access, only: [:avatar]
 
@@ -10,8 +10,15 @@ class UsersController < ApplicationController
 
   def show
     @user = fetch_user_from_params
-    anonymous_etag(@user) do
-      render_serialized(@user, UserSerializer)
+    user_serializer = UserSerializer.new(@user, scope: guardian, root: 'user')
+    respond_to do |format|
+      format.html do
+        store_preloaded("user_#{@user.username}", MultiJson.dump(user_serializer))
+      end
+
+      format.json do
+        render_json_dump(user_serializer)
+      end
     end
   end
 
@@ -192,6 +199,8 @@ class UsersController < ApplicationController
     else
       render :json => {success: false, message: I18n.t("login.errors", errors: user.errors.full_messages.join("\n"))}
     end
+  rescue ActiveRecord::StatementInvalid
+    render :json => {success: false, message: I18n.t("login.something_already_taken")}
   rescue DiscourseHub::NicknameUnavailable
     render :json => {success: false, message: I18n.t("login.errors", errors:I18n.t("login.not_available", suggestion: User.suggest_username(params[:username])) )}
   rescue RestClient::Forbidden

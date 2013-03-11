@@ -1,5 +1,7 @@
 require_dependency 'email_token'
 require_dependency 'trust_level'
+require_dependency 'pbkdf2'
+require_dependency 'summarize'
 
 class User < ActiveRecord::Base
 
@@ -287,7 +289,7 @@ class User < ActiveRecord::Base
   end
 
   def update_ip_address!(new_ip_address)
-    unless ip_address == new_ip_address && new_ip_address.blank?
+    unless ip_address == new_ip_address || new_ip_address.blank?
       update_column(:ip_address, new_ip_address)
     end
   end
@@ -319,6 +321,11 @@ class User < ActiveRecord::Base
     "https://www.gravatar.com/avatar/#{email_hash}.png?s={size}&r=pg&d=identicon"
   end
 
+  # Don't pass this up to the client - it's meant for server side use
+  def small_avatar_url
+    "https://www.gravatar.com/avatar/#{email_hash}.png?s=200&r=pg&d=identicon"
+  end
+
   # return null for local avatars, a template for gravatar
   def avatar_template
     User.avatar_template(email)
@@ -348,7 +355,7 @@ class User < ActiveRecord::Base
   end
 
   # The following count methods are somewhat slow - definitely don't use them in a loop.
-  # They might need to be denormialzied
+  # They might need to be denormalized
   def like_count
     UserAction.where(user_id: id, action_type: UserAction::WAS_LIKED).count
   end
@@ -443,11 +450,17 @@ class User < ActiveRecord::Base
   end
 
   def readable_name
-    if name.present? && name != username
-      "#{name} (#{username})"
-    else
-      username
-    end
+    return "#{name} (#{username})" if name.present? && name != username
+    username
+  end
+
+  def bio_summary
+    return nil unless bio_cooked.present?
+    Summarize.new(bio_cooked).summary
+  end
+
+  def self.count_by_signup_date(since=30.days.ago)
+    where('created_at > ?', since).group('date(created_at)').order('date(created_at)').count
   end
 
   protected
@@ -461,25 +474,14 @@ class User < ActiveRecord::Base
     end
 
     def update_tracked_topics
-      if auto_track_topics_after_msecs_changed?
+      return unless auto_track_topics_after_msecs_changed?
 
-        if auto_track_topics_after_msecs < 0
-
-          User.exec_sql('update topic_users set notification_level = ?
-                         where notifications_reason_id is null and
-                           user_id = ?' , TopicUser::NotificationLevel::REGULAR , id)
-        else
-
-          User.exec_sql('update topic_users set notification_level = ?
-                         where notifications_reason_id is null and
-                           user_id = ? and
-                           total_msecs_viewed < ?' , TopicUser::NotificationLevel::REGULAR , id, auto_track_topics_after_msecs)
-
-          User.exec_sql('update topic_users set notification_level = ?
-                         where notifications_reason_id is null and
-                           user_id = ? and
-                           total_msecs_viewed >= ?' , TopicUser::NotificationLevel::TRACKING , id, auto_track_topics_after_msecs)
-        end
+      where_conditions = {notifications_reason_id: nil, user_id: id}
+      if auto_track_topics_after_msecs < 0
+        TopicUser.update_all({notification_level: TopicUser.notification_levels[:regular]}, where_conditions)
+      else
+        TopicUser.update_all(["notification_level = CASE WHEN total_msecs_viewed < ? THEN ? ELSE ? END",
+                              auto_track_topics_after_msecs, TopicUser.notification_levels[:regular], TopicUser.notification_levels[:tracking]], where_conditions)
       end
     end
 
@@ -496,13 +498,13 @@ class User < ActiveRecord::Base
     end
 
     def hash_password(password, salt)
-      PBKDF2.new(password: password, salt: salt, iterations: Rails.configuration.pbkdf2_iterations).hex_string
+      Pbkdf2.hash_password(password, salt, Rails.configuration.pbkdf2_iterations)
     end
 
     def add_trust_level
+      # there is a possiblity we did no load trust level column, skip it
+      return unless attributes.key? "trust_level"
       self.trust_level ||= SiteSetting.default_trust_level
-    rescue ActiveModel::MissingAttributeError
-      # Ignore it, safely - see http://www.tatvartha.com/2011/03/activerecordmissingattributeerror-missing-attribute-a-bug-or-a-features/
     end
 
     def update_username_lower

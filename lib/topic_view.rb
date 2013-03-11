@@ -1,5 +1,6 @@
 require_dependency 'guardian'
 require_dependency 'topic_query'
+require_dependency 'summarize'
 
 class TopicView
 
@@ -61,12 +62,26 @@ class TopicView
     "#{@topic.relative_url}?page=#{next_page}"
   end
 
+  def absolute_url
+    "#{Discourse.base_url}#{@topic.relative_url}"
+  end
+
   def relative_url
     @topic.relative_url
   end
 
   def title
     @topic.title
+  end
+
+  def summary
+    return nil if posts.blank?
+    Summarize.new(posts.first.cooked).summary
+  end
+
+  def image_url
+    return nil if posts.blank?
+    posts.first.user.small_avatar_url
   end
 
   def filter_posts(opts = {})

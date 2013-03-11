@@ -2,20 +2,23 @@
 
 describe("Discourse.Onebox", function() {
 
+  var anchor;
+
   beforeEach(function() {
     spyOn(jQuery, 'ajax').andCallThrough();
+    anchor = $("<a href='http://bla.com'></a>")[0];
   });
 
   it("Stops rapid calls with cache true", function() {
-    Discourse.Onebox.lookup('http://bla.com', true, function(c) { return c; });
-    Discourse.Onebox.lookup('http://bla.com', true, function(c) { return c; });
-    expect(jQuery.ajax.calls.length).toBe(1);
+    Discourse.Onebox.load(anchor, true);
+    Discourse.Onebox.load(anchor, true);
+    expect($.ajax.calls.length).toBe(1);
   });
 
   it("Stops rapid calls with cache false", function() {
-    Discourse.Onebox.lookup('http://bla.com/a', false, function(c) { return c; });
-    Discourse.Onebox.lookup('http://bla.com/a', false, function(c) { return c; });
-    expect(jQuery.ajax.calls.length).toBe(1);
+    Discourse.Onebox.load(anchor, false);
+    Discourse.Onebox.load(anchor, false);
+    expect($.ajax.calls.length).toBe(1);
   });
 
 });

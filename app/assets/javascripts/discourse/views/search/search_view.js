@@ -6,7 +6,7 @@
   @namespace Discourse
   @module Discourse
 **/
-window.Discourse.SearchView = Discourse.View.extend({
+Discourse.SearchView = Discourse.View.extend({
   tagName: 'div',
   classNames: ['d-dropdown'],
   elementId: 'search-dropdown',
@@ -36,9 +36,10 @@ window.Discourse.SearchView = Discourse.View.extend({
   // If we need to perform another search
   newSearchNeeded: (function() {
     this.set('noResults', false);
-    if (this.present('term')) {
+    var term = this.get('term');
+    if (term && term.length >= Discourse.SiteSettings.min_search_term_length) {
       this.set('loading', true);
-      this.searchTerm(this.get('term'), this.get('typeFilter'));
+      this.searchTerm(term, this.get('typeFilter'));
     } else {
       this.set('results', null);
     }
@@ -94,7 +95,7 @@ window.Discourse.SearchView = Discourse.View.extend({
       this.currentSearch = null;
     }
     this.searcher = this.searcher || Discourse.debounce(function(term, typeFilter) {
-      _this.currentSearch = jQuery.ajax({
+      _this.currentSearch = $.ajax({
         url: '/search',
         data: {
           term: term,

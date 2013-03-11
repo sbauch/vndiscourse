@@ -67,12 +67,10 @@
     }
   }
   .search {
+    float: right;
+    margin-left: 10px;
     label {
       margin-top: 5px;
-      float: right;
-    }
-    input[type=text] {
-      float: right;
     }
   }
 }
@@ -93,7 +91,7 @@
     font-weight: bold
   }
 
-  .version-notes i.icon {
+  .version-notes .icon {
     margin-left: 20px;
   }
 
@@ -104,17 +102,17 @@
     display: none;
   }
 
-  i.icon {
-    font-size: 20px;
+  .icon {
+    font-size: 26px;
   }
 
-  i.update-to-date {
+  .update-to-date {
     color: green;
   }
-  i.updates-available {
-    color: orange;
+  .updates-available {
+    color: #FF9500;
   }
-  i.critical-updates-available {
+  .critical-updates-available {
     color: red;
   }
 }
@@ -302,4 +300,22 @@ table {
   }
   .flaggers { padding: 0 10px; }
   .last-flagged { padding: 0 10px; }
+}
+
+.dashboard-stats {
+  margin-top: 10px;
+
+  table {
+    width: 450px;
+
+    th {
+      font-weight: normal;
+      text-align: center;
+    }
+
+    td.value {
+      font-weight: bold;
+      text-align: center;
+    }
+  }
 }
