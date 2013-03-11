@@ -49,7 +49,13 @@ class DiscourseRedis
 
   def self.new_redis_store
     redis_config = YAML::load(File.open("#{Rails.root}/config/redis.yml"))[Rails.env]
-    redis_store = ActiveSupport::Cache::RedisStore.new "redis://#{redis_config['host']}:#{redis_config['port']}/#{redis_config['cache_db']}"
+    
+    if Rails.env == 'production' 
+      redis_store = ActiveSupport::Cache::RedisStore.new "redis://redistogo:#{@config['password']}@#{@config['host']}:#{@config['port']}"
+    else
+      redis_store = ActiveSupport::Cache::RedisStore.new "redis://#{@config['host']}:#{@config['port']}/#{@config['db']}"
+    end
+    # "redis://#{redis_config['host']}:#{redis_config['port']}/#{redis_config['cache_db']}"
     redis_store.options[:namespace] = -> { DiscourseRedis.namespace }
     redis_store
   end
