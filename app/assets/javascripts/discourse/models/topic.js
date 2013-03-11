@@ -256,10 +256,12 @@ Discourse.Topic = Discourse.Model.extend({
         var post;
         p.scrollToAfterInsert = opts.nearPost;
         post = Discourse.Post.create(p);
+				console.log(post);
         post.set('topic', topic);
         topic.get('posts').pushObject(post);
         lastPost = post;
       });
+			
       topic.set('loaded', true);
     }
 
@@ -449,5 +451,3 @@ Discourse.Topic.reopenClass({
   }
 
 });
-
-
