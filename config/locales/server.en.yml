@@ -494,7 +494,7 @@ en:
       blank: "must be present"
       must_begin_with_alphanumeric: "must begin with a letter or number"
     email:
-      not_allowed: "must be an @vaynermedia.com address. You will need to confirm you own the address before you gain access."
+      not_allowed: "You must be a VaynerMedia employee. Authenticate with your @vaynermedia.com Google Apps account"
 
   invite_mailer:
     subject_template: "[%{site_name}] %{invitee_name} invited you to join a discussion on %{site_name}"
