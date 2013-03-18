@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency 'post_destroyer'
 
 describe Post do
 
@@ -78,14 +79,6 @@ describe Post do
       PostAction.remove_act(user, post, PostActionType.types[:off_topic])
       post.reload
       post.is_flagged?.should == false
-    end
-  end
-
-  describe 'message bus' do
-    it 'enqueues the post on the message bus' do
-      topic = self.topic
-      MessageBus.expects(:publish).with("/topic/#{topic.id}", instance_of(Hash))
-      Fabricate(:post, post_args)
     end
   end
 
@@ -494,7 +487,7 @@ describe Post do
     context "as the creator of the post" do
 
       before do
-        post.delete_by(post.user)
+        PostDestroyer.new(post.user, post).destroy
         post.reload
       end
 
@@ -516,12 +509,12 @@ describe Post do
     context "as a moderator" do
 
       before do
-        post.delete_by(post.user)
+        PostDestroyer.new(moderator, post).destroy
         post.reload
       end
 
       it "deletes the post" do
-        post.deleted_at.should be_blank
+        post.deleted_at.should be_present
       end
 
     end
@@ -530,17 +523,19 @@ describe Post do
 
   describe 'after delete' do
 
+    let(:moderator) { Fabricate(:moderator) }
     let!(:coding_horror) { Fabricate(:coding_horror) }
     let!(:post) { Fabricate(:post, post_args.merge(raw: "Hello @CodingHorror")) }
 
     it "should feature the users again (in case they've changed)" do
       Jobs.expects(:enqueue).with(:feature_topic_users, has_entries(topic_id: post.topic_id, except_post_id: post.id))
-      post.destroy
+      PostDestroyer.new(moderator, post).destroy
     end
 
     describe 'with a reply' do
 
       let!(:reply) { Fabricate(:basic_reply, user: coding_horror, topic: post.topic) }
+      let!(:post_reply) { PostReply.create(post_id: post.id, reply_id: reply.id) }
 
       it 'changes the post count of the topic' do
         post.reload
@@ -552,7 +547,7 @@ describe Post do
 
       it 'lowers the reply_count when the reply is deleted' do
         lambda {
-          reply.destroy
+          PostDestroyer.new(moderator, reply).destroy
           post.reload
         }.should change(post.post_replies, :count).by(-1)
       end
@@ -586,7 +581,7 @@ describe Post do
     end
 
     it 'is of the regular post type' do
-      post.post_type.should == Post::REGULAR
+      post.post_type.should == Post.types[:regular]
     end
 
     it 'has no versions' do
@@ -631,7 +626,7 @@ describe Post do
 
     end
 
-    describe 'quote counts' do
+    describe 'extract_quoted_post_numbers' do
 
       let!(:post) { Fabricate(:post, post_args) }
       let(:reply) { Fabricate.build(:post, post_args) }
@@ -652,8 +647,11 @@ describe Post do
 
     describe 'a new reply' do
 
-      let!(:post) { Fabricate(:post, post_args) }
-      let!(:reply) { Fabricate(:reply, post_args.merge(reply_to_post_number: post.post_number)) }
+      let(:topic) { Fabricate(:topic) }
+      let(:other_user) { Fabricate(:coding_horror) }
+      let(:reply_text) { "[quote=\"Evil Trout, post:1\"]\nhello\n[/quote]\nHmmm!"}
+      let!(:post) { PostCreator.new(topic.user, raw: Fabricate.build(:post).raw, topic_id: topic.id).create }
+      let!(:reply) { PostCreator.new(other_user, raw: reply_text, topic_id: topic.id, reply_to_post_number: post.post_number ).create }
 
       it 'has a quote' do
         reply.quote_count.should == 1
@@ -691,7 +689,10 @@ describe Post do
 
       context 'a multi-quote reply' do
 
-        let!(:multi_reply) { Fabricate(:multi_quote_reply, post_args.merge(reply_to_post_number: post.post_number)) }
+        let!(:multi_reply) do
+          raw = "[quote=\"Evil Trout, post:1\"]post1 quote[/quote]\nAha!\n[quote=\"Evil Trout, post:2\"]post2 quote[/quote]\nNeat-o"
+          PostCreator.new(other_user, raw: raw, topic_id: topic.id, reply_to_post_number: post.post_number).create
+        end
 
         it 'has two quotes' do
           multi_reply.quote_count.should == 2

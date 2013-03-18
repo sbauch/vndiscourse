@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency 'post_destroyer'
 
 describe PostAction do
 
@@ -7,6 +8,7 @@ describe PostAction do
   it { should belong_to :post_action_type }
   it { should rate_limit }
 
+  let(:moderator) { Fabricate(:moderator) }
   let(:codinghorror) { Fabricate(:coding_horror) }
   let(:post) { Fabricate(:post) }
   let(:bookmark) { PostAction.new(user_id: post.user_id, post_action_type_id: PostActionType.types[:bookmark] , post_id: post.id) }
@@ -36,7 +38,7 @@ describe PostAction do
     it "should reset counts when a post is deleted" do
       post2 = Fabricate(:post, topic_id: post.topic_id)
       PostAction.act(codinghorror, post2, PostActionType.types[:off_topic])
-      post2.destroy
+      PostDestroyer.new(moderator, post2).destroy
       PostAction.flagged_posts_count.should == 0
     end
 
@@ -149,7 +151,7 @@ describe PostAction do
       post.reload
 
       post.hidden.should.should be_true
-      post.hidden_reason_id.should == Post::HiddenReason::FLAG_THRESHOLD_REACHED
+      post.hidden_reason_id.should == Post.hidden_reasons[:flag_threshold_reached]
       post.topic.visible.should be_false
 
       post.revise(post.user, post.raw + " ha I edited it ")
@@ -165,14 +167,14 @@ describe PostAction do
       post.reload
 
       post.hidden.should be_true
-      post.hidden_reason_id.should == Post::HiddenReason::FLAG_THRESHOLD_REACHED_AGAIN
+      post.hidden_reason_id.should == Post.hidden_reasons[:flag_threshold_reached_again]
 
       post.revise(post.user, post.raw + " ha I edited it again ")
 
       post.reload
 
       post.hidden.should be_true
-      post.hidden_reason_id.should == Post::HiddenReason::FLAG_THRESHOLD_REACHED_AGAIN
+      post.hidden_reason_id.should == Post.hidden_reasons[:flag_threshold_reached_again]
     end
   end
 

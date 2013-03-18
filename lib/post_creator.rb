@@ -77,6 +77,8 @@ class PostCreator
       post = topic.posts.new(raw: @opts[:raw],
                              user: @user,
                              reply_to_post_number: @opts[:reply_to_post_number])
+      post.extract_quoted_post_numbers
+
       post.image_sizes = @opts[:image_sizes] if @opts[:image_sizes].present?
       post.invalidate_oneboxes = @opts[:invalidate_oneboxes] if @opts[:invalidate_oneboxes].present?
       unless post.save
@@ -110,6 +112,19 @@ class PostCreator
 
       # Update `last_posted_at` to match the post's created_at
       @user.update_column(:last_posted_at, post.created_at)
+
+      # Publish the post in the message bus
+      MessageBus.publish("/topic/#{post.topic_id}",
+                    id: post.id,
+                    created_at: post.created_at,
+                    user: BasicUserSerializer.new(post.user).as_json(root: false),
+                    post_number: post.post_number)
+
+      # Advance the draft sequence
+      post.advance_draft_sequence
+
+      # Save the quote relationships
+      post.save_reply_relationships
     end
 
     post

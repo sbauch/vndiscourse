@@ -2,6 +2,7 @@ require_dependency 'jobs'
 require_dependency 'pretty_text'
 require_dependency 'rate_limiter'
 require_dependency 'post_revisor'
+require_dependency 'enum'
 
 require 'archetype'
 require 'digest/sha1'
@@ -9,18 +10,12 @@ require 'digest/sha1'
 class Post < ActiveRecord::Base
   include RateLimiter::OnCreateRecord
 
-  module HiddenReason
-    FLAG_THRESHOLD_REACHED = 1
-    FLAG_THRESHOLD_REACHED_AGAIN = 2
-  end
-
   versioned if: :raw_changed?
 
   rate_limit
   acts_as_paranoid
 
   after_recover :update_flagged_posts_count
-  after_destroy :update_flagged_posts_count
 
   belongs_to :user
   belongs_to :topic, counter_cache: :posts_count
@@ -42,14 +37,16 @@ class Post < ActiveRecord::Base
 
   SHORT_POST_CHARS = 1200
 
-  # Post Types
-  REGULAR = 1
-  MODERATOR_ACTION = 2
-
-  before_save :extract_quoted_post_numbers
-
   scope :by_newest, order('created_at desc, id desc')
   scope :with_user, includes(:user)
+
+  def self.hidden_reasons
+    @hidden_reasons ||= Enum.new(:flag_threshold_reached, :flag_threshold_reached_again)
+  end
+
+  def self.types
+    @types ||= Enum.new(:regular, :moderator_action)
+  end
 
   def raw_quality
     sentinel = TextSentinel.new(raw, min_entropy: SiteSetting.body_min_entropy)
@@ -144,23 +141,6 @@ class Post < ActiveRecord::Base
 
     results = doc.to_html.scan(PrettyText.mention_matcher)
     @raw_mentions = results.uniq.map { |un| un.first.downcase.gsub!(/^@/, '') }
-  end
-
-  # The rules for deletion change depending on who is doing it.
-  def delete_by(deleted_by)
-    if deleted_by.moderator?
-      # As a moderator, delete the post.
-      Post.transaction do
-        self.destroy
-        Topic.reset_highest(topic_id)
-      end
-    elsif deleted_by.id == user_id
-      # As the poster, make a revision that says deleted.
-      Post.transaction do
-        revise(deleted_by, I18n.t('js.post.deleted_by_author'), force_new_version: true)
-        update_column(:user_deleted, true)
-      end
-    end
   end
 
   def archetype
@@ -337,58 +317,12 @@ class Post < ActiveRecord::Base
     self.cooked = cook(raw, topic_id: topic_id) unless new_record?
   end
 
-  before_destroy do
-
-    # Update the last post id to the previous post if it exists
-    last_post = Post.where("topic_id = ? and id <> ?", topic_id, id).order('created_at desc').limit(1).first
-    if last_post.present?
-      topic.update_attributes(last_posted_at: last_post.created_at,
-                              last_post_user_id: last_post.user_id,
-                              highest_post_number: last_post.post_number)
-
-      # If the poster doesn't have any other posts in the topic, clear their posted flag
-      unless Post.exists?(["topic_id = ? and user_id = ? and id <> ?", topic_id, user_id, id])
-        TopicUser.update_all 'posted = false', topic_id: topic_id, user_id: user_id
-      end
-    end
-
-    # Feature users in the topic
-    Jobs.enqueue(:feature_topic_users, topic_id: topic_id, except_post_id: id)
-
+  def advance_draft_sequence
+    return if topic.blank? # could be deleted
+    DraftSequence.next!(last_editor_id, topic.draft_key)
   end
 
-  after_destroy do
-    # Remove any reply records that point to deleted posts
-    post_ids = PostReply.select(:post_id).where(reply_id: id).map(&:post_id)
-    PostReply.delete_all reply_id: id
-
-    if post_ids.present?
-      Post.where(id: post_ids).each { |p| p.update_column :reply_count, p.replies.count }
-    end
-
-    # Remove any notifications that point to this deleted post
-    Notification.delete_all topic_id: topic_id, post_number: post_number
-  end
-
-  after_save do
-    DraftSequence.next! last_editor_id, topic.draft_key if topic # could be deleted
-
-    quoted_post_numbers << reply_to_post_number if reply_to_post_number.present?
-
-    # Create a reply relationship between quoted posts and this new post
-    if quoted_post_numbers.present?
-      quoted_post_numbers.map(&:to_i).uniq.each do |p|
-        post = Post.where(topic_id: topic_id, post_number: p).first
-        if post.present?
-          post_reply = post.post_replies.new(reply_id: id)
-          if post_reply.save
-            Post.update_all ['reply_count = reply_count + 1'], id: post.id
-          end
-        end
-      end
-    end
-  end
-
+  # Determine what posts are quoted by this post
   def extract_quoted_post_numbers
     self.quoted_post_numbers = []
 
@@ -412,6 +346,24 @@ class Post < ActiveRecord::Base
 
     self.quoted_post_numbers.uniq!
     self.quote_count = quoted_post_numbers.size
+  end
+
+  def save_reply_relationships
+    self.quoted_post_numbers ||= []
+    self.quoted_post_numbers << reply_to_post_number if reply_to_post_number.present?
+
+    # Create a reply relationship between quoted posts and this new post
+    if self.quoted_post_numbers.present?
+      self.quoted_post_numbers.map(&:to_i).uniq.each do |p|
+        post = Post.where(topic_id: topic_id, post_number: p).first
+        if post.present?
+          post_reply = post.post_replies.new(reply_id: id)
+          if post_reply.save
+            Post.update_all ['reply_count = reply_count + 1'], id: post.id
+          end
+        end
+      end
+    end
   end
 
   # Enqueue post processing for this post
