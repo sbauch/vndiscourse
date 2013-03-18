@@ -33,14 +33,6 @@ GIT
       activemodel (>= 3.0)
 
 GIT
-  remote: git://github.com/vaynermedia/discourse_user_directory.git
-  revision: f6ecf78021519e8a22ac922a8ee53d0c6c3748a1
-  specs:
-    discourse_user_directory (0.0.5)
-      coffee-rails
-      rails (~> 3.2.12)
-
-GIT
   remote: git://github.com/zhangyuan/vestal_versions
   revision: 0ea75ec4e269b5a9e609639919ade0f36381a446
   specs:
@@ -62,6 +54,13 @@ PATH
   remote: vendor/gems/discourse_task
   specs:
     discourse_task (0.0.1)
+
+PATH
+  remote: vendor/gems/discourse_user_directory
+  specs:
+    discourse_user_directory (0.0.5)
+      coffee-rails
+      rails (~> 3.2.12)
 
 PATH
   remote: vendor/gems/message_bus
