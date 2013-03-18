@@ -1,0 +1,24 @@
+= DiscourseUserDirectory
+
+= Installation
+
+1) Add discourse_user_directory to your Discourse app's vendor/gems directory
+
+  $ cd vendor/gems
+  $ git clone git://github.com/vaynermedia/discourse_user_directory.git
+
+2) Add gem to Discourse Gemfile
+
+  gem 'discourse_user_directory', path: 'vendor/gems/discourse_user_directory'
+
+3) Install Gems
+
+  bundle install
+
+4) Add 'Directory' as a top nav item
+
+Add 'directory' to validNavNames  in app/assets/javascripts/discourse/models/nav_item.js
+
+Start your server and head to the Site Settings. Add 'directory' as a top_menu item in the pipe-separated list.
+
+This project rocks and uses MIT-LICENSE.

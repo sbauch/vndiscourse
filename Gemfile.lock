@@ -58,7 +58,7 @@ PATH
     discourse_task (0.0.1)
 
 PATH
-  remote: vendor/gems/discourse_user_directory-0.0.5
+  remote: vendor/gems/discourse_user_directory
   specs:
     discourse_user_directory (0.0.5)
       coffee-rails
