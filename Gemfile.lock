@@ -51,6 +51,18 @@ PATH
     discourse_plugin (0.0.1)
 
 PATH
+  remote: vendor/gems/discourse_task
+  specs:
+    discourse_task (0.0.1)
+
+PATH
+  remote: vendor/gems/discourse_user_directory
+  specs:
+    discourse_user_directory (0.0.5)
+      coffee-rails
+      rails (~> 3.2.12)
+
+PATH
   remote: vendor/gems/message_bus
   specs:
     message_bus (0.0.1)
@@ -492,6 +504,8 @@ DEPENDENCIES
   diffy
   discourse_emoji!
   discourse_plugin!
+  discourse_task!
+  discourse_user_directory!
   em-redis
   ember-rails!
   eventmachine
