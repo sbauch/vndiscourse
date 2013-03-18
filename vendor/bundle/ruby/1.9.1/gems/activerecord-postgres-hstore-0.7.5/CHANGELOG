@@ -1,0 +1,16 @@
+0.7.3 / 2013-02-07
+
+* Enhancements
+  * Always use empty hash as default value
+
+
+0.7.2 / 2013-02-07
+
+* Bug fixes
+
+  * Properly quote/escape double quotes https://github.com/engageis/activerecord-postgres-hstore/issues/78
+
+* Enhancements
+
+  * Delegate hstore dumping/loading to https://github.com/seamusabshere/pg-hstore
+  * Add a CHANGELOG!
