@@ -505,7 +505,7 @@ DEPENDENCIES
   discourse_emoji!
   discourse_plugin!
   discourse_task!
-  discourse_user_directory!
+  discourse_user_directory (~> 0.0.5)!
   em-redis
   ember-rails!
   eventmachine
