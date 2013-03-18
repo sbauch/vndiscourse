@@ -45,7 +45,7 @@ Discourse.LoginView = Discourse.ModalBodyView.extend({
   login: function() {
     var _this = this;
     this.set('loggingIn', true);
-    $.post("/session", {
+    $.post(Discourse.getURL("/session"), {
       login: this.get('loginName'),
       password: this.get('loginPassword')
     }).success(function(result) {
@@ -56,7 +56,13 @@ Discourse.LoginView = Discourse.ModalBodyView.extend({
         }
         _this.flash(result.error, 'error');
       } else {
-        return window.location.reload();
+        // Trigger the browser's password manager using the hidden static login form:
+        var $hidden_login_form = $('#hidden-login-form');
+        $hidden_login_form.find('input[name=username]').val(_this.get('loginName'));
+        $hidden_login_form.find('input[name=password]').val(_this.get('loginPassword'));
+        $hidden_login_form.find('input[name=redirect]').val(window.location.href);
+        $hidden_login_form.find('input[name=authenticity_token]').val($('meta[name=csrf-token]').attr('content'));
+        $hidden_login_form.submit();
       }
     }).fail(function(result) {
       _this.flash(Em.String.i18n('login.error'), 'error');
@@ -77,7 +83,7 @@ Discourse.LoginView = Discourse.ModalBodyView.extend({
     this.set('authenticate', 'twitter');
     left = this.get('lastX') - 400;
     top = this.get('lastY') - 200;
-    return window.open("/auth/twitter", "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
+    return window.open(Discourse.getURL("/auth/twitter"), "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
   },
 
   facebookLogin: function() {
@@ -85,7 +91,7 @@ Discourse.LoginView = Discourse.ModalBodyView.extend({
     this.set('authenticate', 'facebook');
     left = this.get('lastX') - 400;
     top = this.get('lastY') - 200;
-    return window.open("/auth/facebook", "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
+    return window.open(Discourse.getURL("/auth/facebook"), "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
   },
 
   openidLogin: function(provider) {
@@ -94,9 +100,9 @@ Discourse.LoginView = Discourse.ModalBodyView.extend({
     top = this.get('lastY') - 200;
     if (provider === "yahoo") {
       this.set("authenticate", 'yahoo');
-      return window.open("/auth/yahoo", "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
+      return window.open(Discourse.getURL("/auth/yahoo"), "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
     } else {
-      window.open("/auth/google", "_blank", "menubar=no,status=no,height=500,width=850,left=" + left + ",top=" + top);
+      window.open(Discourse.getURL("/auth/google"), "_blank", "menubar=no,status=no,height=500,width=850,left=" + left + ",top=" + top);
       return this.set("authenticate", 'google');
     }
   },
@@ -106,7 +112,7 @@ Discourse.LoginView = Discourse.ModalBodyView.extend({
     this.set('authenticate', 'github');
     left = this.get('lastX') - 400;
     top = this.get('lastY') - 200;
-    return window.open("/auth/github", "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
+    return window.open(Discourse.getURL("/auth/github"), "_blank", "menubar=no,status=no,height=400,width=800,left=" + left + ",top=" + top);
   },
 
   personaLogin: function() {
@@ -143,6 +149,11 @@ Discourse.LoginView = Discourse.ModalBodyView.extend({
   },
 
   didInsertElement: function(e) {
+    // Get username and password from the browser's password manager,
+    // if it filled the hidden static login form:
+    this.set('loginName', $('#hidden-login-form input[name=username]').val());
+    this.set('loginPassword', $('#hidden-login-form input[name=password]').val());
+
     var _this = this;
     return Em.run.next(function() {
       return $('#login-account-password').keydown(function(e) {

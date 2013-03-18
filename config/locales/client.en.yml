@@ -267,10 +267,12 @@ en:
       saving_draft_tip: "saving"
       saved_draft_tip: "saved"
       saved_local_draft_tip: "saved locally"
+      similar_topics: "Your topic is similar to..."
+      drafts_offline: "drafts offline"
 
       min_length:
-        at_least: "enter at least {{n}} characters"
-        more: "{{n}} to go..."
+        need_more_for_title: "{{n}} to go for the title"
+        need_more_for_reply: "{{n}} to go for the reply"
 
       save_edit: "Save Edit"
       reply_original: "Reply on Original Topic"
@@ -517,6 +519,7 @@ en:
     post:
       reply: "Replying to {{link}} by {{replyAvatar}} {{username}}"
       reply_topic: "Reply to {{link}}"
+      quote_reply: "quote reply"
       edit: "Editing {{link}} by {{replyAvatar}} {{username}}"
       post_number: "post {{number}}"
       in_reply_to: "in reply to"
@@ -582,11 +585,14 @@ en:
       view: 'View Topics in Category'
       delete: 'Delete Category'
       create: 'Create Category'
+      creation_error: There has been an error during the creation of the category.
       more_posts: "view all {{posts}}..."
       name: "Category Name"
       description: "Description"
       topic: "category topic"
-      color: "Color"
+      badge_colors: "Badge colors"
+      background_color: "Background color"
+      foreground_color: "Foreground color"
       name_placeholder: "Should be short and succinct."
       color_placeholder: "Any web color"
       delete_confirm: "Are you sure you want to delete that category?"
@@ -688,6 +694,8 @@ en:
         please_upgrade: "Please upgrade!"
         latest_version: "Latest version"
         update_often: 'Please update often!'
+        total_users: "Total Users"
+        moderator_short: "mod"
 
         reports:
           today: "Today"
@@ -698,6 +706,10 @@ en:
           7_days_ago: "7 Days Ago"
           30_days_ago: "30 Days Ago"
 
+      commits:
+        latest_changes: "Latest changes"
+        by: "by"
+
       flags:
         title: "Flags"
         old: "Old"
@@ -707,6 +719,7 @@ en:
         delete: "Delete Post"
         delete_title: "delete post (if its the first post delete topic)"
         flagged_by: "Flagged by"
+        error: "Something went wrong"
 
       customize:
         title: "Customize"
@@ -717,6 +730,8 @@ en:
         preview: "preview"
         undo_preview: "undo preview"
         save: "Save"
+        new: "New"
+        new_style: "New Style"
         delete: "Delete"
         delete_confirm: "Delete this customization?"
 

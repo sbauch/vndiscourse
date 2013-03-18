@@ -18,13 +18,26 @@ Discourse.EditCategoryView = Discourse.ModalBodyView.extend({
   }).property('category.name', 'category.color'),
 
   colorStyle: (function() {
-    return "background-color: #" + (this.get('category.color')) + ";";
-  }).property('category.color'),
+    return "background-color: #" + (this.get('category.color')) + "; color: #" + (this.get('category.text_color')) + ";";
+  }).property('category.color', 'category.text_color'),
+
+  // background colors are available as a pipe-separated string
+  backgroundColors: (function() {
+    return Discourse.SiteSettings.category_colors.split("|").map(function(i) { return i.toUpperCase(); });
+  }).property('Discourse.SiteSettings.category_colors'),
+
+  // black & white only for foreground colors
+  foregroundColors: ['FFFFFF', '000000'],
 
   title: (function() {
     if (this.get('category.id')) return Em.String.i18n("category.edit_long");
     return Em.String.i18n("category.create");
   }).property('category.id'),
+
+  categoryName: (function() {
+    var name = this.get('category.name') || "";
+    return name.trim().length > 0 ? name : Em.String.i18n("preview");
+  }).property('category.name'),
 
   buttonTitle: (function() {
     if (this.get('saving')) return Em.String.i18n("saving");
@@ -36,7 +49,7 @@ Discourse.EditCategoryView = Discourse.ModalBodyView.extend({
     if (this.get('category')) {
       this.set('id', this.get('category.slug'));
     } else {
-      this.set('category', Discourse.Category.create({ color: 'AB9364' }));
+      this.set('category', Discourse.Category.create({ color: 'AB9364', text_color: 'FFFFFF' }));
     }
   },
 
@@ -48,7 +61,7 @@ Discourse.EditCategoryView = Discourse.ModalBodyView.extend({
 
   saveSuccess: function(result) {
     $('#discourse-modal').modal('hide');
-    window.location = "/category/" + (Discourse.Utilities.categoryUrlId(result.category));
+    window.location = Discourse.getURL("/category/") + (Discourse.Utilities.categoryUrlId(result.category));
   },
 
   saveCategory: function() {
@@ -59,12 +72,15 @@ Discourse.EditCategoryView = Discourse.ModalBodyView.extend({
         _this.saveSuccess(result);
       },
       error: function(errors) {
+        // displays a generic error message when none is sent from the server
+        // this might happen when some "after" callbacks throws an exception server-side
+        if(errors.length === 0) errors.push(Em.String.i18n("category.creation_error"));
+        // display the errors
         _this.displayErrors(errors);
+        // not saving anymore
         _this.set('saving', false);
       }
     });
   }
 
 });
-
-

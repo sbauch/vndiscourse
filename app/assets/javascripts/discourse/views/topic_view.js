@@ -235,7 +235,7 @@ Discourse.TopicView = Discourse.View.extend(Discourse.Scrolling, {
     if (this.loading) return;
     this.set('loading', true);
     this.set('loadingAbove', true);
-    opts = jQuery.extend({
+    opts = $.extend({
       postsBefore: post.get('post_number')
     }, this.get('controller.postFilters'));
 
@@ -303,9 +303,7 @@ Discourse.TopicView = Discourse.View.extend(Discourse.Scrolling, {
     if (this.topic.posts.last().post_number !== post.post_number) return;
     this.set('loadingBelow', true);
     this.set('loading', true);
-    opts = jQuery.extend({
-      postsAfter: post.get('post_number')
-    }, this.get('controller.postFilters'));
+    opts = $.extend({ postsAfter: post.get('post_number') }, this.get('controller.postFilters'));
     return Discourse.Topic.find(this.get('topic.id'), opts).then(function(result) {
       var suggested;
       if (result.at_bottom || result.posts.length === 0) {
@@ -347,23 +345,33 @@ Discourse.TopicView = Discourse.View.extend(Discourse.Scrolling, {
   },
 
   cancelEdit: function() {
+    // close editing mode
     this.set('editingTopic', false);
   },
 
   finishedEdit: function() {
-    var new_val, topic;
     if (this.get('editingTopic')) {
-      topic = this.get('topic');
-      new_val = $('#edit-title').val();
-      topic.set('title', new_val);
-      topic.set('fancy_title', new_val);
+      var topic = this.get('topic');
+      // retrieve the title from the text field
+      var newTitle = $('#edit-title').val();
+      // retrieve the category from the combox box
+      var newCategoryName = $('#topic-title select option:selected').val();
+      // manually update the titles & category
+      topic.setProperties({
+        title: newTitle,
+        fancy_title: newTitle,
+        categoryName: newCategoryName
+      });
+      // save the modifications
       topic.save();
+      // close editing mode
       this.set('editingTopic', false);
     }
   },
 
   editTopic: function() {
     if (!this.get('topic.can_edit')) return false;
+    // enable editing mode
     this.set('editingTopic', true);
     return false;
   },
@@ -478,7 +486,7 @@ Discourse.TopicView = Discourse.View.extend(Discourse.Scrolling, {
       opts.catLink = Discourse.Utilities.categoryLink(category);
       return Ember.String.i18n("topic.read_more_in_category", opts);
     } else {
-      opts.catLink = "<a href=\"/categories\">" + (Em.String.i18n("topic.browse_all_categories")) + "</a>";
+      opts.catLink = "<a href=\"" + Discourse.getURL("/categories") + "\">" + (Em.String.i18n("topic.browse_all_categories")) + "</a>";
       return Ember.String.i18n("topic.read_more", opts);
     }
   }).property(),

@@ -40,8 +40,6 @@ Discourse.ActionSummary = Discourse.Model.extend({
   act: function(opts) {
 
     // Mark it as acted
-    var promise,
-      _this = this;
     this.set('acted', true);
     this.set('count', this.get('count') + 1);
     this.set('can_act', false);
@@ -53,26 +51,19 @@ Discourse.ActionSummary = Discourse.Model.extend({
     }
 
     // Create our post action
-    promise = new RSVP.Promise();
-    $.ajax({
-      url: "/post_actions",
+    var actionSummary = this;
+    return $.ajax({
+      url: Discourse.getURL("/post_actions"),
       type: 'POST',
       data: {
         id: this.get('post.id'),
         post_action_type_id: this.get('id'),
         message: (opts ? opts.message : void 0) || ""
-      },
-      error: function(error) {
-        var errors;
-        _this.removeAction();
-        errors = $.parseJSON(error.responseText).errors;
-        return promise.reject(errors);
-      },
-      success: function() {
-        return promise.resolve();
       }
+    }).then(null, function (error) {
+      actionSummary.removeAction();
+      return $.parseJSON(error.responseText).errors;
     });
-    return promise;
   },
 
   // Undo this action
@@ -81,7 +72,7 @@ Discourse.ActionSummary = Discourse.Model.extend({
 
     // Remove our post action
     return $.ajax({
-      url: "/post_actions/" + (this.get('post.id')),
+      url: Discourse.getURL("/post_actions/") + (this.get('post.id')),
       type: 'DELETE',
       data: {
         post_action_type_id: this.get('id')
@@ -92,7 +83,7 @@ Discourse.ActionSummary = Discourse.Model.extend({
   clearFlags: function() {
     var _this = this;
     return $.ajax({
-      url: "/post_actions/clear_flags",
+      url: Discourse.getURL("/post_actions/clear_flags"),
       type: "POST",
       data: {
         post_action_type_id: this.get('id'),
@@ -107,7 +98,7 @@ Discourse.ActionSummary = Discourse.Model.extend({
 
   loadUsers: function() {
     var _this = this;
-    return $.getJSON("/post_actions/users", {
+    return $.getJSON(Discourse.getURL("/post_actions/users"), {
       id: this.get('post.id'),
       post_action_type_id: this.get('id')
     }, function(result) {

@@ -39,20 +39,21 @@ Discourse.Utilities = {
 
   // Create a badge like category link
   categoryLink: function(category) {
-    var color, name, description, result;
+    var color, textColor, name, description, result;
     if (!category) return "";
 
     color = Em.get(category, 'color');
+    textColor = Em.get(category, 'text_color');
     name = Em.get(category, 'name');
     description = Em.get(category, 'description');
 
     // Build the HTML link
-    result = "<a href=\"/category/" + this.categoryUrlId(category) + "\" class=\"badge-category\" ";
+    result = "<a href=\"" + Discourse.getURL("/category/") + this.categoryUrlId(category) + "\" class=\"badge-category\" ";
 
     // Add description if we have it
     if (description) result += "title=\"" + description + "\" ";
 
-    return result + "style=\"background-color: #" + color + "\">" + name + "</a>";
+    return result + "style=\"background-color: #" + color + "; color: #" + textColor + ";\">" + name + "</a>";
   },
 
   avatarUrl: function(username, size, template) {
@@ -84,7 +85,7 @@ Discourse.Utilities = {
 
   postUrl: function(slug, topicId, postNumber) {
     var url;
-    url = "/t/";
+    url = Discourse.getURL("/t/");
     if (slug) {
       url += slug + "/";
     }
@@ -103,16 +104,30 @@ Discourse.Utilities = {
   },
 
   selectedText: function() {
-    var t;
-    t = '';
-    if (window.getSelection) {
-      t = window.getSelection().toString();
-    } else if (document.getSelection) {
-      t = document.getSelection().toString();
-    } else if (document.selection) {
-      t = document.selection.createRange().text;
+    var html = '';
+
+    if (typeof window.getSelection !== "undefined") {
+        var sel = window.getSelection();
+        if (sel.rangeCount) {
+            var container = document.createElement("div");
+            for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                container.appendChild(sel.getRangeAt(i).cloneContents());
+            }
+            html = container.innerHTML;
+        }
+    } else if (typeof document.selection !== "undefined") {
+        if (document.selection.type === "Text") {
+            html = document.selection.createRange().htmlText;
+        }
     }
-    return String(t).trim();
+
+    // Strip out any .click elements from the HTML before converting it to text
+    var div = document.createElement('div');
+    div.innerHTML = html;
+    $('.clicks', $(div)).remove();
+    var text = div.textContent || div.innerText || "";
+
+    return String(text).trim();
   },
 
   // Determine the position of the caret in an element

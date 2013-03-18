@@ -63,6 +63,8 @@ cs:
       change_password: "změnit heslo"
       invited_by: "Poznánka od"
       trust_level: "Věrohodnost"
+      external_links_in_new_tab: "Otevírat všechny externí odkazy do nové záložky"
+      enable_quoting: "Povolit odpověď s citací z označeného textu"
 
       change_username:
         action: "změnit uživatelské jméno"
@@ -265,6 +267,7 @@ cs:
       saving_draft_tip: "ukládám"
       saved_draft_tip: "uloženo"
       saved_local_draft_tip: "uloženo lokálně"
+      similar_topics: "Podobná témata"
 
       min_length:
         at_least: "vložte alespoň {{n}} znaků"
@@ -515,7 +518,8 @@ cs:
     post:
       reply: "Odpovídáte na {{link}} od {{replyAvatar}} {{username}}"
       reply_topic: "Odpověď na {{link}}"
-      edit: "Editovat {{link}}"
+      quote_reply: "odpověď s citací"
+      edit: "Editujete {{link}} od uživatele {{replyAvatar}} {{username}}"
       post_number: "příspěvek č. {{number}}"
       in_reply_to: "v odpovědi na"
       reply_as_new_topic: "Odpovědět jako nové téma"
@@ -584,7 +588,9 @@ cs:
       name: "Název kategorie"
       description: "Popis"
       topic: "téma kategorie"
-      color: "Barva"
+      badge_colors: "Barvy štítku"
+      background_color: "Barva pozadí"
+      foreground_color: "Barva textu"
       name_placeholder: "Měl by být krátký a výstižný."
       color_placeholder: "Jakákoliv webová barva"
       delete_confirm: "Opravdu chcete odstranit tuto kategorii?"
@@ -616,17 +622,18 @@ cs:
       invisible:
         help: "toto téma je neviditelné; nebude se zobrazovat v seznamu témat a lze ho navštívit pouze přes přímý odkaz"
 
-    posts: "příspěvky"
+    posts: "Příspěvky"
     posts_long: "{{number}} příspěvků v tomto tématu"
     original_post: "Původní příspěvek"
     views: "Zobrazení"
     replies: "Odpovědi"
     views_long: "toto téma bylo zobrazeno {{number}}krát"
     activity: "Aktivita"
-    likes: "líbí se"
+    likes: "Líbí se"
     top_contributors: "Účastníci"
     category_title: "Kategorie"
     history: "Historie"
+    changed_by: "od uživatele {{author}}"
 
     categories_list: "Seznam kategorií"
 
@@ -692,6 +699,9 @@ cs:
           7_days_ago: "Před 7 dny"
           30_days_ago: "Před 30 dny"
 
+      commits:
+        latest_changes: "Poslední změny"
+
       flags:
         title: "Nahlášení"
         old: "Staré"
@@ -701,6 +711,7 @@ cs:
         delete: "Odstranit příspěvek"
         delete_title: "odstranit příspěvek (smaže celé téma, je-li to první příspěvek v tématu)"
         flagged_by: "Nahlásil"
+        error: "Něco se pokazilo"
 
       customize:
         title: "Přizpůsobení"
@@ -711,6 +722,8 @@ cs:
         preview: "náhled"
         undo_preview: "zrušit náhled"
         save: "Uložit"
+        new: "Nový"
+        new_style: "Nový styl"
         delete: "Smazat"
         delete_confirm: "Smazat toto přizpůsobení?"
 
@@ -777,6 +790,6 @@ cs:
         time_read: "Čas čtení"
 
       site_settings:
-        show_overriden: 'Zobrazit pouze přenastavené'
+        show_overriden: 'Zobrazit pouze změněná nastavení'
         title: 'Nastavení webu'
         reset: 'vrátit do původního nastavení'

@@ -67,6 +67,8 @@ fr:
       change_password: "changer"
       invited_by: "Invité par"
       trust_level: "Niveau de confiance"
+      external_links_in_new_tab: "Ouvrir tous les liens externes dans un nouvel onglet"
+      enable_quoting: "Active la citation automatique du texte surligné"
 
       change_username:
         action: "changer"
@@ -269,10 +271,12 @@ fr:
       saving_draft_tip: "sauvegarde..."
       saved_draft_tip: "sauvegardé"
       saved_local_draft_tip: "sauvegardé en local"
+      similar_topics: "Votre message est trop similaire à..."
+      drafts_offline: "sauvegardé hors ligne"
 
       min_length:
-        at_least: "Saisir au moins {{n}} caractères"
-        more: "{{n}} restants..."
+        need_more_for_title: "{{n}} caractères restant pour le titre"
+        need_more_for_reply: "{{n}} caractères restant pour le message"
 
       save_edit: "Sauvegarder la modification"
       reply_original: Répondre à la discussion initiale
@@ -519,6 +523,7 @@ fr:
     post:
       reply: "Répondre à {{link}} par {{replyAvatar}} {{username}}"
       reply_topic: "Répondre à {{link}}"
+      quote_reply: "Citer"
       edit: "Éditer {{link}} par {{replyAvatar}} {{username}}"
       post_number: message {{number}}
       in_reply_to: "Réponse courte"
@@ -584,11 +589,14 @@ fr:
       view: 'Voir les discussions dans cette catégorie'
       delete: 'Supprimer la catégorie'
       create: 'Créer la catégorie'
+      creation_error: "Il y a eu une erreur lors de la création de la catégorie."
       more_posts: "voir tous les {{posts}}..."
       name: "Nom de la catégorie"
       description: "Description"
       topic: "Catégorie de la discussion"
-      color: "Couleur"
+      badge_colors: "Couleurs du badge"
+      background_color: "Couleur du fond"
+      foreground_color: "Couleur du texte"
       name_placeholder: "Devrait être concis."
       color_placeholder: "N'importe quelle couleur"
       delete_confirm: "Voulez-vous vraiment supprimer cette catégorie ?"
@@ -631,6 +639,7 @@ fr:
     top_contributors: "Participants"
     category_title: "Catégorie"
     history: "Historique"
+    changed_by: "par {{author}}"
 
     categories_list: "Liste des catégories"
 
@@ -686,6 +695,7 @@ fr:
         please_upgrade: "Veuillez mettre à jour !"
         latest_version: "Dernière version"
         update_often: "Merci de mettre à jour régulièrement !"
+        total_users: "Total d'utilisateurs"
 
         reports:
           today: "Aujourd'hui"
@@ -696,6 +706,9 @@ fr:
           7_days_ago: Il y a 7 jours
           30_days_ago: Il y a 30 jours
 
+      commits:
+        latest_changes: Derniers changements
+
       flags:
         title: "Signalements"
         old: "Vieux"
@@ -705,6 +718,7 @@ fr:
         delete: "Supprimer le message"
         delete_title: "supprimer le message (va supprimer la discussion si c'est le premier message)"
         flagged_by: "Signalé par"
+        error: "Quelque chose s'est mal passé"
 
       customize:
         title: "Personnaliser"
@@ -715,6 +729,8 @@ fr:
         preview: "prévisualiser"
         undo_preview: "annuler la prévisualisation"
         save: "Sauvegarder"
+        new: "Nouveau"
+        new_style: "Nouveau style"
         delete: "Supprimer"
         delete_confirm: "Supprimer cette personnalisation"
 

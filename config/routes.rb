@@ -54,6 +54,7 @@ Discourse::Application.routes.draw do
     resources :site_customizations
     resources :export
     get 'version_check' => 'versions#show'
+    resources :dashboard, only: [:index]
   end
 
   get 'email_preferences' => 'email#preferences_redirect'
@@ -61,7 +62,7 @@ Discourse::Application.routes.draw do
   post 'email/resubscribe/:key' => 'email#resubscribe', as: 'email_resubscribe'
 
 
-  resources :session, id: USERNAME_ROUTE_FORMAT do
+  resources :session, id: USERNAME_ROUTE_FORMAT, :only => [:create, :destroy] do
     collection do
       post 'forgot_password'
     end
@@ -75,6 +76,7 @@ Discourse::Application.routes.draw do
   end
 
   resources :static
+  post 'login' => 'static#enter'
   get 'faq' => 'static#show', id: 'faq'
   get 'tos' => 'static#show', id: 'tos'
   get 'privacy' => 'static#show', id: 'privacy'
@@ -161,7 +163,8 @@ Discourse::Application.routes.draw do
   delete 't/:id' => 'topics#destroy'
   put 't/:id' => 'topics#update'
   post 't' => 'topics#create'
-  post 'topics/timings' => 'topics#timings'
+  post 'topics/timings'
+  get 'topics/similar_to'
 
   # Legacy route for old avatars
   get 'threads/:topic_id/:post_number/avatar' => 'topics#avatar', :constraints => {:topic_id => /\d+/, :post_number => /\d+/}

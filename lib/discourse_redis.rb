@@ -4,7 +4,7 @@
 class DiscourseRedis
 
   def initialize
-    @config = URI.parse('redis://redistogo:611f8c35965c4409db1c52d29bcbded1@barreleye.redistogo.com:9531/')
+    @config = URI.parse(ENV['REDISTOGO_URL'])
     redis_opts = {:host => @config.host, :port => @config.port, :db => 0, :username => @config.user, :password => @config.password}
     @redis = Redis.new(redis_opts)
   end
@@ -36,7 +36,7 @@ class DiscourseRedis
   end
 
   def url
-    "redis://redistogo:611f8c35965c4409db1c52d29bcbded1@barreleye.redistogo.com:9531/"
+    "#{ENV['REDISTOGO_URL']}0"
   end
 
 end

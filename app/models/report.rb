@@ -69,17 +69,6 @@ class Report
     end
   end
 
-  def self.report_total_users(report)
-    report.data = []
-    fetch report do
-      (0..30).to_a.reverse.each do |i|
-        if (count = User.where('created_at < ?', i.days.ago).count) > 0
-          report.data << {x: i.days.ago.to_date.to_s, y: count}
-        end
-      end
-    end
-  end
-
   def self.report_flags(report)
     report.data = []
     fetch report do
@@ -91,6 +80,32 @@ class Report
     end
   end
 
+  def self.report_users_by_trust_level(report)
+    report.data = []
+    fetch report do
+      User.counts_by_trust_level.each do |level, count|
+        report.data << {x: level.to_i, y: count}
+      end
+    end
+  end
+
+  def self.report_likes(report)
+    report.data = []
+    fetch report do
+      PostAction.count_likes_per_day(30.days.ago).each do |date, count|
+        report.data << {x: date, y: count}
+      end
+    end
+  end
+
+  def self.report_emails(report)
+    report.data = []
+    fetch report do
+      EmailLog.count_per_day(30.days.ago).each do |date, count|
+        report.data << {x: date, y: count}
+      end
+    end
+  end
 
   private
 

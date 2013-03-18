@@ -25,11 +25,10 @@ Discourse.Composer = Discourse.Model.extend({
   archetypesBinding: 'Discourse.site.archetypes',
 
   init: function() {
-    var val;
     this._super();
-    val = Discourse.KeyValueStore.get('composer.showPreview') || 'true';
+    var val = Discourse.KeyValueStore.get('composer.showPreview') || 'true';
     this.set('showPreview', val === 'true');
-    return this.set('archetypeId', Discourse.get('site.default_archetype'));
+    this.set('archetypeId', Discourse.get('site.default_archetype'));
   },
 
   creatingTopic: (function() {
@@ -68,36 +67,33 @@ Discourse.Composer = Discourse.Model.extend({
 
   togglePreview: function() {
     this.toggleProperty('showPreview');
-    return Discourse.KeyValueStore.set({
-      key: 'showPreview',
-      value: this.get('showPreview')
-    });
+    return Discourse.KeyValueStore.set({ key: 'showPreview', value: this.get('showPreview') });
   },
 
   // Import a quote from the post
   importQuote: function() {
-    var post, posts,
-      _this = this;
-    post = this.get('post');
+    var post = this.get('post');
+
+    // If we don't have a post, check the topic for the first one
     if (!post) {
-      posts = this.get('topic.posts');
+      var posts = this.get('topic.posts');
       if (posts && posts.length > 0) {
         post = posts[0];
       }
     }
+
     if (post) {
       this.set('loading', true);
-      return Discourse.Post.load(post.get('id'), function(result) {
-        var quotedText;
-        quotedText = Discourse.BBCode.buildQuoteBBCode(post, result.get('raw'));
-        _this.appendText(quotedText);
-        return _this.set('loading', false);
+      var composer = this;
+      Discourse.Post.load(post.get('id')).then(function(result) {
+        composer.appendText(Discourse.BBCode.buildQuoteBBCode(post, result.get('raw')));
+        composer.set('loading', false);
       });
     }
   },
 
   appendText: function(text) {
-    return this.set('reply', (this.get('reply') || '') + text);
+    this.set('reply', (this.get('reply') || '') + text);
   },
 
   // Determine the appropriate title for this action
@@ -146,10 +142,7 @@ Discourse.Composer = Discourse.Model.extend({
   }).property('action', 'post', 'topic', 'topic.title'),
 
   toggleText: (function() {
-    if (this.get('showPreview')) {
-      return Em.String.i18n('composer.hide_preview');
-    }
-    return Em.String.i18n('composer.show_preview');
+    return this.get('showPreview') ? Em.String.i18n('composer.hide_preview') : Em.String.i18n('composer.show_preview');
   }).property('showPreview'),
 
   hidePreview: (function() {
@@ -163,14 +156,11 @@ Discourse.Composer = Discourse.Model.extend({
     if (this.get('loading')) return true;
 
     // Title is required on new posts
-    if (this.get('creatingTopic')) {
-      if (this.blank('title')) return true;
-      if (this.get('title').trim().length < Discourse.SiteSettings.min_topic_title_length) return true;
-    }
+    if (this.get('creatingTopic') && this.get('titleLength') < Discourse.SiteSettings.min_topic_title_length) return true;
 
     // Otherwise just reply is required
-    if (this.blank('reply')) return true;
-    if (this.get('reply').trim().length < Discourse.SiteSettings.min_post_length) return true;
+    if (this.get('replyLength') < Discourse.SiteSettings.min_post_length) return true;
+
     return false;
   }).property('reply', 'title', 'creatingTopic', 'loading'),
 
@@ -211,22 +201,22 @@ Discourse.Composer = Discourse.Model.extend({
        quote    - If we're opening a reply from a quote, the quote we're making
   */
   open: function(opts) {
-    var replyBlank, topicId,
-      _this = this;
+    var topicId;
     if (!opts) opts = {};
 
     this.set('loading', false);
     if (opts.topic) {
       topicId = opts.topic.get('id');
     }
-    replyBlank = (this.get("reply") || "") === "";
 
+    var replyBlank = (this.get("reply") || "") === "";
+    var composer = this;
     if (!replyBlank &&
         (opts.action !== this.get('action') || ((opts.reply || opts.action === this.EDIT) && this.get('reply') !== this.get('originalText'))) &&
         !opts.tested) {
       opts.tested = true;
       this.cancel(function() {
-        return _this.open(opts);
+        return composer.open(opts);
       });
       return;
     }
@@ -253,9 +243,10 @@ Discourse.Composer = Discourse.Model.extend({
     this.set('reply', opts.reply || this.get("reply") || "");
     if (opts.postId) {
       this.set('loading', true);
-      Discourse.Post.load(opts.postId, function(result) {
-        _this.set('post', result);
-        return _this.set('loading', false);
+      Discourse.Post.load(opts.postId).then(function(result) {
+        console.log(result);
+        composer.set('post', result);
+        composer.set('loading', false);
       });
     }
 
@@ -263,10 +254,10 @@ Discourse.Composer = Discourse.Model.extend({
     if (opts.action === EDIT && opts.post) {
       this.set('title', this.get('topic.title'));
       this.set('loading', true);
-      Discourse.Post.load(opts.post.get('id'), function(result) {
-        _this.set('reply', result.get('raw'));
-        _this.set('originalText', _this.get('reply'));
-        return _this.set('loading', false);
+      Discourse.Post.load(opts.post.get('id')).then(function(result) {
+        composer.set('reply', result.get('raw'));
+        composer.set('originalText', composer.get('reply'));
+        composer.set('loading', false);
       });
     }
 
@@ -289,82 +280,81 @@ Discourse.Composer = Discourse.Model.extend({
 
   // When you edit a post
   editPost: function(opts) {
-    var oldCooked, post, promise, topic,
-      _this = this;
-    promise = new RSVP.Promise();
-    post = this.get('post');
-    oldCooked = post.get('cooked');
+    var post = this.get('post');
+    var oldCooked = post.get('cooked');
+    var composer = this;
 
     // Update the title if we've changed it
     if (this.get('title') && post.get('post_number') === 1) {
-      topic = this.get('topic');
+      var topic = this.get('topic');
       topic.set('title', this.get('title'));
+      topic.set('fancy_title', this.get('title'));
       topic.set('categoryName', this.get('categoryName'));
       topic.save();
     }
+
     post.set('raw', this.get('reply'));
     post.set('imageSizes', opts.imageSizes);
     post.set('cooked', $('#wmd-preview').html());
     this.set('composeState', CLOSED);
-    post.save(function(savedPost) {
 
-      var idx, postNumber, posts;
-      posts = _this.get('topic.posts');
+    return Ember.Deferred.promise(function(promise) {
+      post.save(function(savedPost) {
+        var posts = composer.get('topic.posts');
 
-      // perhaps our post came from elsewhere eg. draft
-      idx = -1;
-      postNumber = post.get('post_number');
-      posts.each(function(p, i) {
-        if (p.get('post_number') === postNumber) {
-          idx = i;
-        }
-      });
-      if (idx > -1) {
-        savedPost.set('topic', _this.get('topic'));
-        posts.replace(idx, 1, [savedPost]);
-        promise.resolve({
-          post: post
+        // perhaps our post came from elsewhere eg. draft
+        var idx = -1;
+        var postNumber = post.get('post_number');
+        posts.each(function(p, i) {
+          if (p.get('post_number') === postNumber) {
+            idx = i;
+          }
         });
-        _this.set('topic.draft_sequence', savedPost.draft_sequence);
-      }
-    }, function(error) {
-      var errors;
-      errors = $.parseJSON(error.responseText).errors;
-      promise.reject(errors[0]);
-      post.set('cooked', oldCooked);
-      return _this.set('composeState', OPEN);
+        if (idx > -1) {
+          savedPost.set('topic', composer.get('topic'));
+          posts.replace(idx, 1, [savedPost]);
+          promise.resolve({ post: post });
+          composer.set('topic.draft_sequence', savedPost.draft_sequence);
+        }
+      }, function(error) {
+        var errors;
+        errors = $.parseJSON(error.responseText).errors;
+        promise.reject(errors[0]);
+        post.set('cooked', oldCooked);
+        return composer.set('composeState', OPEN);
+      });
     });
-    return promise;
   },
 
   // Create a new Post
   createPost: function(opts) {
-    var addedToStream, createdPost, diff, lastPost, post, promise, topic,
-      _this = this;
-    promise = new RSVP.Promise();
-    post = this.get('post');
-    topic = this.get('topic');
-    createdPost = Discourse.Post.create({
-      raw: this.get('reply'),
-      title: this.get('title'),
-      category: this.get('categoryName'),
-      topic_id: this.get('topic.id'),
-      reply_to_post_number: post ? post.get('post_number') : null,
-      imageSizes: opts.imageSizes,
-      post_number: this.get('topic.highest_post_number') + 1,
-      cooked: $('#wmd-preview').html(),
-      reply_count: 0,
-      display_username: Discourse.get('currentUser.name'),
-      username: Discourse.get('currentUser.username'),
-      metaData: this.get('metaData'),
-      archetype: this.get('archetypeId'),
-      post_type: Discourse.get('site.post_types.regular'),
-      target_usernames: this.get('targetUsernames'),
-      actions_summary: Em.A(),
-      yours: true,
-      newPost: true
-    });
-    addedToStream = false;
+    var post = this.get('post'),
+        topic = this.get('topic'),
+        currentUser = Discourse.get('currentUser'),
+        addedToStream = false;
+
+    // Build the post object
+    var createdPost = Discourse.Post.create({
+        raw: this.get('reply'),
+        title: this.get('title'),
+        category: this.get('categoryName'),
+        topic_id: this.get('topic.id'),
+        reply_to_post_number: post ? post.get('post_number') : null,
+        imageSizes: opts.imageSizes,
+        post_number: this.get('topic.highest_post_number') + 1,
+        cooked: $('#wmd-preview').html(),
+        reply_count: 0,
+        display_username: currentUser.get('name'),
+        username: currentUser.get('username'),
+        metaData: this.get('metaData'),
+        archetype: this.get('archetypeId'),
+        post_type: Discourse.get('site.post_types.regular'),
+        target_usernames: this.get('targetUsernames'),
+        actions_summary: Em.A(),
+        moderator: currentUser.get('moderator'),
+        yours: true,
+        newPost: true
+      });
 
     // If we're in a topic, we can append the post instantly.
     if (topic) {
@@ -385,9 +375,9 @@ Discourse.Composer = Discourse.Model.extend({
       createdPost.set('created_at', new Date());
 
       // If we're near the end of the topic, load new posts
-      lastPost = topic.posts.last();
+      var lastPost = topic.posts.last();
       if (lastPost) {
-        diff = topic.get('highest_post_number') - lastPost.get('post_number');
+        var diff = topic.get('highest_post_number') - lastPost.get('post_number');
 
         // If the new post is within a threshold of the end of the topic,
         // add it and scroll there instead of adding the link.
@@ -401,50 +391,51 @@ Discourse.Composer = Discourse.Model.extend({
     }
 
     // Save callback
-    createdPost.save(function(result) {
-      var addedPost, saving;
-      addedPost = false;
-      saving = true;
-      createdPost.updateFromSave(result);
-      if (topic) {
-        // It's no longer a new post
-        createdPost.set('newPost', false);
-        topic.set('draft_sequence', result.draft_sequence);
-      } else {
-        // We created a new topic, let's show it.
-        _this.set('composeState', CLOSED);
-        saving = false;
-      }
-      _this.set('reply', '');
-      _this.set('createdPost', createdPost);
-      if (addedToStream) {
-        _this.set('composeState', CLOSED);
-      } else if (saving) {
-        _this.set('composeState', SAVING);
-      }
-      return promise.resolve({
-        post: result
+    var composer = this;
+    return Ember.Deferred.promise(function(promise) {
+      createdPost.save(function(result) {
+        var addedPost = false,
+            saving = true;
+        createdPost.updateFromSave(result);
+        if (topic) {
+          // It's no longer a new post
+          createdPost.set('newPost', false);
+          topic.set('draft_sequence', result.draft_sequence);
+        } else {
+          // We created a new topic, let's show it.
+          composer.set('composeState', CLOSED);
+          saving = false;
+        }
+        composer.set('reply', '');
+        composer.set('createdPost', createdPost);
+        if (addedToStream) {
+          composer.set('composeState', CLOSED);
+        } else if (saving) {
+          composer.set('composeState', SAVING);
+        }
+        return promise.resolve({ post: result });
+      }, function(error) {
+        // If an error occurs
+        if (topic) {
+          topic.posts.removeObject(createdPost);
+        }
+        promise.reject($.parseJSON(error.responseText).errors[0]);
+        composer.set('composeState', OPEN);
       });
-    }, function(error) {
-      var errors;
-      if (topic) {
-        topic.posts.removeObject(createdPost);
-      }
-      errors = $.parseJSON(error.responseText).errors;
-      promise.reject(errors[0]);
-      return _this.set('composeState', OPEN);
     });
-    return promise;
   },
 
   saveDraft: function() {
-    var data,
-      _this = this;
+    // Do not save when drafts are disabled
     if (this.get('disableDrafts')) return;
+    // Do not save when there is no reply
     if (!this.get('reply')) return;
+    // Do not save when the title's length is too small (only when creating a new post)
+    if (this.get('creatingTopic') && this.get('titleLength') < Discourse.SiteSettings.min_topic_title_length) return;
+    // Do not save when the reply's length is too small
     if (this.get('replyLength') < Discourse.SiteSettings.min_post_length) return;
 
-    data = {
+    var data = {
       reply: this.get('reply'),
       action: this.get('action'),
       title: this.get('title'),
@@ -456,31 +447,43 @@ Discourse.Composer = Discourse.Model.extend({
     };
 
     this.set('draftStatus', Em.String.i18n('composer.saving_draft_tip'));
+
+    var composer = this;
     return Discourse.Draft.save(this.get('draftKey'), this.get('draftSequence'), data).then((function() {
-      _this.set('draftStatus', Em.String.i18n('composer.saved_draft_tip'));
+      composer.set('draftStatus', Em.String.i18n('composer.saved_draft_tip'));
     }), (function() {
-      _this.set('draftStatus', 'drafts offline');
+      composer.set('draftStatus', Em.String.i18n('composer.drafts_offline'));
     }));
   },
 
   resetDraftStatus: (function() {
-    var len = Discourse.SiteSettings.min_post_length,
-        replyLength = this.get('replyLength');
-
-    if (replyLength === 0) {
-      this.set('draftStatus', Em.String.i18n('composer.min_length.at_least', { n: len }));
-    } else if (replyLength < len) {
-      this.set('draftStatus', Em.String.i18n('composer.min_length.more', { n: len - replyLength }));
-    } else {
-      this.set('draftStatus', null);
+    // 'title' is focused
+    if ($('#reply-title').is(':focus')) {
+      var titleDiff = Discourse.SiteSettings.min_topic_title_length - this.get('titleLength');
+      if (titleDiff > 0) {
+        return this.set('draftStatus', Em.String.i18n('composer.min_length.need_more_for_title', { n: titleDiff }));
+      }
+    // 'reply' is focused
+    } else if ($('#wmd-input').is(':focus')) {
+      var replyDiff = Discourse.SiteSettings.min_post_length - this.get('replyLength');
+      if (replyDiff > 0) {
+        return this.set('draftStatus', Em.String.i18n('composer.min_length.need_more_for_reply', { n: replyDiff }));
+      }
     }
+    // hide the counters if the currently focused text field is OK
+    this.set('draftStatus', null);
 
   }).observes('reply', 'title'),
 
-  blank: function(prop) {
-    var p = this.get(prop);
-    return !(p && p.length > 0);
-  },
+  /**
+    Computes the length of the title minus non-significant whitespaces
+
+    @property titleLength
+  **/
+  titleLength: function() {
+    var title = this.get('title') || "";
+    return title.replace(/\s+/img, " ").trim().length;
+  }.property('title'),
 
   /**
     Computes the length of the reply minus the quote(s) and non-significant whitespaces
@@ -488,8 +491,7 @@ Discourse.Composer = Discourse.Model.extend({
     @property replyLength
   **/
   replyLength: function() {
-    var reply = this.get('reply');
-    if(!reply) reply = "";
+    var reply = this.get('reply') || "";
     while (Discourse.BBCode.QUOTE_REGEXP.test(reply)) { reply = reply.replace(Discourse.BBCode.QUOTE_REGEXP, ""); }
     return reply.replace(/\s+/img, " ").trim().length;
   }.property('reply')
@@ -549,5 +551,3 @@ Discourse.Composer.reopenClass({
   // Draft key
   REPLY_AS_NEW_TOPIC_KEY: REPLY_AS_NEW_TOPIC_KEY
 });
-
-

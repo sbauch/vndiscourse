@@ -155,6 +155,24 @@ describe Topic do
   end
 
 
+  context 'similar_to' do
+
+    it 'returns blank with nil params' do
+      Topic.similar_to(nil, nil).should be_blank
+    end
+
+    context 'with a similar topic' do
+      let!(:topic) { Fabricate(:topic, title: "Evil trout is the dude who posted this topic") }
+
+      it 'returns the similar topic if the title is similar' do
+        Topic.similar_to("has evil trout made any topics?", "i am wondering has evil trout made any topics?").should == [topic]
+      end
+
+    end
+
+  end
+
+
   context 'message bus' do
     it 'calls the message bus observer after create' do
       MessageBusObserver.any_instance.expects(:after_create_topic).with(instance_of(Topic))
@@ -414,15 +432,17 @@ describe Topic do
 
     context "other user" do
 
+      let(:creator) { PostCreator.new(topic.user, raw: Fabricate.build(:post).raw, topic_id: topic.id )}
+
       it "sends the other user an email when there's a new post" do
         UserNotifications.expects(:private_message).with(coding_horror, has_key(:post))
-        Fabricate(:post, topic: topic, user: topic.user)
+        creator.create
       end
 
       it "doesn't send the user an email when they have them disabled" do
         coding_horror.update_column(:email_private_messages, false)
         UserNotifications.expects(:private_message).with(coding_horror, has_key(:post)).never
-        Fabricate(:post, topic: topic, user: topic.user)
+        creator.create
       end
 
     end
