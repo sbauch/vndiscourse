@@ -87,8 +87,8 @@ locales/cs.js: locales/cs-f26452fa02782cd62890269646a62b08.js
 locales/cs/index.js: locales/cs-f26452fa02782cd62890269646a62b08.js
 locales/de.js: locales/de-64c5ebcc2bd499ed143a87504b30c66c.js
 locales/de/index.js: locales/de-64c5ebcc2bd499ed143a87504b30c66c.js
-locales/en.js: locales/en-1ffa5820bc263c540da20c12ef92c89c.js
-locales/en/index.js: locales/en-1ffa5820bc263c540da20c12ef92c89c.js
+locales/en.js: locales/en-8f1bf78333d3a859f83cd8b3d69bae22.js
+locales/en/index.js: locales/en-8f1bf78333d3a859f83cd8b3d69bae22.js
 locales/fr.js: locales/fr-fb134293cb75ece0ea580ef8450d1fd6.js
 locales/fr/index.js: locales/fr-fb134293cb75ece0ea580ef8450d1fd6.js
 locales/nl.js: locales/nl-72019cc24a651a154fa5b510cc7298fd.js
