@@ -152,7 +152,7 @@ class UsersController < ApplicationController
       user.active = true
     end
     user.password_required! unless auth
-
+    
     DiscourseHub.register_nickname( user.username, user.email ) if user.valid? && SiteSetting.call_discourse_hub?
 
     if user.save

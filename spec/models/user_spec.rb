@@ -462,6 +462,11 @@ describe User do
       Fabricate.build(:user, email: 'notgood@mailinator.com').should_not be_valid
       Fabricate.build(:user, email: 'mailinator@gmail.com').should be_valid
     end
+    
+    it 'should not reject partial matches' do
+      SiteSetting.stubs(:email_domains_blacklist).returns('mail.com')
+      Fabricate.build(:user, email: 'mailinator@gmail.com').should be_valid
+    end
 
     it 'should reject some emails based on the email_domains_blacklist site setting' do
       SiteSetting.stubs(:email_domains_blacklist).returns('mailinator.com|trashmail.net')

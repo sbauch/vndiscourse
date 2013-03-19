@@ -4,8 +4,9 @@
 class DiscourseRedis
 
   def initialize
-    @config = URI.parse(ENV['REDISTOGO_URL'])
-    redis_opts = {:host => @config.host, :port => @config.port, :db => 0, :username => @config.user, :password => @config.password}
+    @config = YAML.load(ERB.new(File.new("#{Rails.root}/config/redis.yml").read).result)[Rails.env]
+    redis_opts = {:host => @config['host'], :port => @config['port'], :db => @config['db']}
+    redis_opts[:password] = @config['password'] if @config['password']
     @redis = Redis.new(redis_opts)
   end
 
@@ -35,8 +36,15 @@ class DiscourseRedis
     RailsMultisite::ConnectionManagement.current_db
   end
 
+  def self.new_redis_store
+    redis_config = YAML.load(ERB.new(File.new("#{Rails.root}/config/redis.yml").read).result)[Rails.env]
+    redis_store = ActiveSupport::Cache::RedisStore.new "redis://#{(':' + redis_config['password'] + '@') if redis_config['password']}#{redis_config['host']}:#{redis_config['port']}/#{redis_config['cache_db']}"
+    redis_store.options[:namespace] = -> { DiscourseRedis.namespace }
+    redis_store
+  end
+
   def url
-    "#{ENV['REDISTOGO_URL']}0"
+    "redis://#{(':' + @config['password'] + '@') if @config['password']}#{@config['host']}:#{@config['port']}/#{@config['db']}"
   end
 
 end

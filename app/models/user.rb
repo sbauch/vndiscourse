@@ -506,8 +506,8 @@ class User < ActiveRecord::Base
     end
 
     def add_trust_level
-      # there is a possiblity we did no load trust level column, skip it
-      return unless attributes.key? "trust_level"
+      # there is a possiblity we did not load trust level column, skip it
+      return unless has_attribute? :trust_level
       self.trust_level ||= SiteSetting.default_trust_level
     end
 
@@ -528,7 +528,7 @@ class User < ActiveRecord::Base
       if (setting = SiteSetting.email_domains_blacklist).present?
         domains = setting.gsub('.', '\.')
         regexp = Regexp.new("@(#{domains})", true)
-        if self.email !=~ regexp
+        if self.email =~ regexp
           errors.add(:email, I18n.t(:'user.email.not_allowed'))
         end
       end
