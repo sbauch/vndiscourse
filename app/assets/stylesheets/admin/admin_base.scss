@@ -302,11 +302,15 @@ table {
 .version-check {
   .version-number {
     font-size: 18px;
-    font-weight: bold
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .face {
+    width: 20px;
   }
 
   .version-notes .icon {
-    margin-left: 20px;
     vertical-align: bottom;
   }
 
@@ -350,6 +354,12 @@ table {
       font-weight: normal;
       text-align: center;
     }
+    thead {
+      tr:hover > td,
+      tr:hover > th {
+        background-color: $white;
+      }
+    }
 
     td.value {
       font-weight: bold;
@@ -371,6 +381,10 @@ table {
     td.value {
       width: 33px;
     }
+  }
+
+  &.total-users {
+    margin-left: 45px;
   }
 }
 
@@ -428,7 +442,7 @@ table {
   }
 
   .header:hover h1 {
-    text-decoration: underline;
+    color: $link-color-hover;
   }
 
   .commits-list {
