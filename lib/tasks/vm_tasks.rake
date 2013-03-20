@@ -7,7 +7,8 @@ task "vm:users:pull" => :environment do
                 :name => resp['full_name'],
                 :position => resp['function'],
                 :username => resp['full_name'].gsub(' ',''),
-                :password => '373parkavenue'                
+                :password => '373parkavenue',
+                :short_position => VmUserService.short_position(resp['function'])                
                 )
   end
 end
