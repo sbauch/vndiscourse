@@ -8,6 +8,6 @@ class DirectoriesController < ApplicationController
     else
       @users = User.order("COALESCE(last_seen_at, to_date('1970-01-01', 'YYYY-MM-DD')) DESC, username").limit(20)
     end      
-    render :json => @users.to_json
+    render :json => @users.each.map{|u| DirectoryUserSerializer.new(u, :root => false)}.to_json
   end
 end

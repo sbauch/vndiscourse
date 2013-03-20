@@ -177,7 +177,7 @@ GEM
     coffee-script (2.2.0)
       coffee-script-source
       execjs
-    coffee-script-source (1.6.1)
+    coffee-script-source (1.6.2)
     connection_pool (1.0.0)
     daemons (1.1.9)
     debug_inspector (0.0.2)
