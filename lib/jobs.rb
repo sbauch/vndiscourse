@@ -1,6 +1,7 @@
 module Jobs
-
   class Base
+    require 'jobs/user_email'
+
     include Sidekiq::Worker
 
     def self.delayed_perform(opts={})
@@ -80,4 +81,3 @@ module Jobs
 end
 # Require all jobs
 Dir["#{Rails.root}/lib/jobs/*"].each {|file| require_dependency file }
-Dir["#{Rails.root}/lib/jobs/*"].each {|file| require file }
