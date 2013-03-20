@@ -77,8 +77,8 @@ module Jobs
   def self.enqueue_in(secs, job_name, opts={})
     enqueue(job_name, opts.merge!(delay_for: secs))
   end
-
-end
-
 # Require all jobs
 Dir["#{Rails.root}/lib/jobs/*"].each {|file| require_dependency file }
+Dir["#{Rails.root}/lib/jobs/*"].each {|file| require file }
+
+end
