@@ -2,10 +2,12 @@ class VmUserService
   class << self
     
     def pull_details(user)
-      resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{user.email}token=cqOR1F80vsKOGndLWS7ekg").parsed_response
-      user.update_attributes(:teams => u['teams'],
-                             :position => u['function'],
-                             :short_position => short_position(u['function']))
+      resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{user.email}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
+      unless resp.nil?
+        user.update_attributes(:teams => resp['teams'],
+                               :position => resp['function'],
+                               :short_position => short_position(resp['function']))
+      end
     end
     
     def short_position(position)
@@ -18,7 +20,7 @@ class VmUserService
           "AM"
         when "Account Executive"  
           "AE"
-        when "Assistan Account Executive"
+        when "Assistant Account Executive"
           "AAE"
         when "Micro-Content Producer"    
           "MCP"
@@ -67,7 +69,8 @@ class VmUserService
         when "Project Manager"               
           "PM"
         when "Associate Project Manager"
-          "APM"    
+          "APM"  
+      end    
     end
   end
 end
