@@ -27,8 +27,8 @@ d-logo-sketch.png: d-logo-sketch-7d26dfcdcba50cc6b9c106e1d7452286.png
 d-logo-sketch/index.png: d-logo-sketch-7d26dfcdcba50cc6b9c106e1d7452286.png
 default-favicon.png: default-favicon-1ca218454c49deec51d837fe26d9e21d.png
 default-favicon/index.png: default-favicon-1ca218454c49deec51d837fe26d9e21d.png
-favicon.ico: favicon-7949079c705396fc6f9d0cbecf1c7178.ico
-favicon/index.ico: favicon-7949079c705396fc6f9d0cbecf1c7178.ico
+favicon.ico: favicon-339b2da8fb7504e434b1e76e502a9016.ico
+favicon/index.ico: favicon-339b2da8fb7504e434b1e76e502a9016.ico
 favicons/1282043220-favicon.ico: favicons/1282043220-favicon-8b58108cf264385246b15e160e9a230b.ico
 favicons/1282043220-favicon/index.ico: favicons/1282043220-favicon-8b58108cf264385246b15e160e9a230b.ico
 favicons/amazon.png: favicons/amazon-286c1106248bf70f586594ef976dc2c5.png
