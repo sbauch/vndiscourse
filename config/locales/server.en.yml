@@ -80,18 +80,16 @@ en:
     post_template: "%{replace_paragraph}\n\nUse this space below for a longer description, as well as to establish any rules or discussion!"
 
   trust_levels:
-    new:
-      title: "new user"
+    visitor:
+      title: "visitor"
     basic:
       title: "basic user"
     regular:
       title: "regular user"
-    experienced:
-      title: "experienced user"
-    advanced:
-      title: "advanced user"
-    moderator:
-      title: "moderator"
+    leader:
+      title: "leader"
+    elder:
+      title: "elder"
 
   rate_limiter:
     too_many_requests: "You're doing that too often. Please wait %{time_left} before trying again."
@@ -185,6 +183,7 @@ en:
     title: 'reset password'
     success: "You successfully changed your password and are now logged in."
     success_unapproved: "You successfully changed your password."
+    continue: "Continue to %{site_name}"
 
   change_email:
     confirmed: "Your email has been updated."
@@ -253,27 +252,23 @@ en:
       xaxis: "Day"
       yaxis: "Number of visits"
     signups:
-      title: "New Users"
+      title: "Users"
       xaxis: "Day"
       yaxis: "Number of new users"
     topics:
-      title: "New Topics"
+      title: "Topics"
       xaxis: "Day"
       yaxis: "Number of new topics"
     posts:
-      title: "New Posts"
+      title: "Posts"
       xaxis: "Day"
       yaxis: "Number of new posts"
     likes:
-      title: "New Likes"
+      title: "Likes"
       xaxis: "Day"
       yaxis: "Number of new likes"
-    total_users:
-      title: "Total Users"
-      xaxis: "Day"
-      yaxis: "Total number of users"
     flags:
-      title: "New Flags"
+      title: "Flags"
       xaxis: "Day"
       yaxis: "Number of flags"
     users_by_trust_level:
@@ -284,6 +279,14 @@ en:
       title: "Emails Sent"
       xaxis: "Day"
       yaxis: "Number of Emails"
+
+  dashboard:
+    rails_env_warning: "Your server is running in %{env} mode."
+    host_names_warning: "Your config/database.yml file is using the default localhost hostname. Update it to use your site's hostname."
+    gc_warning: 'Your server is using default ruby garbage collection parameters, which will not give you the best performance. Read this topic on performance tuning: <a href="http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126">Tuning Ruby and Rails for Discourse</a>.'
+    clockwork_warning: 'Clockwork is not running. Ensure that a clockwork process is always running so that important jobs can be scheduled. <a href="https://github.com/tomykaira/clockwork">Learn about clockwork here</a>.'
+    sidekiq_warning: 'Sidekiq is not running. Many tasks, like sending emails, are executed asynchronously by sidekiq. Please ensure at least one sidekiq process is running. <a href="https://github.com/mperham/sidekiq">Learn about Sidekiq here</a>.'
+    memory_warning: 'Your server is running with less than 1 GB of total memory. At least 1 GB of memory is recommended.'
 
   site_settings:
     default_locale: "The default language of this Discourse instance (ISO 639-1 Code)"
@@ -327,6 +330,7 @@ en:
     best_of_score_threshold: "The minimum score of a post to be included in the 'best of'"
     best_of_posts_required: "Minimum posts in a topic before 'best of' mode is enabled"
     best_of_likes_required: "Minimum likes in a topic before the 'best of' mode will be enabled"
+    best_of_percent_filter: "When a user clicks best of, show the top % of posts"
     enable_private_messages: "Allow trust level 1 users to create private messages and conversations"
 
     enable_long_polling: "Message bus used for notification can use long polling"
@@ -354,6 +358,7 @@ en:
     supress_reply_directly_below: "Don't show reply count on a post when there is a single reply directly below"
     allow_index_in_robots_txt: "Site should be indexed by search engines (update robots.txt)"
     email_domains_blacklist: "A pipe-delimited list of email domains that are not allowed. Example: mailinator.com|trashmail.net"
+    email_domains_whitelist: "A pipe-delimited list of email domains that users may register with. WARNING: Users with email domains other than those listed will not be allowed."
     version_checks: "Ping the Discourse Hub for version updates and show version messages on the /admin dashboard"
 
     port: "Use this HTTP port rather than the default of port 80. Leave blank for none, mainly useful for development"

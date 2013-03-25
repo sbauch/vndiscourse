@@ -24,7 +24,6 @@ en:
     links: Links
     faq: "FAQ"
     you: "You"
-    ok: "ok"
     or: "or"
     now: "just now"
 
@@ -203,8 +202,10 @@ en:
 
     best_of:
       title: "Best Of"
+      enabled_description: You are currently viewing the "Best Of" view of this topic.
       description: "There are <b>{{count}}</b> posts in this topic. That's a lot! Would you like to save time by switching your view to show only the posts with the most interactions and responses?"
-      button: 'Switch to "Best Of" view'
+      enable: 'Switch to "Best Of" view'
+      disable: 'Cancel "Best Of"'
 
     private_message_info:
       title: "Private Conversation"
@@ -331,7 +332,7 @@ en:
       posted: "<i title='replied' class='icon icon-reply'></i> {{username}} {{link}}"
       edited: "<i title='edited' class='icon icon-pencil'></i> {{username}} {{link}}"
       liked: "<i title='liked' class='icon icon-heart'></i> {{username}} {{link}}"
-      private_message: "<i class='icon icon-lock' title='private message'></i> {{username}} sent you a private message: {{link}}"
+      private_message: "<i class='icon icon-envelope-alt' title='private message'></i> {{username}} sent you a private message: {{link}}"
       invited_to_private_message: "{{username}} invited you to a private conversation: {{link}}"
       invitee_accepted: "<i title='accepted your invitation' class='icon icon-signin'></i> {{username}} accepted your invitation"
       moved_post: "<i title='moved post' class='icon icon-arrow-right'></i> {{username}} moved post to {{link}}"
@@ -416,6 +417,7 @@ en:
       read_position_reset: "Your read position has been reset."
       jump_reply_up: jump to earlier reply
       jump_reply_down: jump to later reply
+      deleted: "The topic has been deleted"
 
       progress:
         title: topic progress
@@ -497,7 +499,9 @@ en:
       login_reply: 'Log In to Reply'
 
       filters:
-        user: "You're viewing only posts by specific user(s)."
+        user:
+          one: "You're viewing only posts by a specific user."
+          other: "You're viewing only posts made by specific users."
         best_of: "You're viewing only the 'Best Of' posts."
         cancel: "Show all posts in this topic again."
 
@@ -699,8 +703,9 @@ en:
         installed_version: "Installed"
         latest_version: "Latest"
         update_often: 'Please update often!'
-        total_users: "Total Users"
-        moderator_short: "mod"
+        problems_found: "Some problems have been found with your installation of Discourse:"
+        moderators: 'Moderators:'
+        admins: 'Admins:'
 
         reports:
           today: "Today"
@@ -710,6 +715,9 @@ en:
           all_time: "All Time"
           7_days_ago: "7 Days Ago"
           30_days_ago: "30 Days Ago"
+          all: "All"
+          view_table: "View as Table"
+          view_chart: "View as Bar Chart"
 
       commits:
         latest_changes: "Latest changes."

@@ -197,13 +197,8 @@ Discourse.Topic = Discourse.Model.extend({
   },
 
   // Delete this topic
-  "delete": function(callback) {
-    return $.ajax(Discourse.getURL("/t/") + (this.get('id')), {
-      type: 'DELETE',
-      success: function() {
-        return typeof callback === "function" ? callback() : void 0;
-      }
-    });
+  destroy: function() {
+    return $.ajax(Discourse.getURL("/t/") + (this.get('id')), { type: 'DELETE' });
   },
 
   // Load the posts for this topic
@@ -391,7 +386,7 @@ Discourse.Topic.reopenClass({
     @returns A promise that will resolve to the topics
   **/
   findSimilarTo: function(title, body) {
-    return $.ajax({url: "/topics/similar_to", data: {title: title, raw: body} }).then(function (results) {
+    return $.ajax({url: Discourse.getURL("/topics/similar_to"), data: {title: title, raw: body} }).then(function (results) {
       return results.map(function(topic) { return Discourse.Topic.create(topic) });
     });
   },
@@ -422,7 +417,7 @@ Discourse.Topic.reopenClass({
     if (opts.userFilters && opts.userFilters.length > 0) {
       data.username_filters = [];
       opts.userFilters.forEach(function(username) {
-        return data.username_filters.push(username);
+        data.username_filters.push(username);
       });
     }
 
@@ -432,7 +427,7 @@ Discourse.Topic.reopenClass({
     }
 
     // Check the preload store. If not, load it via JSON
-    return PreloadStore.get("topic_" + topicId, function() {
+    return PreloadStore.getAndRemove("topic_" + topicId, function() {
       return $.getJSON(url + ".json", data);
     }).then(function(result) {
       var first = result.posts.first();

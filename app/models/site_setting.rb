@@ -33,6 +33,7 @@ class SiteSetting < ActiveRecord::Base
   client_setting(:flush_timings_secs, 5)
   client_setting(:supress_reply_directly_below, true)
   client_setting(:email_domains_blacklist, 'mailinator.com')
+  client_setting(:email_domains_whitelist)
   client_setting(:version_checks, true)
   client_setting(:min_title_similar_length, 10)
   client_setting(:min_body_similar_length, 15)
@@ -106,6 +107,7 @@ class SiteSetting < ActiveRecord::Base
   setting(:best_of_score_threshold, 15)
   setting(:best_of_posts_required, 50)
   setting(:best_of_likes_required, 1)
+  setting(:best_of_percent_filter, 20)
 
   # we need to think of a way to force users to enter certain settings, this is a minimal config thing
   setting(:notification_email, 'info@discourse.org')
@@ -145,7 +147,7 @@ class SiteSetting < ActiveRecord::Base
   # Trust related
   setting(:basic_requires_topics_entered, 5)
   setting(:basic_requires_read_posts, 50)
-  setting(:basic_requires_time_spent_mins, 30)
+  setting(:basic_requires_time_spent_mins, 15)
 
   # Entropy checks
   setting(:title_min_entropy, 10)

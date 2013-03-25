@@ -48,6 +48,7 @@ class Admin::UsersController < Admin::AdminController
   def refresh_browsers
     @user = User.where(id: params[:user_id]).first
     MessageBus.publish "/file-change", ["refresh"], user_ids: [@user.id]
+    render nothing: true
   end
 
   def revoke_admin
@@ -67,7 +68,7 @@ class Admin::UsersController < Admin::AdminController
   def revoke_moderation
     @moderator = User.where(id: params[:user_id]).first
     guardian.ensure_can_revoke_moderation!(@moderator)
-    @moderator.change_trust_level(:advanced)
+    @moderator.moderator = false
     @moderator.save
     render nothing: true
   end
@@ -75,7 +76,7 @@ class Admin::UsersController < Admin::AdminController
   def grant_moderation
     @user = User.where(id: params[:user_id]).first
     guardian.ensure_can_grant_moderation!(@user)
-    @user.change_trust_level(:moderator)
+    @user.moderator = true
     @user.save
     render_serialized(@user, AdminUserSerializer)
   end

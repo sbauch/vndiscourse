@@ -93,7 +93,7 @@ class ApplicationController < ActionController::Base
 
   # If we are rendering HTML, preload the session data
   def preload_json
-    if request.format.html?
+    if request.format && request.format.html?
       if guardian.current_user
         guardian.current_user.sync_notification_channel_position
       end
@@ -217,7 +217,7 @@ class ApplicationController < ActionController::Base
     def check_restricted_access
       # note current_user is defined in the CurrentUser mixin
       if SiteSetting.access_password.present? && cookies[:_access] != SiteSetting.access_password
-        redirect_to request_access_path(:return_path => request.fullpath)
+        redirect_to request_access_path(return_path: request.fullpath)
         return false
       end
     end

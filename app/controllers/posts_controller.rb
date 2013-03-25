@@ -143,7 +143,7 @@ class PostsController < ApplicationController
         PostAction.remove_act(current_user, post, PostActionType.types[:bookmark])
       end
     end
-    render :nothing => true
+    render nothing: true
   end
 
 
@@ -153,7 +153,7 @@ class PostsController < ApplicationController
       finder = Post.where(id: params[:id] || params[:post_id])
 
       # Include deleted posts if the user is a moderator
-      finder = finder.with_deleted if current_user.try(:has_trust_level?, :moderator)
+      finder = finder.with_deleted if current_user.try(:moderator?)
 
       post = finder.first
       guardian.ensure_can_see!(post)

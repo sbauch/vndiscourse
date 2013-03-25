@@ -238,7 +238,10 @@ class User < ActiveRecord::Base
   end
 
   def moderator?
-    has_trust_level?(:moderator)
+    # this saves us from checking both, admins are always moderators 
+    #
+    # in future we may split this out
+    admin || moderator
   end
 
   def regular?
@@ -400,7 +403,12 @@ class User < ActiveRecord::Base
   # Takes into account admin, etc.
   def has_trust_level?(level)
     raise "Invalid trust level #{level}" unless TrustLevel.valid_level?(level)
-    admin? || TrustLevel.compare(trust_level, level)
+    admin? || moderator? || TrustLevel.compare(trust_level, level)
+  end
+
+  # a touch faster than automatic
+  def admin? 
+    admin
   end
 
   def change_trust_level(level)
@@ -525,13 +533,21 @@ class User < ActiveRecord::Base
     end
 
     def email_validator
-      if (setting = SiteSetting.email_domains_blacklist).present?
-        domains = setting.gsub('.', '\.')
-        regexp = Regexp.new("@(#{domains})", true)
-        if self.email =~ regexp
+      if (setting = SiteSetting.email_domains_whitelist).present?
+        unless email_in_restriction_setting?(setting)
+          errors.add(:email, I18n.t(:'user.email.not_allowed'))
+        end
+      elsif (setting = SiteSetting.email_domains_blacklist).present?
+        if email_in_restriction_setting?(setting)
           errors.add(:email, I18n.t(:'user.email.not_allowed'))
         end
       end
+    end
+    
+    def email_in_restriction_setting?(setting)
+      domains = setting.gsub('.', '\.')
+      regexp = Regexp.new("@(#{domains})", true)
+      self.email =~ regexp
     end
 
     def password_validator

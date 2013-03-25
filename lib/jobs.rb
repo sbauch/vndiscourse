@@ -1,4 +1,16 @@
 module Jobs
+
+  def self.queued
+    Sidekiq::Stats.new.enqueued
+  end
+
+  def self.last_job_performed_at
+    Sidekiq.redis do |r|
+      int = r.get('last_job_perform_at')
+      int ? Time.at(int.to_i) : nil
+    end
+  end
+
   class Base
     require 'jobs/user_email'
 
@@ -19,6 +31,12 @@ module Jobs
     def perform(opts={})
       opts = opts.with_indifferent_access
 
+      if SiteSetting.queue_jobs?
+        Sidekiq.redis do |r|
+          r.set('last_job_perform_at', Time.now.to_i)
+        end
+      end
+
       if opts.delete(:sync_exec)
         if opts.has_key?(:current_site_id) && opts[:current_site_id] != RailsMultisite::ConnectionManagement.current_db
           raise ArgumentError.new("You can't connect to another database when executing a job synchronously.")
@@ -38,7 +56,7 @@ module Jobs
       dbs.each do |db|
         begin
           Jobs::Base.mutex.synchronize do
-            RailsMultisite::ConnectionManagement.establish_connection(:db => db)
+            RailsMultisite::ConnectionManagement.establish_connection(db: db)
             I18n.locale = SiteSetting.default_locale
             execute(opts)
           end

@@ -54,19 +54,19 @@
               </nav>
             </div>
 
-            {{#if view.loadingAbove}}
+            {{#if loadingAbove}}
               <div class='spinner'>{{i18n loading}}</div>
             {{/if}}
-            {{view Discourse.TopicPostsView contentBinding="content.posts" topicViewBinding="view"}}
+            {{collection itemViewClass="Discourse.PostView" contentBinding="content.posts" topicViewBinding="view"}}
 
-            {{#if view.loadingBelow}}
+            {{#if loadingBelow}}
               <div class='spinner'>{{i18n loading}}</div>
             {{/if}}
           </div>
           <div id='topic-bottom'></div>
 
-          {{#if view.loading}}
-            {{#unless view.loadingBelow}}
+          {{#if loading}}
+            {{#unless loadingBelow}}
               <div class='spinner small'>{{i18n loading}}</div>
             {{/unless}}
           {{else}}
@@ -126,12 +126,10 @@
   {{/if}}
 {{/if}}
 
-{{#if controller.filter}}
-  <div id='topic-filter'>
-    {{filterDesc}}
-    <a href='#' {{action cancelFilter target="controller"}}>{{i18n topic.filters.cancel}}</a>
-  </div>
-{{/if}}
+<div id='topic-filter' style='display: none'>
+  {{filterDesc}}
+  <a href='#' {{action cancelFilter target="controller"}}>{{i18n topic.filters.cancel}}</a>
+</div>
 
 {{render share}}
 {{render quoteButton}}

@@ -225,11 +225,13 @@ describe User do
   end
 
   describe "trust levels" do
-    let(:user) { Fabricate(:user, trust_level: TrustLevel.levels[:new]) }
+
+    # NOTE be sure to use build to avoid db calls 
+    let(:user) { Fabricate.build(:user, trust_level: TrustLevel.levels[:visitor]) }
 
     it "sets to the default trust level setting" do
-      SiteSetting.expects(:default_trust_level).returns(TrustLevel.levels[:advanced])
-      User.new.trust_level.should == TrustLevel.levels[:advanced]
+      SiteSetting.expects(:default_trust_level).returns(TrustLevel.levels[:elder])
+      User.new.trust_level.should == TrustLevel.levels[:elder]
     end
 
     describe 'has_trust_level?' do
@@ -239,39 +241,39 @@ describe User do
       end
 
       it "is true for your basic level" do
-        user.has_trust_level?(:new).should be_true
+        user.has_trust_level?(:visitor).should be_true
       end
 
       it "is false for a higher level" do
-        user.has_trust_level?(:moderator).should be_false
+        user.has_trust_level?(:regular).should be_false
       end
 
       it "is true if you exceed the level" do
-        user.trust_level = TrustLevel.levels[:advanced]
-        user.has_trust_level?(:basic).should be_true
+        user.trust_level = TrustLevel.levels[:elder]
+        user.has_trust_level?(:visitor).should be_true
       end
 
       it "is true for an admin even with a low trust level" do
         user.trust_level = TrustLevel.levels[:new]
         user.admin = true
-        user.has_trust_level?(:advanced).should be_true
+        user.has_trust_level?(:elder).should be_true
       end
 
     end
 
     describe 'moderator' do
       it "isn't a moderator by default" do
-        user.has_trust_level?(:moderator).should be_false
+        user.moderator?.should be_false
       end
 
       it "is a moderator if the user level is moderator" do
-        user.trust_level = TrustLevel.levels[:moderator]
-        user.has_trust_level?(:moderator).should be_true
+        user.moderator = true
+        user.has_trust_level?(:elder).should be_true
       end
 
       it "is a moderator if the user is an admin" do
         user.admin = true
-        user.has_trust_level?(:moderator).should be_true
+        user.moderator?.should be_true
       end
 
     end
@@ -474,7 +476,12 @@ describe User do
       Fabricate.build(:user, email: 'notgood@trashmail.net').should_not be_valid
       Fabricate.build(:user, email: 'mailinator.com@gmail.com').should be_valid
     end
-
+    
+    it 'should not reject partial matches' do
+      SiteSetting.stubs(:email_domains_blacklist).returns('mail.com')
+      Fabricate.build(:user, email: 'mailinator@gmail.com').should be_valid
+    end
+    
     it 'should reject some emails based on the email_domains_blacklist site setting ignoring case' do
       SiteSetting.stubs(:email_domains_blacklist).returns('trashmail.net')
       Fabricate.build(:user, email: 'notgood@TRASHMAIL.NET').should_not be_valid
@@ -494,6 +501,38 @@ describe User do
     it 'should be used when email is being changed' do
       SiteSetting.stubs(:email_domains_blacklist).returns('mailinator.com')
       u = Fabricate(:user, email: 'good@gmail.com')
+      u.email = 'nope@mailinator.com'
+      u.should_not be_valid
+    end
+    
+    it 'whitelist should reject some emails based on the email_domains_whitelist site setting' do
+      SiteSetting.stubs(:email_domains_whitelist).returns('vaynermedia.com')
+      Fabricate.build(:user, email: 'notgood@mailinator.com').should_not be_valid
+      Fabricate.build(:user, email: 'sbauch@vaynermedia.com').should be_valid
+    end
+
+    it 'should reject some emails based on the email_domains_whitelist site setting when whitelisting multiple domains' do
+      SiteSetting.stubs(:email_domains_whitelist).returns('vaynermedia.com|gmail.com')
+      Fabricate.build(:user, email: 'notgood@mailinator.com').should_not be_valid
+      Fabricate.build(:user, email: 'notgood@trashmail.net').should_not be_valid
+      Fabricate.build(:user, email: 'mailinator.com@gmail.com').should be_valid
+      Fabricate.build(:user, email: 'mailinator.com@vaynermedia.com').should be_valid
+    end
+
+    it 'should accept some emails based on the email_domains_whitelist site setting ignoring case' do
+      SiteSetting.stubs(:email_domains_whitelist).returns('vaynermedia.com')
+      Fabricate.build(:user, email: 'good@VAYNERMEDIA.COM').should be_valid
+    end
+
+    it 'email whitelist should not be used to validate existing records' do
+      u = Fabricate(:user, email: 'in_before_whitelisted@fakemail.com')
+      SiteSetting.stubs(:email_domains_blacklist).returns('vaynermedia.com')
+      u.should be_valid
+    end
+
+    it 'email whitelist should be used when email is being changed' do      
+      SiteSetting.stubs(:email_domains_whitelist).returns('vaynermedia.com')
+      u = Fabricate(:user, email: 'good@vaynermedia.com')
       u.email = 'nope@mailinator.com'
       u.should_not be_valid
     end
