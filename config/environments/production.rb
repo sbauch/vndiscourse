@@ -41,14 +41,14 @@ Discourse::Application.configure do
   config.ember.handlebars_location = "#{Rails.root}/app/assets/javascripts/external/handlebars-1.0.rc.3.js"
   config.handlebars.precompile = true
   
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.default_url_options = { :host => 'vaynermedia.com' }
-  ActionMailer::Base.smtp_settings = {
-    :address        => "smtp.sendgrid.net",
-    :port           => "25",
-    :authentication => :plain,
-    :user_name      => ENV['SENDGRID_USERNAME'],
-    :password       => ENV['SENDGRID_PASSWORD'],
-    :domain => 'heroku.com'
-  }
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.default_url_options = { :host => 'vaynermedia.com' }
+  # ActionMailer::Base.smtp_settings = {
+  #   :address        => "smtp.sendgrid.net",
+  #   :port           => "25",
+  #   :authentication => :plain,
+  #   :user_name      => ENV['SENDGRID_USERNAME'],
+  #   :password       => ENV['SENDGRID_PASSWORD'],
+  #   :domain => 'heroku.com'
+  # }
 end

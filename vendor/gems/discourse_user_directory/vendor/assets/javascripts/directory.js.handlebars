@@ -64,8 +64,10 @@
 
 <div class='clearfix'></div>
 
-{{#if content.length}}
-
+{{#if content.loading}}
+    <div class='spinner'>{{i18n loading}}</div>
 {{else}}
-  <div>We couldn't find any users!</div>
+  {{#unless content.length}}
+    <h3>We couldn't find any users - try a different search!</h3>
+  {{/unless}}  
 {{/if}}
