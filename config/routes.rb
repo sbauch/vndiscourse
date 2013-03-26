@@ -4,7 +4,7 @@ require_dependency 'admin_constraint'
 
 # This used to be User#username_format, but that causes a preload of the User object
 # and makes Guard not work properly.
-USERNAME_ROUTE_FORMAT = /[A-Za-z0-9\_]+/
+USERNAME_ROUTE_FORMAT = /[A-Za-z0-9\_]+/ unless defined? USERNAME_ROUTE_FORMAT
 
 Discourse::Application.routes.draw do
 
@@ -56,6 +56,11 @@ Discourse::Application.routes.draw do
     resources :export
     get 'version_check' => 'versions#show'
     resources :dashboard, only: [:index]
+    resources :api, only: [:index] do
+      collection do
+        post 'generate_key'
+      end
+    end
   end
 
   get 'email_preferences' => 'email#preferences_redirect'

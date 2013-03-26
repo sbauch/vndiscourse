@@ -110,21 +110,33 @@ class Post < ActiveRecord::Base
 
   def link_count
     return 0 unless raw.present?
-    cooked_document.search("a[href]").count
+
+    # Don't include @mentions in the link count
+    total = 0
+    cooked_document.search("a[href]").each do |l|
+      html_class = l.attributes['class']
+      if html_class.present?
+        next if html_class.to_s == 'mention' && l.attributes['href'].to_s =~ /^\/users\//
+      end
+      total +=1
+    end
+    total
   end
 
   def max_mention_validator
-    errors.add(:raw, I18n.t(:too_many_mentions)) if raw_mentions.size > SiteSetting.max_mentions_per_post
+    max_mentions = SiteSetting.visitor_max_mentions_per_post
+    max_mentions = SiteSetting.max_mentions_per_post if user.present? && user.has_trust_level?(:basic)
+    errors.add(:base, I18n.t(:too_many_mentions, count: max_mentions)) if raw_mentions.size > max_mentions
   end
 
   def max_images_validator
     return if user.present? && user.has_trust_level?(:basic)
-    errors.add(:raw, I18n.t(:too_many_images)) if image_count > 0
+    errors.add(:base, I18n.t(:too_many_images, count: SiteSetting.visitor_max_images)) if image_count > SiteSetting.visitor_max_images
   end
 
   def max_links_validator
     return if user.present? && user.has_trust_level?(:basic)
-    errors.add(:raw, I18n.t(:too_many_links)) if link_count > 1
+    errors.add(:base, I18n.t(:too_many_links, count: SiteSetting.visitor_max_links)) if link_count > SiteSetting.visitor_max_links
   end
 
 
