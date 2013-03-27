@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
 
  has_many :posts
   has_many :notifications
+  has_many :alerts
   has_many :topic_users
   has_many :topics
   has_many :user_open_ids
@@ -206,12 +207,16 @@ class User < ActiveRecord::Base
     @unread_notifications_by_type ||= notifications.where("id > ? and read = false", seen_notification_id).group(:notification_type).count
   end
 
-  def reload
-    @unread_notifications_by_type = nil
-    super
+  def unread_alerts
+    @unread_alerts ||= alerts.where("id > ? and read = false", seen_alert_id).count
   end
 
-
+  def reload
+    @unread_notifications_by_type = nil
+    @unread_alerts = nil
+    super
+  end
+  
   def unread_private_messages
     unread_notifications_by_type[Notification.types[:private_message]] || 0
   end
@@ -224,6 +229,17 @@ class User < ActiveRecord::Base
     User.update_all ["seen_notification_id = ?", notification_id], ["seen_notification_id < ?", notification_id]
   end
 
+  def saw_alert_id(alert_id)
+    User.update_all ["seen_alert_id = ?", alert_id], ["seen_alert_id < ?", alert_id]
+  end
+  
+  def publish_alerts_state
+    MessageBus.publish("/alert/#{id}",
+        { unread_alerts: unread_alerts },
+        user_ids: [id] # only publish the notification to this user
+      ) 
+  end
+  
   def publish_notifications_state
     MessageBus.publish("/notification/#{id}",
         { unread_notifications: unread_notifications,

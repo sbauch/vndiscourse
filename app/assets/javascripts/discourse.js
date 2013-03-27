@@ -71,6 +71,10 @@ Discourse = Ember.Application.createWithMixins({
         user.set('unread_notifications', data.unread_notifications);
         user.set('unread_private_messages', data.unread_private_messages);
       }), user.notification_channel_position);
+			
+			bus.subscribe("/alert/" + user.id, (function(data) {
+        user.set('unread_alerts', data.unread_alerts);
+      }), user.notification_channel_position);
     }
   }.observes('currentUser'),
 

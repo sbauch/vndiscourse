@@ -3,7 +3,11 @@ require_dependency 'discourse_observer'
 # This class is responsible for notifying the message bus of various
 # events.
 class MessageBusObserver < DiscourseObserver
-  observe :notification, :user_action, :topic
+  observe :notification, :user_action, :topic, :alert
+  
+  def after_create_alert(alert)
+    refresh_alert_count(alert)
+  end
 
   def after_create_notification(notification)
     refresh_notification_count(notification)
@@ -37,7 +41,14 @@ class MessageBusObserver < DiscourseObserver
   end
 
   protected
-
+    def refresh_alert_count(alert)
+      user_id = alert.user.id
+      MessageBus.publish("/alert/#{user_id}",
+        {unread_alerts: alert.user.unread_alerts},
+        user_ids: [user_id] # only publish the notification to this user
+      )
+    end
+    
     def refresh_notification_count(notification)
       user_id = notification.user.id
       MessageBus.publish("/notification/#{user_id}",

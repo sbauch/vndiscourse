@@ -1,0 +1,14 @@
+#banner-spacer{
+	height:30px;
+	display:inline-block;
+	width:100%;
+	position: relative;
+}
+
+.d-header .has-alert{
+	top: 28px;
+}
+
+#main-outlet .has-alert{
+	padding-top: 103px;
+}

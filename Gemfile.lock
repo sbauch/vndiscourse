@@ -56,6 +56,11 @@ PATH
     discourse_emoji (0.0.1)
 
 PATH
+  remote: vendor/gems/discourse_pervasive_banner
+  specs:
+    discourse_pervasive_banner (0.0.10)
+
+PATH
   remote: vendor/gems/discourse_plugin
   specs:
     discourse_plugin (0.0.1)
@@ -516,6 +521,7 @@ DEPENDENCIES
   clockwork
   diffy
   discourse_emoji!
+  discourse_pervasive_banner!
   discourse_plugin!
   discourse_task!
   discourse_user_directory!

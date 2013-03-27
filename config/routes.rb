@@ -122,6 +122,7 @@ Discourse::Application.routes.draw do
   end
 
   resources :notifications
+  resources :alerts
   resources :categories
 
   match "/auth/:provider/callback", to: "users/omniauth_callbacks#complete"

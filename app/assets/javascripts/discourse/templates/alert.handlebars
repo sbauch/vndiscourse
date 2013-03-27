@@ -1,0 +1,23 @@
+{{#if view.currentUser.unread_alerts}}
+{{#each view.alerts}}
+
+<div id='discourse-pervasive-banner'>
+<div class='container'>
+  <div class="contents clearfix">
+  <div id='banner-text'>
+    {{icon}}
+    {{message}}
+    {{rendered}}
+    <a href='#' {{action closeAlert target='view'}}>
+      <i class='pull-right icon icon-remove'></i>
+    </a>
+  </div>
+  </div>
+  </div>
+</div>
+  <script>
+   $('.d-header').css('top', '28px');
+   $('#main-outlet').css('padding-top', '103px');
+  </script>
+{{/each}}  
+{{/if}}

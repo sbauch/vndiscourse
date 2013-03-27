@@ -26,6 +26,6 @@ Discourse.ApplicationController = Discourse.Controller.extend({
     } else {
       this.afterFirstHit = true;
     }
-  }.observes('currentPath')
+  }.observes('currentPath'),
 
 });

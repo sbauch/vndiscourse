@@ -69,6 +69,7 @@ gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
 gem 'discourse_emoji', path: 'vendor/gems/discourse_emoji'
 gem 'discourse_task', path: 'vendor/gems/discourse_task'
 gem 'discourse_user_directory', path: 'vendor/gems/discourse_user_directory'
+gem 'discourse_pervasive_banner', path: 'vendor/gems/discourse_pervasive_banner'
 
 # Gems used only for assets and not required
 # in production environments by default.
