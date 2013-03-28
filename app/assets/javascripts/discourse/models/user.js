@@ -142,7 +142,10 @@ Discourse.User = Discourse.Model.extend({
                                'digest_after_days',
                                'new_topic_duration_minutes',
                                'external_links_in_new_tab',
-                               'enable_quoting'),
+                               'enable_quoting',
+															 'fact_one',
+															 'fact_two',
+															 'fact_three'),
       type: 'PUT',
       success: function() {
         Discourse.set('currentUser.enable_quoting', _this.get('enable_quoting'));

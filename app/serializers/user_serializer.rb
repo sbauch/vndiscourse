@@ -14,7 +14,12 @@ class UserSerializer < BasicUserSerializer
              :can_send_private_message_to_user,
              :bio_excerpt,
              :invited_by,
-             :trust_level
+             :trust_level,
+             :fact_one,
+             :fact_two,
+             :fact_three,
+             :teams,
+             :position
 
 
   def self.private_attributes(*attrs)
@@ -38,8 +43,7 @@ class UserSerializer < BasicUserSerializer
     e
   end
 
-  private_attributes :email,
-             :email_digests,
+  private_attributes :email_digests,
              :email_private_messages,
              :email_direct,
              :digest_after_days,

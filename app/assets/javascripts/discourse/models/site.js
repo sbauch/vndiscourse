@@ -7,7 +7,19 @@
   @module Discourse
 **/
 Discourse.Site = Discourse.Model.extend({
-
+	
+	composerCategories: (function(){
+		var eventsIndex;
+		console.log(this.categories);	
+		this.categories.reject(function(item, index, enumerable){ 
+			if (item.name == 'Events'){ 
+				eventsIndex = index;
+				}
+			});
+		return this.categories.removeAt(eventsIndex);	
+	}).property(),
+	
+	
   notificationLookup: (function() {
     var result;
     result = [];
@@ -42,6 +54,8 @@ Discourse.Site.reopenClass({
     return Object.tap(this._super(obj), function(result) {
       if (result.categories) {
         result.categories = result.categories.map(function(c) {
+					console.log(c.name);
+
           return Discourse.Category.create(c);
         });
       }

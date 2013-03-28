@@ -5,7 +5,8 @@ require_dependency 'summarize'
 
 class User < ActiveRecord::Base
 
-  attr_accessible :name, :username, :password, :email, :bio_raw, :website, :teams, :position, :short_position
+  attr_accessible :name, :username, :password, :email, :bio_raw, :website, :teams, :position, :short_position,
+                  :fact_one, :fact_two, :fact_three
 
  has_many :posts
   has_many :notifications

@@ -44,7 +44,7 @@ class ListController < ApplicationController
     end
 
     list.more_topics_url = url_for(category_path(params[:category], page: next_page, format: "json"))
-    respond(list)
+    respond(list, @category.name)
   end
 
   def category_feed
@@ -62,8 +62,11 @@ class ListController < ApplicationController
 
   protected
 
-  def respond(list)
-
+  def respond(list, category_name = nil)
+    
+    list.current_user_admin = current_user.admin?
+    list.category_private = category_name == 'Events'
+    
     list.draft_key = Draft::NEW_TOPIC
     list.draft_sequence = DraftSequence.current(current_user, Draft::NEW_TOPIC)
 

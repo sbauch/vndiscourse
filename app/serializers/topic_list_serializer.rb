@@ -5,7 +5,13 @@ class TopicListSerializer < ApplicationSerializer
   has_many :topics, serializer: TopicListItemSerializer, embed: :objects
 
   def can_create_topic
-    scope.can_create?(Topic)
+    if object.current_user_admin
+      return true
+    elsif object.category_private
+      return false
+    else    
+      scope.can_create?(Topic, nil, object.category_private)
+    end
   end
 
   def include_more_topics_url?

@@ -18,9 +18,6 @@
             {{#linkTo "user.privateMessages"}}{{i18n user.private_messages}}{{/linkTo}}
           </li>
         {{/if}}
-        <li>
-          {{#linkTo 'user.invited'}}{{i18n user.invited.title}}{{/linkTo}}
-        </li>
         {{#if content.can_edit}}
           <li>
             {{#linkTo 'preferences'}}{{i18n user.preferences}}{{/linkTo}}
@@ -35,9 +32,13 @@
 </div>
 <div class="container">
   <div class='user-info clearfix'>
-     <div class='about-me'>
-       {{{content.bio_excerpt}}}
-      </div>
+    <div class='about-me'>
+      <ol>
+        <li>{{{content.fact_one}}}</li>
+        <li>{{{content.fact_two}}}</li>
+        <li>{{{content.fact_three}}}</li>
+      </ol>    
+    </div>
   </div>
 </div>
 <div class="container">

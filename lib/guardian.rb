@@ -56,10 +56,9 @@ class Guardian
   alias :can_see_flags? :can_moderate?
 
   # Can the user create a topic in the forum
-  def can_create?(klass, parent=nil)
+  def can_create?(klass, parent=nil, category_private=false)
     return false if klass.blank?
     return false if @user.blank?
-
     # If no parent is provided, we look for a can_i_create_klass?
     # custom method.
     #
@@ -71,9 +70,13 @@ class Guardian
       target << "_on_#{parent.class.name.underscore}"
     end
     create_method = :"can_create_#{target}?"
-
-    return send(create_method, parent) if respond_to?(create_method)
-
+    
+    if klass == Topic
+      return send(create_method, parent, category_private) if respond_to?(create_method)
+    else
+      return send(create_method, parent) if respond_to?(create_method)
+    end
+    
     true
   end
 
@@ -226,6 +229,11 @@ class Guardian
     return false if topic.closed?
     return false if topic.archived?
     true
+  end
+  
+  def can_create_topic?(parent=nil,category_private=false)
+    return true if @user.admin
+    return !category_private
   end
 
   # Editing Methods

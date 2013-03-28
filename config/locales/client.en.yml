@@ -684,7 +684,13 @@ en:
         help: "popular topics in the {{categoryName}} category"
       directory:
         title: "Directory"
-        help: "Find a Vayniac"  
+        help: "Find a Vayniac"
+      events:
+        title:
+          zero: "Events"
+          one: "Events (1 New)"
+          other: "Events ({{count}} New)"
+        help: "Flash Lessons and Company Events"    
 
   # This section is exported to the javascript for i18n in the admin section
   admin_js:
