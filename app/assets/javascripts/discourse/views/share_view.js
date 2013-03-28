@@ -27,28 +27,18 @@ Discourse.ShareView = Discourse.View.extend({
     }
   }).observes('controller.link'),
 
-  facebookUrl: function() {
-    return ("http://www.facebook.com/sharer.php?u=" + this.get('controller.link'));
-  }.property('controller.link'),
-
-  twitterUrl: function() {
-    return ("http://twitter.com/home?status=" + this.get('controller.link'));
-  }.property('controller.link'),
-
-  googlePlusUrl: function() {
-    return ("https://plus.google.com/share?url=" + this.get('controller.link'));
-  }.property('controller.link'),
-
   didInsertElement: function() {
     var _this = this;
-    $('html').on('click.outside-share-link', function(e) {
+    $('html').on('mousedown.outside-share-link', function(e) {
+      // Use mousedown instead of click so this event is handled before routing occurs when a
+      // link is clicked (which is a click event) while the share dialog is showing.
       if (_this.$().has(e.target).length !== 0) {
         return;
       }
       _this.get('controller').close();
       return true;
     });
-    return $('html').on('click.discoure-share-link', '[data-share-url]', function(e) {
+    $('html').on('click.discoure-share-link', '[data-share-url]', function(e) {
       var $currentTarget, url;
       e.preventDefault();
       $currentTarget = $(e.currentTarget);
@@ -62,11 +52,17 @@ Discourse.ShareView = Discourse.View.extend({
       _this.get('controller').shareLink(e, url);
       return false;
     });
+    $('html').on('keydown.share-view', function(e){
+      if (e.keyCode === 27) {
+        _this.get('controller').close();
+      }
+    });
   },
 
   willDestroyElement: function() {
     $('html').off('click.discoure-share-link');
-    $('html').off('click.outside-share-link');
+    $('html').off('mousedown.outside-share-link');
+    $('html').off('keydown.share-view');
   }
 
 });
