@@ -659,7 +659,7 @@ en:
         title: "Latest"
         help: "the most recent topics"
       hot:
-        title: "Hot"
+        title: "Popular"
         help: "a seclection of the hottest topics"
       favorited:
         title: "Favorited"
