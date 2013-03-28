@@ -161,7 +161,7 @@ class Users::OmniauthCallbacksController < ApplicationController
       else
         log_on_user(user)
         
-        resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{u.email}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
+        resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{user.email}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
         user.update_attributes(:teams => resp['teams'], :position => resp['function'])
         
         @data = {authenticated: true}
