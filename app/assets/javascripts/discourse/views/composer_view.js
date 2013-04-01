@@ -219,6 +219,7 @@ Discourse.ComposerView = Discourse.View.extend({
           }
         });
         _this.set('content.targetUsernames', items.join(","));
+				console.log(items.join(","));
         selected = items;
       },
 

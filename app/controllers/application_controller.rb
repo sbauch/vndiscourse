@@ -216,9 +216,11 @@ class ApplicationController < ActionController::Base
 
     def check_restricted_access
       # note current_user is defined in the CurrentUser mixin
-      if SiteSetting.access_password.present? && cookies[:_access] != SiteSetting.access_password
-        redirect_to request_access_path(return_path: request.fullpath)
-        return false
+      unless params[:api_key].present?
+        if SiteSetting.access_password.present? && cookies[:_access] != SiteSetting.access_password
+          redirect_to request_access_path(return_path: request.fullpath)
+          return false
+        end
       end
     end
 

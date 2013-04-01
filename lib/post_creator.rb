@@ -64,7 +64,12 @@ class PostCreator
           end
           topic.topic_allowed_users.build(user_id: @user.id)
         end
-
+        
+        if @opts[:archetype] == Archetype.event
+          topic.attendee_limit = @opts[:attendee_limit].to_i
+          topic.attendee_count = 0
+        end
+        
         unless topic.save
           @errors = topic.errors
           raise ActiveRecord::Rollback.new

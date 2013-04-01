@@ -31,7 +31,7 @@ Discourse.TopicStatusView = Discourse.View.extend({
     if (!this.get('hasDisplayableStatus')) return;
 
     // Allow a plugin to add a custom icon to a topic
-    this.trigger('addCustomIcon', buffer);
+    // this.trigger('addCustomIcon', buffer);
 
     if (this.get('topic.closed')) {
       this.renderIcon(buffer, 'lock', 'locked');

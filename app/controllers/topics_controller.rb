@@ -146,6 +146,26 @@ class TopicsController < ApplicationController
     topic.clear_pin_for(current_user)
     render nothing: true
   end
+  
+  def rsvp
+    topic = Topic.where(id: params[:topic_id].to_i).first
+    new_status = current_user.toggle_rsvp(topic)
+    render :json => {'status' => new_status}
+  end
+  
+  def attendees
+    topic = Topic.where(id: params[:topic_id].to_i).first
+    attendees = topic.attendees
+    render_serialized(attendees, BasicUserSerializer)
+  end
+  
+  def attendance
+    user = User.find_by_username(params[:username])
+    reservation = user.reservations.where(topic_id: params[:topic_id].to_i ).first
+    reservation.update_attribute(:status, params[:present] == 'true' ? 'attended' : 'absent')
+    render :nothing => true
+  end
+
 
   def timings
     PostTiming.process_timings(

@@ -7,7 +7,18 @@
   position: fixed;
   top: 70px;
   right: 10px;
-  z-index: 1000;
+  z-index: 999;
+
+  i {
+    margin: 0px;
+    line-height: 10px;
+  }
+}
+#show-event-host {
+  position: fixed;
+  top: 100px;
+  right: 10px;
+  z-index: 999;
 
   i {
     margin: 0px;

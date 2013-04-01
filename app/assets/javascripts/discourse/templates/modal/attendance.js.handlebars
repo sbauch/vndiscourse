@@ -1,0 +1,20 @@
+<div class="modal-body">
+{{#each attendee in view.attendees}}
+  <div class='row'>
+    <div class='span3'>
+     <p>{{attendee.username}}</p>
+    </div>
+    <div class='span4'>
+      <p>{{attendee.buttonClass}}</p>
+      <button class='btn ok' {{action didAttend attendee attended=true target='view'}}><i class='icon-ok'></i></button>
+      <button class='btn cancel' {{action absent attendee href=false target='view'}}><i class='icon-remove'></i></button>
+      {{#if attendee.attended}}
+        <span>{{attendee.attended}}</span>
+      {{/if}}  
+    </div>
+  </div>
+{{/each}}
+</div>
+<div class="modal-footer">
+  <button class='btn btn-primary' data-dismiss="modal">{{i18n close}}</button>
+</div>

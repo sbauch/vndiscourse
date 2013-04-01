@@ -37,7 +37,7 @@ class Topic < ActiveRecord::Base
   belongs_to :category
   has_many :posts
   has_many :topic_allowed_users
-  has_many :allowed_users, through: :topic_allowed_users, source: :user
+  has_many :allowed_users, through: :topic_allowed_users, source: :users
   belongs_to :user
   belongs_to :last_poster, class_name: 'User', foreign_key: :last_post_user_id
   belongs_to :featured_user1, class_name: 'User', foreign_key: :featured_user1_id
@@ -49,7 +49,10 @@ class Topic < ActiveRecord::Base
   has_many :topic_links
   has_many :topic_invites
   has_many :invites, through: :topic_invites, source: :invite
-
+  
+  has_many :reservations
+  has_many :attendees, through: :reservations, source: :user
+  
   # When we want to temporarily attach some data to a forum topic (usually before serialization)
   attr_accessor :user_data
   attr_accessor :posters  # TODO: can replace with posters_summary once we remove old list code
@@ -90,7 +93,7 @@ class Topic < ActiveRecord::Base
     changed_to_category(category)
     TopicUser.change(user_id, id,
                      notification_level: TopicUser.notification_levels[:watching],
-                     notifications_reason_id: TopicUser.notification_reasons[:created_topic])
+                     notifications_reason_id: TopicUser.notification_reasons[:created_topic])                 
     if archetype == Archetype.private_message
       DraftSequence.next!(user, Draft::NEW_PRIVATE_MESSAGE)
     else

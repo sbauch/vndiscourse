@@ -279,6 +279,10 @@ Discourse.TopicController = Discourse.ObjectController.extend({
     this.get('content').toggleStar();
   },
 
+	toggleRsvp: function(e){
+		this.get('content').toggleRsvp();
+	},
+
   /**
     Clears the pin from a topic for the currentUser
 
@@ -390,6 +394,15 @@ Discourse.TopicController = Discourse.ObjectController.extend({
     var modalController = this.get('controllers.modal');
     if (modalController) {
       modalController.show(Discourse.InviteModalView.create({
+        topic: this.get('content')
+      }));
+    }
+  },
+
+	 showAttendanceModal: function() {
+    var modalController = this.get('controllers.modal');
+    if (modalController) {
+      modalController.show(Discourse.AttendanceModalView.create({
         topic: this.get('content')
       }));
     }

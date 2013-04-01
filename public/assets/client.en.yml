@@ -484,6 +484,23 @@ en:
         title: 'Share'
         help: 'share a link to this topic'
 
+      rsvp:
+        open: 
+          text: 'RSVP for this Event'
+          help: 'Spots are open - reserve yours before this event iflls up!'
+        waitlist: 
+          text: 'Add Yourself to the Waitlist for this Event' 
+          help: 'This event is full, but if a spot becomes available we will let you know'
+        registered:
+          text: 'Cancel Your RSVP'
+          help: "Can't make the event? Make room for others"
+        waitlisted:
+          text: "Cancel Your Waitlist Spot"
+          help: "Can't make the event? Take yourself off the waitlist"
+        absent:
+          text: "You didn't show! Not cool."
+        attended:
+          text: "Thanks for coming!"  
       inviting: "Inviting..."
 
       invite_private:

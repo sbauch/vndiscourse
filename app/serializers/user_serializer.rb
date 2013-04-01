@@ -19,7 +19,8 @@ class UserSerializer < BasicUserSerializer
              :fact_two,
              :fact_three,
              :teams,
-             :position
+             :position,
+             :events_attended
 
 
   def self.private_attributes(*attrs)

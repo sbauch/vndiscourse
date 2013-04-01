@@ -45,7 +45,10 @@ class TopicViewSerializer < ApplicationSerializer
              :at_bottom,
              :highest_post_number,
              :pinned,
-             :filtered_posts_count
+             :filtered_posts_count,
+             :user_rsvp_status,
+             :post_creator,
+             :event_menu
 
   has_one :created_by, serializer: BasicUserSerializer, embed: :objects
   has_one :last_poster, serializer: BasicUserSerializer, embed: :objects
@@ -74,7 +77,24 @@ class TopicViewSerializer < ApplicationSerializer
       end
     }
   end
-
+  
+  def user_rsvp_status
+    options[:scope].user.attendance_status(object.topic)
+  end
+  
+  def post_creator
+    return true if options[:scope].user.admin 
+    object.topic.user == options[:scope].user ? true : false
+  end
+  
+  def event_menu
+    if object.topic.archetype == 'event'
+      if options[:scope].user.admin || (object.topic.user == options[:scope].user)
+        return true
+      end
+    end
+  end
+    
   def draft
     object.draft
   end

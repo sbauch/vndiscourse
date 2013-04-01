@@ -1,0 +1,15 @@
+{{#if visible}}
+<div class="topic-admin-menu">
+  <h3>Event Host Menu</h3>
+    <ul>
+      <li>  
+        <button class='btn btn-admin' {{action takeAttendance target="controller"}}><i class='icon-ok'></i> Take Attendance</button>
+      </li>
+      <li>  
+        <button class='btn btn-admin' {{action composePrivateMessage target="controller"}}><i class='icon-bullhorn'></i> PM Attendees</button>
+      </li>
+    </ul>
+</div>
+{{else}}
+  <button class='btn' id='show-event-host' {{action show}}>Host Menu</button>
+{{/if}}

@@ -9,34 +9,75 @@
 Discourse.TopicFooterButtonsView = Ember.ContainerView.extend({
   elementId: 'topic-footer-buttons',
   topicBinding: 'controller.content',
-
+	
   init: function() {
     this._super();
-    return this.createButtons();
+		return this.createButtons();
   },
 
   // Add the buttons below a topic
   createButtons: function() {
-    var topic;
-    topic = this.get('topic');
+		var topic = this.get('topic');
+		
     if (Discourse.get('currentUser')) {
-      if (!topic.get('isPrivateMessage')) {
-
-        // We hide some controls from private messages
-        if (this.get('topic.can_invite_to')) {
-          this.addObject(Discourse.ButtonView.create({
-            textKey: 'topic.invite_reply.title',
-            helpKey: 'topic.invite_reply.help',
-
+			if (topic.get('archetype') == 'event'){
+          this.addObject(Discourse.ButtonView.createWithMixins({
+            helpKey: 'topic.rsvp.' + this.get('controller.content.user_rsvp_status') + '.help',
+						classNames: ['btn', 'btn-primary'],
+						
+          	rsvpChanged: (function() {
+            	this.rerender();
+							if (this.get('controller.content.user_rsvp_status') == 'registered'){
+								console.log('TODO: render gcal modal');
+								}
+          	}).observes('controller.content.user_rsvp_status'),
+						
+						textKey: (function() {
+	          	return 'topic.rsvp.' + this.get('controller.content.user_rsvp_status') + '.text';
+	        	}).property('controller.content.user_rsvp_status'),
+						
             renderIcon: function(buffer) {
-              buffer.push("<i class='icon icon-group'></i>");
-            },
+							// return = (function() {
+							switch (this.get('controller.content.user_rsvp_status')) {
+                case 'open':
+                  buffer.push("<i class='icon icon-check'></i>");
+									break;
+                case 'waitlist':
+                  buffer.push("<i class='icon icon-group'></i>");
+									break;
+								case 'registered':
+                  buffer.push("<i class='icon icon-remove'></i>");
+                	break;
+								case 'waitlisted':
+                  buffer.push("<i class='icon icon-remove'></i>");
+              		break;
+								}
+							return false
+						},
 
             click: function() {
-              return this.get('controller').showInviteModal();
-            }
+            	this.get('controller').toggleRsvp();
+						}
           }));
-        }
+				}
+    
+				if (!topic.get('isPrivateMessage')) {
+
+        // We hide some controls from private messages
+        // if (this.get('topic.can_invite_to')) {
+        //   this.addObject(Discourse.ButtonView.create({
+        //     textKey: 'topic.invite_reply.title',
+        //     helpKey: 'topic.invite_reply.help',
+        // 
+        //     renderIcon: function(buffer) {
+        //       buffer.push("<i class='icon icon-group'></i>");
+        //     },
+        // 
+        //     click: function() {
+        //       return this.get('controller').showInviteModal();
+        //     }
+        //   }));
+        // }
 
         this.addObject(Discourse.ButtonView.createWithMixins({
           textKey: 'favorite.title',
@@ -59,15 +100,15 @@ Discourse.TopicFooterButtonsView = Ember.ContainerView.extend({
           }
         }));
 
-        this.addObject(Discourse.ButtonView.create({
-          textKey: 'topic.share.title',
-          helpKey: 'topic.share.help',
-          'data-share-url': topic.get('url'),
-
-          renderIcon: function(buffer) {
-            buffer.push("<i class='icon icon-share'></i>");
-          }
-        }));
+        // this.addObject(Discourse.ButtonView.create({
+        //   textKey: 'topic.share.title',
+        //   helpKey: 'topic.share.help',
+        //   'data-share-url': topic.get('url'),
+        // 
+        //   renderIcon: function(buffer) {
+        //     buffer.push("<i class='icon icon-share'></i>");
+        //   }
+        // }));
 
         // Add our clear pin button
         this.addObject(Discourse.ButtonView.createWithMixins({

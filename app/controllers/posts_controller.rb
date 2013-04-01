@@ -19,7 +19,8 @@ class PostsController < ApplicationController
                                    target_usernames: params[:target_usernames],
                                    reply_to_post_number: params[:post][:reply_to_post_number],
                                    image_sizes: params[:image_sizes],
-                                   meta_data: params[:meta_data])
+                                   meta_data: params[:meta_data],
+                                   attendee_limit: params[:attendee_limit])
     post = post_creator.create
 
     if post_creator.errors.present?

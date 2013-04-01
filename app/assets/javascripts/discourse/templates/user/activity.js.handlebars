@@ -1,10 +1,11 @@
 <div id='user-info'> 
     <div class='show'>
     <dl>
-    <!-- <dt>Start Date:</dt><dd>{{date content.start_date}}</dd>   -->
     <dt>{{i18n user.email.title}}:</dt><dd {{bindAttr title="content.email"}}>{{content.email}}</dd>
     <dt>Position:</dt><dd {{bindAttr title="content.position"}}>{{content.position}}</dd>
     <dt>Teams:</dt><dd {{bindAttr title="content.teams"}}>{{content.teams}}</dd>
+    <dt>Flash Lessons:</dt><dd>{{content.events_attended}}</dd>  
+
     {{#if content.last_posted_at}}
       <dt>{{i18n user.last_posted}}:</dt><dd>{{date content.last_posted_at}}</dd>
     {{/if}}

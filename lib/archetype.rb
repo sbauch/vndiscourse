@@ -24,6 +24,10 @@ class Archetype
   def self.private_message
     'private_message'
   end
+  
+  def self.event
+    'event'
+  end  
 
   def self.list
     return [] unless @archetypes.present?
@@ -39,5 +43,5 @@ class Archetype
   # By default we have a regular archetype and a private message
   register 'regular'
   register 'private_message'
-
+  register 'event'
 end

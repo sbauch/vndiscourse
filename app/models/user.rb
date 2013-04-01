@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
  has_many :posts
   has_many :notifications
   has_many :alerts
+  has_many :reservations
   has_many :topic_users
   has_many :topics
   has_many :user_open_ids
@@ -57,6 +58,54 @@ class User < ActiveRecord::Base
 
   def self.username_length
     3..15
+  end
+  
+  def events_attended
+    reservations.where(:status => 'attended').count.to_s
+  end
+  
+  def toggle_rsvp(topic)
+    case attendance_status(topic)
+      when 'open'
+        reservations.create(:topic_id => topic.id, :status => 'registered')
+        return 'registered'
+      
+      when 'registered'
+        reservations.where(:topic_id => topic.id).destroy_all
+        if (bumped_user = topic.reservations.order("created_at ASC").where(:status => 'waitlisted').limit(1).user)
+          bumped_user.reservations.where(:topic_id => topic.id).update_attribute(:status, 'registered')
+          #create private message
+        end  
+        
+        return 'open'
+      
+      when 'waitlisted'
+        reservations.where(:topic_id => topic.id).destroy_all
+        return 'waitlist'  
+      
+      when 'waitlist'
+        reservations.create(:topic_id => topic.id, :status => 'waitlisted')   
+        return 'waitlisted'
+    end       
+  end
+  
+  def attendance_status(topic)
+    if (limit  = topic.attendee_limit)
+      reservation = reservations.where(:topic_id => topic.id)
+      if topic.attendee_count >= limit
+        if reservation.empty?
+          return 'waitlist'
+        else
+          return reservation.first.status
+        end  
+      else #open space
+        if reservation.empty?
+          return 'open'
+        else
+          return reservation.first.status
+        end  
+      end
+    end        
   end
 
   def self.suggest_username(name)

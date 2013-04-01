@@ -185,7 +185,10 @@ Discourse::Application.routes.draw do
   put 't/:topic_id/clear-pin' => 'topics#clear_pin', constraints: {topic_id: /\d+/}
   put 't/:topic_id/mute' => 'topics#mute', constraints: {topic_id: /\d+/}
   put 't/:topic_id/unmute' => 'topics#unmute', constraints: {topic_id: /\d+/}
-
+  put 't/:slug/:topic_id/rsvp' => 'topics#rsvp', constraints: {topic_id: /\d+/}
+  put 't/:slug/:topic_id/:username/attended' => 'topics#attendance'
+  
+  get 't/:slug/:topic_id/attendees' => 'topics#attendees', constraints: {topic_id: /\d+/, post_number: /\d+/}
   get 't/:topic_id/:post_number' => 'topics#show', constraints: {topic_id: /\d+/, post_number: /\d+/}
   get 't/:slug/:topic_id.rss' => 'topics#feed', format: :rss, constraints: {topic_id: /\d+/}
   get 't/:slug/:topic_id' => 'topics#show', constraints: {topic_id: /\d+/}
