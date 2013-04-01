@@ -68,8 +68,10 @@ class ListController < ApplicationController
 
   def respond(list, category_name = nil)
     
-    list.current_user_admin = current_user.admin?
-    list.category_private = category_name == 'Events'
+    if current_user
+      list.current_user_admin = current_user.admin?
+      list.category_private = category_name == 'Events'
+    end
     
     list.draft_key = Draft::NEW_TOPIC
     list.draft_sequence = DraftSequence.current(current_user, Draft::NEW_TOPIC)
