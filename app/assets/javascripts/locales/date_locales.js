@@ -1,3 +1,4 @@
+//encoding: utf-8
 // create CS locale, because it's not supported by Sugar at all
 Date.addLocale('cs', {
   'plural': true,

@@ -64,7 +64,7 @@ gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
 
 # Discourse Plugins (optional)
 # Polls and Tasks have been disabled for launch, we need think all sorts of stuff through before adding them back in
-#   biggest concern is core support for custom sort orders, but there is also styling that just gets mishmashed into our core theme. 
+#   biggest concern is core support for custom sort orders, but there is also styling that just gets mishmashed into our core theme.
 # gem 'discourse_poll', path: 'vendor/gems/discourse_poll'
 gem 'discourse_emoji', path: 'vendor/gems/discourse_emoji'
 gem 'discourse_task', path: 'vendor/gems/discourse_task'
@@ -91,7 +91,7 @@ group :test, :development do
   gem 'certified'
   gem 'fabrication'
   gem 'guard-jasmine'
-  gem 'guard-rspec' 
+  gem 'guard-rspec'
   gem 'guard-spork'
   gem 'jasminerice'
   gem 'mocha', require: false
@@ -104,12 +104,17 @@ group :test, :development do
   gem 'railroady'
 end
 
-group :development do 
+group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'librarian', '>= 0.0.25', require: false
-  gem 'pry-rails'  
+  gem 'pry-rails'
 end
+
+# this is an optional gem, it provides a high performance replacement
+# to String#blank? a method that is called quite frequently in current
+# ActiveRecord, this may change in the future
+gem 'fast_blank', github: "SamSaffron/fast_blank"
 
 # IMPORTANT: mini profiler monkey patches, so it better be required last
 #  If you want to amend mini profiler to do the monkey patches in the railstie
@@ -121,5 +126,5 @@ group :profile do
   # travis refuses to install this, instead of fuffing, just avoid it for now
   #
   # if you need to profile, uncomment out this line
-  # gem 'rack-perftools_profiler', require: 'rack/perftools_profiler', platform: :mri_19 
+  # gem 'rack-perftools_profiler', require: 'rack/perftools_profiler', platform: :mri_19
 end
