@@ -26,9 +26,11 @@ Discourse.EventHostMenuController = Discourse.ObjectController.extend({
   	},
   
 		takeAttendance: function() {
+			var _this = this;
 			var modal = Discourse.AttendanceModalView.create({
       			topic: this.get('content'),
-						attendees: this.get('attendees')
+						attendees: this.get('attendees'),
+						url: "" + (_this.get('url'))
     			});
 
     var modalController = this.get('controllers.modal');

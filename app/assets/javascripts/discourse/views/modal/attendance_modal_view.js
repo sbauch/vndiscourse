@@ -19,8 +19,7 @@ Discourse.AttendanceModalView = Discourse.View.extend({
 	getAttendees: function() {
     var _this = this;
 		var message;
-		_this.set('url', "" + (this.get('url')))
-    $.get("" + (this.get('url')) + '/attendees').then(function(result) {
+		$.get("" + (this.get('url')) + '/attendees').then(function(result) {
      _this.set('attendees',  result.map(function(a) {
 				console.log(Discourse.Attendee.create(a));
 				return Discourse.Attendee.create(a);
@@ -31,7 +30,7 @@ Discourse.AttendanceModalView = Discourse.View.extend({
 	
 	didAttend: function(event) {
     return $.ajax({
-      url: event.username + "/attended",
+      url: "" + (this.get('url')) + '/' + event.username + "/attended",
       type: 'PUT',
       data: { present: true },
 			success: function( data ){
@@ -47,7 +46,7 @@ Discourse.AttendanceModalView = Discourse.View.extend({
 	
 	absent: function(event) {
 		  return $.ajax({
-      url: event.username + "/attended",
+      url: "" + (this.get('url')) + '/' + event.username + "/attended",
       type: 'PUT',
       data: { present: false },
 			success: function( data ){
