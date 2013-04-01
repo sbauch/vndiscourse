@@ -30,7 +30,7 @@ Discourse.AttendanceModalView = Discourse.View.extend({
 	
 	didAttend: function(event) {
     return $.ajax({
-      url: "" +  event.username + "/attended",
+      url: "" + (this.get('url')) + event.username + "/attended",
       type: 'PUT',
       data: { present: true },
 			success: function( data ){
@@ -46,7 +46,7 @@ Discourse.AttendanceModalView = Discourse.View.extend({
 	
 	absent: function(event) {
 		  return $.ajax({
-      url: "" +  event.username + "/attended",
+      url: (this.get('url')) + event.username + "/attended",
       type: 'PUT',
       data: { present: false },
 			success: function( data ){
