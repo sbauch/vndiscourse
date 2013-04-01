@@ -148,7 +148,7 @@ class TopicsController < ApplicationController
   end
   
   def rsvp
-    topic = Topic.where(slug: params[:topic_id].to_i).first
+    topic = Topic.where(id: params[:topic_id].to_i).first
     new_status = current_user.toggle_rsvp(topic)
     render :json => {'status' => new_status}
   end
