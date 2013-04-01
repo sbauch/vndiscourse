@@ -14,7 +14,7 @@ Discourse.EventHostMenuController = Discourse.ObjectController.extend({
     	this.set('visible', true);
 			var _this = this;
 			var message;
-    	$.get(Discourse.getURL("attendees")).then(function(result) {
+    	$.get("" + (this.get('url')) + '/attendees').then(function(result) {
      		_this.set('attendees',  result.map(function(a) {
 					return Discourse.Attendee.create(a);
       		}));
