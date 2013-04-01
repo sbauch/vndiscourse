@@ -9,6 +9,8 @@ gem 'vestal_versions', git: 'git://github.com/zhangyuan/vestal_versions'
 gem 'message_bus', path: 'vendor/gems/message_bus'
 gem 'rails_multisite', path: 'vendor/gems/rails_multisite'
 gem 'simple_handlebars_rails', path: 'vendor/gems/simple_handlebars_rails'
+gem 'handlebars-source', '1.0.0.rc3'
+
 
 gem 'redcarpet', require: false
 gem 'activerecord-postgres-hstore'
