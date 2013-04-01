@@ -57,7 +57,7 @@ class User < ActiveRecord::Base
   end
 
   def self.username_length
-    3..15
+    3..25
   end
   
   def events_attended
