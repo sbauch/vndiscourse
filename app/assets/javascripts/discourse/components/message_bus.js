@@ -68,7 +68,7 @@ Discourse.MessageBus = (function() {
           data[c.channel] = c.last_id === void 0 ? -1 : c.last_id;
         });
         gotData = false;
-        _this.longPoll = $.ajax(Discourse.getURL("/message-bus/") + clientId + "/poll?" + (isHidden() || !_this.enableLongPolling ? "dlp=t" : ""), {
+        _this.longPoll = Discourse.ajax(Discourse.getURL("/message-bus/") + clientId + "/poll?" + (isHidden() || !_this.enableLongPolling ? "dlp=t" : ""), {
           data: data,
           cache: false,
           dataType: 'json',
@@ -102,12 +102,8 @@ Discourse.MessageBus = (function() {
               if (failCount > 2) {
                 interval = interval * failCount;
               } else if (isHidden()) {
-                /* slowning down stuff a lot when hidden
-                */
-
-                /* we will need to add a lot of fine tuning here
-                */
-
+                // slowning down stuff a lot when hidden
+                // we will need to add a lot of fine tuning here
                 interval = interval * 4;
               }
               if (interval > _this.maxPollInterval) {

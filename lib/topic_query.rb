@@ -27,6 +27,24 @@ class TopicQuery
        END DESC"
     end
 
+    def order_hotness
+
+      # When anonymous, don't use topic_user
+      if @user.blank?
+        return "CASE
+                  WHEN topics.pinned_at IS NOT NULL THEN 100
+                  ELSE hot_topics.score + (COALESCE(categories.hotness, 5.0) / 11.0)
+                END DESC"
+      end
+
+      # When logged in take into accounts what pins you've closed
+      "CASE
+        WHEN (COALESCE(topics.pinned_at, '#{lowest_date}') > COALESCE(tu.cleared_pinned_at, '#{lowest_date}'))
+          THEN 100
+        ELSE hot_topics.score + (COALESCE(categories.hotness, 5.0) / 11.0)
+       END DESC"
+    end
+
     # If you've clearned the pin, use bumped_at, otherwise put it at the top
     def order_nocategory_with_pinned_sql
       "CASE
@@ -123,11 +141,9 @@ class TopicQuery
 
   def list_hot
     return_list(unordered: true) do |list|
-
-      # Let's not include topic categories on hot
-      list = list.where("categories.topic_id <> topics.id")
-
-      list =list.order("coalesce(categories.hotness, 5) desc, topics.bumped_at desc")
+      # Find hot topics
+      list = list.joins(:hot_topic)
+                 .order(TopicQuery.order_hotness)
     end
   end
 

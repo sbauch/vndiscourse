@@ -373,10 +373,12 @@ cs:
         new: "Nemáte žádná nová témata ke čtení."
         read: "Zatím jste nečetli žádná témata."
         posted: "Zatím jste nepřispěli do žádného tématu."
-        latest: "Nejsou tu žádná populární témata. To je docela smutné."
+        latest: "Nejsou tu žádná témata z poslední doby. To je docela smutné."
+        hot: "Nejsou tu žádná populární témata."
         category: "V kategorii {{category}} nejsou žádná témata."
       bottom:
-        latest: "Nejsou tu žádná další populární témata k přečtení."
+        latest: "Nejsou tu žádná další témata z poslední doby k přečtení."
+        hot: "Nejsou tu žádná další populární témata k přečtení."
         posted: "Nejsou tu žádná další zaslaná témata k přečtení."
         read: "Nejsou tu žádná další přečtená témata."
         new: "Nejsou tu žádná další nová témata k přečtení."
@@ -525,6 +527,7 @@ cs:
         move: přesunout označené
         description:
           one: Máte označen <b>1</b> příspěvek.
+          few: "Máte označeny <b>{{count}}</b> příspěvky."
           other: "Máte označeno <b>{{count}}</b> příspěvků."
 
     post:
@@ -654,6 +657,9 @@ cs:
 
     filters:
       latest:
+        title: "Aktuální"
+        help: "nejaktuálnější témata"
+      hot:
         title: "Populární"
         help: "populární témata z poslední doby"
       favorited:

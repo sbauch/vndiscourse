@@ -51,6 +51,9 @@ class User < ActiveRecord::Base
   # This is just used to pass some information into the serializer
   attr_accessor :notification_channel_position
 
+  scope :admins, ->{ where(admin: true) }
+  scope :moderators, ->{ where(moderator: true) }
+
   module NewTopicDuration
     ALWAYS = -1
     LAST_VISIT = -2
@@ -108,37 +111,47 @@ class User < ActiveRecord::Base
     end        
   end
 
-  def self.suggest_username(name)
-    return unless name.present?
-
-    # If it's an email
-    if name =~ /([^@]+)@([^\.]+)/
-      name = Regexp.last_match[1]
-
-      # Special case, if it's "me" or "i" @ something, take the something.
-      name = Regexp.last_match[2] if ['i', 'me'].include?(name)
-    end
-
-    name.gsub!(/^[^A-Za-z0-9]+/, "")
-    name.gsub!(/[^A-Za-z0-9_]+$/, "")
+  def self.sanitize_username!(name)
+    name.gsub!(/^[^A-Za-z0-9]+|[^A-Za-z0-9_]+$/, "")
     name.gsub!(/[^A-Za-z0-9_]+/, "_")
+  end
 
-    # Pad the length with 1s
+  def self.pad_missing_chars_with_1s!(name)
     missing_chars = User.username_length.begin - name.length
     name << ('1' * missing_chars) if missing_chars > 0
+  end
 
-    # Trim extra length
-    name = name[0..User.username_length.end-1]
-
+  def self.find_available_username_based_on(name)
     i = 1
     attempt = name
-    while !username_available?(attempt)
+    until username_available?(attempt)
       suffix = i.to_s
       max_length = User.username_length.end - suffix.length - 1
       attempt = "#{name[0..max_length]}#{suffix}"
       i += 1
     end
     attempt
+  end
+
+  EMAIL = %r{([^@]+)@([^\.]+)}
+
+  def self.suggest_username(name)
+    return unless name.present?
+
+    if name =~ EMAIL
+      # When 'walter@white.com' take 'walter'
+      name = Regexp.last_match[1]
+
+      # When 'me@eviltrout.com' take 'eviltrout'
+      name = Regexp.last_match[2] if ['i', 'me'].include?(name)
+    end
+
+    sanitize_username!(name)
+    pad_missing_chars_with_1s!(name)
+
+    # Trim extra length
+    name = name[0..User.username_length.end-1]
+    find_available_username_based_on(name)
   end
 
   def self.create_for_email(email, opts={})
@@ -304,7 +317,7 @@ class User < ActiveRecord::Base
   end
 
   def moderator?
-    # this saves us from checking both, admins are always moderators 
+    # this saves us from checking both, admins are always moderators
     #
     # in future we may split this out
     admin || moderator
@@ -473,7 +486,7 @@ class User < ActiveRecord::Base
   end
 
   # a touch faster than automatic
-  def admin? 
+  def admin?
     admin
   end
 
@@ -609,7 +622,7 @@ class User < ActiveRecord::Base
         end
       end
     end
-    
+
     def email_in_restriction_setting?(setting)
       domains = setting.gsub('.', '\.')
       regexp = Regexp.new("@(#{domains})", true)

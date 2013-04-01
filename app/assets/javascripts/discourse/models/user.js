@@ -86,7 +86,7 @@ Discourse.User = Discourse.Model.extend({
     @returns Result of ajax call
   **/
   changeUsername: function(newUsername) {
-    return $.ajax({
+    return Discourse.ajax({
       url: Discourse.getURL("/users/") + (this.get('username_lower')) + "/preferences/username",
       type: 'PUT',
       data: {
@@ -103,7 +103,7 @@ Discourse.User = Discourse.Model.extend({
     @returns Result of ajax call
   **/
   changeEmail: function(email) {
-    return $.ajax({
+    return Discourse.ajax({
       url: Discourse.getURL("/users/") + (this.get('username_lower')) + "/preferences/email",
       type: 'PUT',
       data: {
@@ -131,7 +131,7 @@ Discourse.User = Discourse.Model.extend({
   **/
   save: function(finished) {
     var _this = this;
-    $.ajax(Discourse.getURL("/users/") + this.get('username').toLowerCase(), {
+    Discourse.ajax(Discourse.getURL("/users/") + this.get('username').toLowerCase(), {
       data: this.getProperties('auto_track_topics_after_msecs',
                                'bio_raw',
                                'website',
@@ -166,7 +166,7 @@ Discourse.User = Discourse.Model.extend({
   changePassword: function(callback) {
     var good;
     good = false;
-  $.ajax({
+  Discourse.ajax({
       url: Discourse.getURL("/session/forgot_password"),
       dataType: 'json',
       data: {
@@ -212,7 +212,7 @@ Discourse.User = Discourse.Model.extend({
     var stream,
       _this = this;
     stream = this.get('stream');
-    $.ajax({
+    Discourse.ajax({
       url: Discourse.getURL("/user_actions/") + id + ".json",
       dataType: 'json',
       cache: 'false',
@@ -254,7 +254,7 @@ Discourse.User = Discourse.Model.extend({
       url += "&filter=" + (this.get('streamFilter'));
     }
 
-    return $.ajax({
+    return Discourse.ajax({
       url: url,
       dataType: 'json',
       cache: 'false',
@@ -375,7 +375,7 @@ Discourse.User.reopenClass({
     @param {String} email An email address to check
   **/
   checkUsername: function(username, email) {
-    return $.ajax({
+    return Discourse.ajax({
       url: Discourse.getURL('/users/check_username'),
       type: 'GET',
       data: {
@@ -441,7 +441,7 @@ Discourse.User.reopenClass({
 
     // Check the preload store first
     return PreloadStore.getAndRemove("user_" + username, function() {
-      return $.ajax({ url: Discourse.getURL("/users/") + username + '.json' });
+      return Discourse.ajax({ url: Discourse.getURL("/users/") + username + '.json' });
     }).then(function (json) {
 
       // Create a user from the resulting JSON
@@ -478,7 +478,7 @@ Discourse.User.reopenClass({
     @returns Result of ajax call
   **/
   createAccount: function(name, email, password, username, passwordConfirm, challenge) {
-    return $.ajax({
+    return Discourse.ajax({
       url: Discourse.getURL("/users"),
       dataType: 'json',
       data: {

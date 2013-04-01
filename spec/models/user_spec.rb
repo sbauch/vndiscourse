@@ -14,6 +14,9 @@ describe User do
   it { should have_many :views }
   it { should have_many :user_visits }
   it { should belong_to :approved_by }
+  it { should have_many :email_logs }
+  it { should have_many :topic_allowed_users }
+  it { should have_many :invites }
 
   it { should validate_presence_of :username }
   it { should validate_presence_of :email }
@@ -165,7 +168,30 @@ describe User do
         user.reload
         user.username_lower.should == new_username.downcase
       end
+    end
 
+    context 'failure' do
+      let(:wrong_username) { "" }
+      let(:username_before_change) { user.username }
+      let(:username_lower_before_change) { user.username_lower }
+
+      before do
+        @result = user.change_username(wrong_username)
+      end
+
+      it 'returns false' do
+        @result.should be_false
+      end
+
+      it 'should not change the username' do
+        user.reload
+        user.username.should == username_before_change
+      end
+
+      it 'should not change the username_lower' do
+        user.reload
+        user.username_lower.should == username_lower_before_change
+      end
     end
 
   end
@@ -189,6 +215,20 @@ describe User do
         else
           p.should be_nil
         end
+      end
+    end
+
+    it 'does not allow non moderators to delete all posts' do
+      invalid_guardian = Guardian.new(Fabricate(:user))
+
+      expect do
+        @user.delete_all_posts!(invalid_guardian)
+      end.to raise_error Discourse::InvalidAccess
+
+      @posts.each do |p|
+        p.reload
+        p.should be_present
+        p.topic.should be_present
       end
     end
   end
@@ -403,7 +443,7 @@ describe User do
     end
 
     it 'corrects weird characters' do
-      User.suggest_username("Darth%^Vadar").should == "Darth_Vadar"
+      User.suggest_username("Darth%^Vader").should == "Darth_Vader"
     end
 
     it 'adds 1 to an existing username' do
@@ -415,8 +455,9 @@ describe User do
       User.suggest_username('a').should == 'a11'
     end
 
-    it "has a special case for me emails" do
+    it "has a special case for me and i emails" do
       User.suggest_username('me@eviltrout.com').should == 'eviltrout'
+      User.suggest_username('i@eviltrout.com').should == 'eviltrout'
     end
 
     it "shortens very long suggestions" do
@@ -476,12 +517,12 @@ describe User do
       Fabricate.build(:user, email: 'notgood@trashmail.net').should_not be_valid
       Fabricate.build(:user, email: 'mailinator.com@gmail.com').should be_valid
     end
-    
+
     it 'should not reject partial matches' do
       SiteSetting.stubs(:email_domains_blacklist).returns('mail.com')
       Fabricate.build(:user, email: 'mailinator@gmail.com').should be_valid
     end
-    
+
     it 'should reject some emails based on the email_domains_blacklist site setting ignoring case' do
       SiteSetting.stubs(:email_domains_blacklist).returns('trashmail.net')
       Fabricate.build(:user, email: 'notgood@TRASHMAIL.NET').should_not be_valid
@@ -504,7 +545,7 @@ describe User do
       u.email = 'nope@mailinator.com'
       u.should_not be_valid
     end
-    
+
     it 'whitelist should reject some emails based on the email_domains_whitelist site setting' do
       SiteSetting.stubs(:email_domains_whitelist).returns('vaynermedia.com')
       Fabricate.build(:user, email: 'notgood@mailinator.com').should_not be_valid
@@ -530,7 +571,7 @@ describe User do
       u.should be_valid
     end
 
-    it 'email whitelist should be used when email is being changed' do      
+    it 'email whitelist should be used when email is being changed' do
       SiteSetting.stubs(:email_domains_whitelist).returns('vaynermedia.com')
       u = Fabricate(:user, email: 'good@vaynermedia.com')
       u.email = 'nope@mailinator.com'
@@ -700,11 +741,12 @@ describe User do
   end
 
   describe '#create_for_email' do
-    let(:subject) { User.create_for_email('test@email.com') }
+    let(:subject) { User.create_for_email('walter.white@email.com') }
     it { should be_present }
-    its(:username) { should == 'test' }
-    its(:name) { should == 'test'}
+    its(:username) { should == 'walter_white' }
+    its(:name) { should == 'walter_white'}
     it { should_not be_active }
+    its(:email) { should == 'walter.white@email.com' }
   end
 
   describe 'email_confirmed?' do

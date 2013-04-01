@@ -4,19 +4,27 @@ class AdminDashboardData
 
   REPORTS = ['visits', 'signups', 'topics', 'posts', 'flags', 'users_by_trust_level', 'likes', 'emails']
 
-  def self.fetch
+  def self.fetch_all
     AdminDashboardData.new
+  end
+
+  def self.fetch_problems
+    AdminDashboardData.new.problems
   end
 
   def as_json
     @json ||= {
       reports: REPORTS.map { |type| Report.find(type) },
-      problems: [rails_env_check, host_names_check, gc_checks, sidekiq_check || clockwork_check, ram_check].compact,
-      admins: User.where(admin: true).count,
-      moderators: User.where(moderator: true).count
+      problems: problems,
+      admins: User.admins.count,
+      moderators: User.moderators.count
     }.merge(
       SiteSetting.version_checks? ? {version_check: DiscourseUpdates.check_version} : {}
     )
+  end
+
+  def problems
+    [rails_env_check, host_names_check, gc_checks, sidekiq_check || clockwork_check, ram_check, facebook_config_check, twitter_config_check, github_config_check].compact
   end
 
   def rails_env_check
@@ -42,5 +50,17 @@ class AdminDashboardData
 
   def ram_check
     I18n.t('dashboard.memory_warning') if MemInfo.new.mem_total and MemInfo.new.mem_total < 1_000_000
+  end
+
+  def facebook_config_check
+    I18n.t('dashboard.facebook_config_warning') if SiteSetting.enable_facebook_logins and (!SiteSetting.facebook_app_id.present? or !SiteSetting.facebook_app_secret.present?)
+  end
+
+  def twitter_config_check
+    I18n.t('dashboard.twitter_config_warning') if SiteSetting.enable_twitter_logins and (!SiteSetting.twitter_consumer_key.present? or !SiteSetting.twitter_consumer_secret.present?)
+  end
+
+  def github_config_check
+    I18n.t('dashboard.github_config_warning') if SiteSetting.enable_github_logins and (!SiteSetting.github_client_id.present? or !SiteSetting.github_client_secret.present?)
   end
 end

@@ -543,6 +543,7 @@ describe Topic do
       @topic.reload
       @original_bumped_at = @topic.bumped_at.to_f
       @user = @topic.user
+      @user.admin = true
     end
 
     context 'visibility' do
@@ -871,6 +872,10 @@ describe Topic do
 
     it 'is not a best_of' do
       topic.has_best_of.should be_false
+    end
+
+    it "is the 1.0 percent rank" do
+      topic.percent_rank.should == 1.0
     end
 
     it 'is not invisible' do
