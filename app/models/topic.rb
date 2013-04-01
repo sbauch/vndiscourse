@@ -37,7 +37,7 @@ class Topic < ActiveRecord::Base
   belongs_to :category
   has_many :posts
   has_many :topic_allowed_users
-  has_many :allowed_users, through: :topic_allowed_users, source: :users
+  has_many :allowed_users, through: :topic_allowed_users, source: :user
   belongs_to :user
   belongs_to :last_poster, class_name: 'User', foreign_key: :last_post_user_id
   belongs_to :featured_user1, class_name: 'User', foreign_key: :featured_user1_id
