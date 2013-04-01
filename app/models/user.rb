@@ -72,7 +72,7 @@ class User < ActiveRecord::Base
       
       when 'registered'
         reservations.where(:topic_id => topic.id).destroy_all
-        if (bumped_user = topic.reservations.order("created_at ASC").where(:status => 'waitlisted').limit(1).user)
+        if (bumped_user = topic.reservations.order("created_at ASC").where(:status => 'waitlisted').first.user)
           bumped_user.reservations.where(:topic_id => topic.id).update_attribute(:status, 'registered')
           #create private message
         end  
