@@ -10,7 +10,9 @@
     <label class="control-label">{{i18n user.username.title}}</label>
     <div class="controls">
       <span class='static'>{{content.username}}</span>
-      {{#linkTo "preferences.username" class="btn pad-left"}}{{i18n user.change_username.action}}{{/linkTo}}
+      {{#if Discourse.currentUser.admin}}
+        {{#linkTo "preferences.username" class="btn pad-left"}}{{i18n user.change_username.action}}{{/linkTo}}
+      {{/if}}
     </div>
     <div class='instructions'>
       {{{i18n user.username.short_instructions username="content.username"}}}
