@@ -9,6 +9,7 @@ Discourse.AttendanceModalView = Discourse.View.extend({
   title: 'Take Attendance',
 
 	init: function() {
+		console.log(this.get("attendees"));
 			this._super();
 			if ( this.get("attendees") == null){
 				this.getAttendees();
