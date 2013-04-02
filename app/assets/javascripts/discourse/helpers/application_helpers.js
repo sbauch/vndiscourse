@@ -23,6 +23,24 @@ Handlebars.registerHelper('breakUp', function(property, options) {
 });
 
 /**
+  Splits long strings on capital letters
+
+  @method longUser
+  @for Handlebars
+**/
+
+Handlebars.registerHelper('longUser', function(property, options) {
+  var prop, result, tokens;
+  prop = Ember.Handlebars.get(this, property, options);
+  if (!prop) return "";
+
+  if (prop.length <= 15) return prop;
+	
+	result = prop.split(/(?=[A-Z])/);
+	return result;
+});
+
+/**
   Truncates long strings
 
   @method shorten
