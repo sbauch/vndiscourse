@@ -33,7 +33,7 @@ Discourse.Alert = Discourse.Model.extend({
   }).property(),
 
   rendered: (function() {
-      var html = " &#183; <a href='" + (this.get('url')) + "'>" + this.data.topic_title + "</a>"
+      var html = " &#183; <a href='" + (this.get('url')) + "'>Click Here for More</a>"
 			return new Handlebars.SafeString(html);
   }).property()
 

@@ -31,7 +31,6 @@ Discourse.AlertView = Discourse.View.extend({
 	closeAlert: function() {
 		var id = this.get('alerts').get('firstObject').id;
     var _this = this;
-    _this.set('currentUser.unread_alerts', 0);
  		$('.d-header').css('top', '0');
     $('#main-outlet').css('padding-top', '75px');
 		
@@ -39,7 +38,6 @@ Discourse.AlertView = Discourse.View.extend({
       url: '/alerts/' + id + '?user_id=' + Discourse.currentUser.id,
       type: 'PUT',
 			success: function( data ){
-			
 
 			},
       error: function(error) {
