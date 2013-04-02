@@ -68,6 +68,9 @@ class PostCreator
         if @opts[:archetype] == Archetype.event
           topic.attendee_limit = @opts[:attendee_limit].to_i
           topic.attendee_count = 0
+          topic.starts_at = @opts[:starts_at]
+          topic.ends_at = @opts[:ends_at]
+          topic.location = @opts[:location]
         end
         
         unless topic.save

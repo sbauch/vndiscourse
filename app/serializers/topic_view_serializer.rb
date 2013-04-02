@@ -18,7 +18,8 @@ class TopicViewSerializer < ApplicationSerializer
      :moderator_posts_count,
      :has_best_of,
      :archetype,
-     :slug]
+     :slug,
+     :location]
   end
 
   def self.guardian_attributes
@@ -48,7 +49,9 @@ class TopicViewSerializer < ApplicationSerializer
              :filtered_posts_count,
              :user_rsvp_status,
              :post_creator,
-             :event_menu
+             :event_menu,
+             :starts_at,
+             :ends_at
 
   has_one :created_by, serializer: BasicUserSerializer, embed: :objects
   has_one :last_poster, serializer: BasicUserSerializer, embed: :objects
@@ -76,6 +79,16 @@ class TopicViewSerializer < ApplicationSerializer
         scope.#{ga}?(object.topic)
       end
     }
+  end
+  
+  def starts_at
+    return nil if object.topic.archetype != 'event'
+    object.topic.starts_at.utc.iso8601.gsub("-","").gsub(":","")
+  end
+  
+  def ends_at
+    return nil if object.topic.archetype != 'event'
+    object.topic.ends_at.utc.iso8601.gsub("-","").gsub(":","")  
   end
   
   def user_rsvp_status

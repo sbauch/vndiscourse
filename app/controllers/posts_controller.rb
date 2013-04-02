@@ -20,7 +20,10 @@ class PostsController < ApplicationController
                                    reply_to_post_number: params[:post][:reply_to_post_number],
                                    image_sizes: params[:image_sizes],
                                    meta_data: params[:meta_data],
-                                   attendee_limit: params[:attendee_limit])
+                                   attendee_limit: params[:attendee_limit],
+                                   starts_at: params[:starts_at],
+                                   ends_at: params[:ends_at],
+                                   location: params[:location])
     post = post_creator.create
 
     if post_creator.errors.present?

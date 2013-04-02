@@ -26,9 +26,17 @@ Discourse.TopicFooterButtonsView = Ember.ContainerView.extend({
 						classNames: ['btn', 'btn-primary'],
 						
           	rsvpChanged: (function() {
+							topic.set('gcal', null)
             	this.rerender();
 							if (this.get('controller.content.user_rsvp_status') == 'registered'){
-								console.log('TODO: render gcal modal');
+								var starts = topic.get('starts_at');
+								var ends = topic.get('ends_at');
+								var location = topic.get('location');
+								var title = topic.get('title');
+								
+								var url = "http://www.google.com/calendar/event?action=TEMPLATE&text=" + title + '&dates=' + starts + '/' + ends + '&location=' + location + '&trp=true&sprop=net.vaynermedia.com&sprop=name:Vaynernet';
+								var prints = "You're registered! <a href='" + url + "' target='_blank'>Add to your Google Calendar</a>"
+								topic.set('gcal', new Handlebars.SafeString(prints));
 								}
           	}).observes('controller.content.user_rsvp_status'),
 						
