@@ -14,9 +14,7 @@ Discourse.AlertView = Discourse.View.extend({
 	templateName: 'alert',
 	init: function() {
     this._super();
-    if ( this.get("alerts") == null){
       this.getAlerts();
-    }
   }, 
 
 	getAlerts: function() {
