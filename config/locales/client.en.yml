@@ -450,7 +450,7 @@ en:
           description: "same as Tracking, plus you will be notified of all new posts."
         tracking:
           title: "Tracking"
-          description: "you will be notified of unread posts, @name mentions, and replies to your posts."
+          description: "you will be notified of @name mentions and replies to your posts, plus you will see a count of unread and new posts."
         regular:
           title: "Regular"
           description: "you will be notified only if someone mentions your @name or replies to your post."
@@ -731,7 +731,7 @@ en:
           other: "Events ({{count}} New)"
         help: "Flash Lessons and Company Events"
 
-    browser_update: 'Unfortunately, <a href="http://www.discourse.org/faq/#browser">your browser is too old to work on this Discourse forum</a>. Please <a href="%{url}">upgrade your browser</a>.'
+    browser_update: 'Unfortunately, <a href="http://www.discourse.org/faq/#browser">your browser is too old to work on this Discourse forum</a>. Please <a href="http://browsehappy.com">upgrade your browser</a>.'
 
   # This section is exported to the javascript for i18n in the admin section
   admin_js:
