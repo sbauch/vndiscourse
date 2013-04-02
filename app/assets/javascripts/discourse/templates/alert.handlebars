@@ -1,13 +1,12 @@
 {{#if view.currentUser.unread_alerts}}
-{{#each view.alerts}}
 
 <div id='discourse-pervasive-banner'>
 <div class='container'>
   <div class="contents clearfix">
   <div id='banner-text'>
-    {{icon}}
-    {{message}}
-    {{rendered}}
+    {{view.alert.icon}}
+    {{view.alert.message}}
+    {{view.alert.rendered}}
     <a href='#' {{action closeAlert target='view'}}>
       <i class='pull-right icon icon-remove'></i>
     </a>
@@ -19,5 +18,4 @@
    $('.d-header').css('top', '28px');
    $('#main-outlet').css('padding-top', '103px');
   </script>
-{{/each}}  
 {{/if}}

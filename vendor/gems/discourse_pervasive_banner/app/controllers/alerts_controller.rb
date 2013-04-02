@@ -2,8 +2,11 @@ class AlertsController < ApplicationController
 
   # before_filter :ensure_logged_in, :except => :create
   def index
-    alerts = current_user.alerts.unread.includes(:topic).all
-    render_serialized(alerts, AlertSerializer)
+    alerts = current_user.alerts.unread.includes(:topic).first
+    current_user.reload
+    current_user.publish_notifications_state
+
+    render_serialized(alerts, AlertSerializer, :root => false)
   end
   
   def create
@@ -22,6 +25,7 @@ class AlertsController < ApplicationController
   def update
     @alert = Alert.find(params[:id])
     @alert.update_attribute(:read, true)
+    current_user.publish_notifications_state
     render :nothing => true
   end  
 

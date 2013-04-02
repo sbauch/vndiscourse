@@ -12,41 +12,44 @@ Discourse.AlertView = Discourse.View.extend({
   categoriesBinding: 'site.categories',
   topicBinding: 'Discourse.router.topicController.content',
 	templateName: 'alert',
+	
+	
 	init: function() {
-    this._super();
-      this.getAlerts();
-  }, 
-
+		    this._super();
+		      this.getAlerts();
+		  },
+		
 	getAlerts: function() {
     var _this = this;
 		var message;
     $.get(Discourse.getURL("/alerts")).then(function(result) {
-      _this.set('alerts',  result.map(function(a) {
-				return Discourse.Alert.create(a);
-      }));
-    });
-		return false	
-  },
+      	if (result) {
+	 				_this.set('alert', Discourse.Alert.create(result));
+    			Discourse.currentUser.set('unread_alerts', 1);
+					}
+				else { 
+					$('.d-header').css('top', '0');
+    			$('#main-outlet').css('padding-top', '75px');
+					}	
+				});
+				return false	
+  		}.observes('Discourse.currentUser.unread_alerts'),
 
 	closeAlert: function() {
-		var id = this.get('alerts').get('firstObject').id;
-    var _this = this;
- 		$('.d-header').css('top', '0');
-    $('#main-outlet').css('padding-top', '75px');
+		var id = this.get('alert').id;
 		
-		$.ajax({
+			$.ajax({
       url: '/alerts/' + id + '?user_id=' + Discourse.currentUser.id,
       type: 'PUT',
 			success: function( data ){
 
 			},
       error: function(error) {
-        // topic.toggleProperty('starred');
         var errors = $.parseJSON(error.responseText).errors;
         return bootbox.alert(errors[0]);
-      }
-    });
-    return false;
+      	}
+    	});
+		Discourse.currentUser.set('unread_alerts', 0);
     }
 
 });

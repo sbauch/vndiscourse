@@ -205,8 +205,6 @@ Discourse.Topic = Discourse.Model.extend({
  							type: 1,
 							topic_title: this.get('title')},
 			success: function( data ){
-				event.set('attended', 'absent');
-
 			},
       error: function(error) {
         // topic.toggleProperty('starred');
