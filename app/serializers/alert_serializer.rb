@@ -7,7 +7,8 @@ class AlertSerializer < ApplicationSerializer
              :topic_id,
              :slug,
              :data,
-             :message
+             :message,
+             :id
 
   def slug
     Slug.for(object.topic.title) if object.topic.present?

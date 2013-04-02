@@ -154,6 +154,13 @@ Discourse.TopicView = Discourse.View.extend(Discourse.Scrolling, {
     });
   },
 
+	 alertify: function(e) {
+    var topicView = this;
+    this.get('topic').alertify(function() {
+
+    });
+  },
+
   gotFocus: function(){
     if (Discourse.get('hasFocus')){
       this.scrolled();

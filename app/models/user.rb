@@ -271,12 +271,11 @@ class User < ActiveRecord::Base
   end
 
   def unread_alerts
-    @unread_alerts ||= alerts.where("id > ? and read = false", seen_alert_id).count
+    @unread_alerts ||= alerts.where("read = false").count
   end
 
   def reload
     @unread_notifications_by_type = nil
-    @unread_alerts = nil
     super
   end
   
@@ -297,7 +296,7 @@ class User < ActiveRecord::Base
   end
   
   def publish_alerts_state
-    MessageBus.publish("/alert/#{id}",
+    MessageBus.publish("/alerts",
         { unread_alerts: unread_alerts },
         user_ids: [id] # only publish the notification to this user
       ) 

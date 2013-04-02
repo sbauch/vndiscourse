@@ -47,6 +47,7 @@ class MessageBusObserver < DiscourseObserver
         {unread_alerts: alert.user.unread_alerts},
         user_ids: [user_id] # only publish the notification to this user
       )
+      
     end
     
     def refresh_notification_count(notification)

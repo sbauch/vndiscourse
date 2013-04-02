@@ -196,6 +196,26 @@ Discourse.Topic = Discourse.Model.extend({
     });
   },
 
+  // Create an alert from a topic
+  alertify: function(callback) {
+     return $.ajax({
+      url: '/alerts',
+      type: 'POST',
+      data: { topic_id: (this.get('id')),
+ 							type: 1,
+							topic_title: this.get('title')},
+			success: function( data ){
+				event.set('attended', 'absent');
+
+			},
+      error: function(error) {
+        // topic.toggleProperty('starred');
+        var errors = $.parseJSON(error.responseText).errors;
+        return bootbox.alert(errors[0]);
+      }
+    });
+  },
+
   // Invite a user to this topic
   inviteUser: function(user) {
     return Discourse.ajax({
