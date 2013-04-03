@@ -26,6 +26,8 @@ Discourse.AlertView = Discourse.View.extend({
       	if (result) {
 	 				_this.set('alert', Discourse.Alert.create(result));
     			Discourse.currentUser.set('unread_alerts', 1);
+					$('.d-header').css('top', '28px');
+   				$('#main-outlet').css('padding-top', '103px');
 					}
 				else { 
 					$('.d-header').css('top', '0');
