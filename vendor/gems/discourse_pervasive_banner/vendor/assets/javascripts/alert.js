@@ -13,17 +13,26 @@ Discourse.Alert = Discourse.Model.extend({
 		console.log(alert_type);
 		if (alert_type == 2){
 		html = "<i class='icon icon-calendar'></i><span style='margin-left:15px'>Heads up! - Flash Lessons Today:</span>"
-		} else
+		} else if (alert_type == 1)
 		{
 		html = "<i class='icon icon-exclamation-sign'></i><span style='margin-left:15px'>Important Notice!</span>"
+		}
+		else
+		{
+			html = ''
 		}
 		return new Handlebars.SafeString(html);
 	}).property(),
 
-  readClass: (function() {
-    if (this.read) return 'read';
-    return '';
-  }).property('read'),
+  bgClass: (function() {
+			var alert_type = this.get('alert_type');
+	    if (alert_type == 2){
+	    	return 'flash-lesson';
+	  		}
+			else if (alert_type == 1){
+				return 'announcement';
+			}	
+		}).property('bgClass'),
 
   url: (function() {
     var slug;
