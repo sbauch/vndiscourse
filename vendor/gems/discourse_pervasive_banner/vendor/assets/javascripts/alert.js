@@ -32,7 +32,7 @@ Discourse.Alert = Discourse.Model.extend({
 			else if (alert_type == 1){
 				return 'announcement';
 			}	
-		}).property('bgClass'),
+		}).property(),
 
   url: (function() {
     var slug;
