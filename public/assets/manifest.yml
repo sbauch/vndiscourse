@@ -73,8 +73,8 @@ wmd-quote-post.gif: wmd-quote-post-458e5d151f5754c6050e44b97940e188.gif
 wmd-quote-post/index.gif: wmd-quote-post-458e5d151f5754c6050e44b97940e188.gif
 admin.js: admin-efd397a3b775df88cfd461511e6c5a0d.js
 admin/index.js: admin-efd397a3b775df88cfd461511e6c5a0d.js
-application.js: application-3d975cadd3e3a1cb4891194331e9d482.js
-application/index.js: application-3d975cadd3e3a1cb4891194331e9d482.js
+application.js: application-7a5d4f989d4786c9ee18fa663f396bce.js
+application/index.js: application-7a5d4f989d4786c9ee18fa663f396bce.js
 defer/html-sanitizer-bundle.js: defer/html-sanitizer-bundle-0d7d015010d73c5ddca51b9496b28431.js
 defer/html-sanitizer-bundle/index.js: defer/html-sanitizer-bundle-0d7d015010d73c5ddca51b9496b28431.js
 discourse/templates/application.js: discourse/templates/application-8f33b19472350bd69b119cc9f57dc015.js
