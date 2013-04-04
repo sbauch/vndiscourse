@@ -68,7 +68,7 @@ en:
       trust_level: "Trust Level"
       external_links_in_new_tab: "Open all external links in a new tab"
       enable_quoting: "Enable quote reply for highlighted text"
-
+      
       change_username:
         action: "change"
         title: "Change Username"
@@ -82,7 +82,11 @@ en:
         taken: "Sorry that email is not available."
         error: "There was an error changing your email. Perhaps that address is already in use?"
         success: "We've sent an email to that address. Please follow the confirmation instructions."
-
+        
+      custom_avatar:
+        tip: 'Choose a file from your computer to upload, then click'
+        instructions: 'You will need to refresh this page for change to take effect. If you do not upload an avatar, we will fall back to your Gravatar for '
+        
       email:
         title: "Email"
         instructions: "Your email will never be shown to the public."

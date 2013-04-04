@@ -47,12 +47,26 @@
 
   <div class="control-group">
     <label class="control-label">{{i18n user.avatar.title}}</label>
-    <div class="controls">
-      {{avatar content imageSize="large"}}
-    </div>
-    <div class='instructions'>
-      {{{i18n user.avatar.instructions}}} {{content.email}}
-    </div>
+    {{#if Discourse.SiteSettings.custom_avatars}}
+      <div id='custom-avatar' class="controls">
+        {{avatar content imageSize="large"}}
+         <form>
+           <input type="file" name="file" id="filename-input" value="browse"><br>
+           <span class='description'>{{i18n user.custom_avatar.tip}}</span> 
+           <a href="#" {{action upload target="view"}} class='btn'>Save</a><br>
+         </form>
+      </div>
+      <div class='instructions'>
+        {{{i18n user.custom_avatar.instructions}}} {{content.email}}
+      </div>
+    {{else}}
+      <div class="controls">
+        {{avatar content imageSize="large"}}
+      </div>
+      <div class='instructions'>
+        {{{i18n user.avatar.instructions}}} {{content.email}}
+      </div>
+    {{/if}}
   </div>
 
   <div class="control-group">

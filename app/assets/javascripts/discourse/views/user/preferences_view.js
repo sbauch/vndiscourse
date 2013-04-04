@@ -8,7 +8,35 @@
 **/
 Discourse.PreferencesView = Discourse.View.extend({
   templateName: 'user/preferences',
-  classNames: ['user-preferences']
+  classNames: ['user-preferences'],
+
+	upload: function(){
+		var _this = this;
+		var $uploadTarget = $('#custom-avatar');
+		var username = Discourse.currentUser.username;
+		
+		$uploadTarget.fileupload({
+      	url: '/users/' + username + '/custom_avatar' ,
+      	dataType: 'json',
+      	timeout: 20000,
+      	formData: { topic_id: 1234  } // spoof requirement in Upload model
+			}),
+			
+		$uploadTarget.on('fileuploaddone', function (e, data) {
+      var upload = data.result;
+			console.log(Discourse.currentUser);
+      Discourse.currentUser.set('avatar_template', upload.url + '?size={size}');
+    });	
+
+		$uploadTarget.fileupload('send', { fileInput: $('#filename-input') });
+
+		return false;
+		},
+	
+	add: function() {	
+		console.log('added!');
+	}
+
 });
 
 

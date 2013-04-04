@@ -431,6 +431,8 @@ en:
 
     enable_s3_uploads: "Place uploads on Amazon S3"
     s3_upload_bucket: "The Amazon S3 bucket name that files will be uploaded into"
+    
+    custom_avatars: "Allow users to upload custom avatars. WRANING: will disable Gravatar and requires S3 uploads to be configured"
 
     default_invitee_trust_level: "Default trust level (0-5) for invited users"
     default_trust_level: "Default trust level (0-5) for users"
