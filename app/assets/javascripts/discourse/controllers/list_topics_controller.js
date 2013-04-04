@@ -7,7 +7,10 @@
   @module Discourse
 **/
 Discourse.ListTopicsController = Discourse.ObjectController.extend({
-  needs: ['list', 'composer'],
+  needs: ['list', 'composer', 'modal'],
+
+  rankDetailsVisible: false,
+
   // If we're changing our channel
   previousChannel: null,
 
@@ -48,6 +51,18 @@ Discourse.ListTopicsController = Discourse.ObjectController.extend({
   // Star a topic
   toggleStar: function(topic) {
     topic.toggleStar();
+  },
+
+  toggleRankDetails: function() {
+    this.toggleProperty('rankDetailsVisible');
+  },
+
+  // Show rank details
+  showRankDetails: function(topic) {
+    var modalController = this.get('controllers.modal');
+    if (modalController) {
+      modalController.show(Discourse.TopicRankDetailsView.create({ topic: topic }));
+    }
   },
 
   createTopic: function() {

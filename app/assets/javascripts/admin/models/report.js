@@ -29,6 +29,30 @@ Discourse.Report = Discourse.Model.extend({
     }
   },
 
+  todayCount: function() {
+    return this.valueAt(0);
+  }.property('data'),
+
+  yesterdayCount: function() {
+    return this.valueAt(1);
+  }.property('data'),
+
+  lastSevenDaysCount: function() {
+    return this.sumDays(1,7);
+  }.property('data'),
+
+  lastThirtyDaysCount: function() {
+    return this.sumDays(1,30);
+  }.property('data'),
+
+  sevenDaysAgoCount: function() {
+    return this.valueAt(7);
+  }.property('data'),
+
+  thirtyDaysAgoCount: function() {
+    return this.valueAt(30);
+  }.property('data'),
+
   yesterdayTrend: function() {
     var yesterdayVal = this.valueAt(1);
     var twoDaysAgoVal = this.valueAt(2);
@@ -69,24 +93,19 @@ Discourse.Report = Discourse.Model.extend({
 Discourse.Report.reopenClass({
   find: function(type) {
     var model = Discourse.Report.create({type: type});
-    Discourse.ajax(Discourse.getURL("/admin/reports/") + type, {
-      type: 'GET',
-      success: function(json) {
-
-        // Add a percent field to each tuple
-        var maxY = 0;
+    Discourse.ajax(Discourse.getURL("/admin/reports/") + type).then(function (json) {
+      // Add a percent field to each tuple
+      var maxY = 0;
+      json.report.data.forEach(function (row) {
+        if (row.y > maxY) maxY = row.y;
+      });
+      if (maxY > 0) {
         json.report.data.forEach(function (row) {
-          if (row.y > maxY) maxY = row.y;
+          row.percentage = Math.round((row.y / maxY) * 100);
         });
-        if (maxY > 0) {
-          json.report.data.forEach(function (row) {
-            row.percentage = Math.round((row.y / maxY) * 100);
-          });
-        }
-
-        model.mergeAttributes(json.report);
-        model.set('loaded', true);
       }
+      model.mergeAttributes(json.report);
+      model.set('loaded', true);
     });
     return(model);
   }

@@ -216,9 +216,9 @@
       height: 400px;
     }
     .contents {
-      input[type=text] {
+      input#reply-title {
         padding: 7px 10px;
-        margin: 6px 0 3px 0;
+        margin: 6px 10px 3px 0;
       }
       .wmd-controls {
         top: 100px;
@@ -230,6 +230,7 @@
     min-width: 1280px;
     .form-element {
       .chzn-container {
+        width: 400px;
         margin-top: 6px;
         a {
           padding-top: 4px;
@@ -237,6 +238,23 @@
         }
         b {
           margin-top: 4px;
+        }
+      }
+      .category-combobox {
+        width: 430px;
+        @include medium-width { width: 285px; }
+        @include small-width { width: 220px; }
+
+        .chzn-drop {
+          left: -9000px;
+          width: 428px;
+          @include medium-width { width: 283px; }
+          @include small-width { width: 218px; }
+        }
+        .chzn-search input {
+          width: 378px;
+          @include medium-width { width: 233px; }
+          @include small-width { width: 168px; }
         }
       }
     }
