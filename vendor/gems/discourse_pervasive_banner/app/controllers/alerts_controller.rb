@@ -2,9 +2,10 @@ class AlertsController < ApplicationController
 
   # before_filter :ensure_logged_in, :except => :create
   def index
+    #TODO: prioritization of alerts
     alerts = current_user.alerts.unread.includes(:topic).first
-    current_user.reload
-    current_user.publish_notifications_state
+    # current_user.reload
+    current_user.publish_alerts_state
 
     render_serialized(alerts, AlertSerializer, :root => false)
   end

@@ -7,31 +7,43 @@
   @module Discourse
 **/
 Discourse.Alert = Discourse.Model.extend({
+	
 	icon: (function() {
 		var html;
 		var alert_type = this.get('alert_type');
-		console.log(alert_type);
-		if (alert_type == 2){
-		html = "<i class='icon icon-calendar'></i><span style='margin-left:15px'>Heads up! - Flash Lessons Today:</span>"
-		} else if (alert_type == 1)
-		{
-		html = "<i class='icon icon-exclamation-sign'></i><span style='margin-left:15px'>Important Notice!</span>"
-		}
-		else
-		{
-			html = ''
-		}
+		switch(alert_type)
+			{
+			case 1:
+			  html = "<i class='icon icon-exclamation-sign'></i><span style='margin-left:15px'>Important Notice!</span>";
+				break;
+			case 2:
+				html = "<i class='icon icon-calendar'></i><span style='margin-left:15px'>Heads up! - Flash Lessons Today:</span>";
+				break;
+			case 3:
+				html = "<i class='icon icon-gift'></i><span style='margin-left:15px'>Celebrate!</span>";
+				break;
+			}
 		return new Handlebars.SafeString(html);
 	}).property(),
 
-  bgClass: (function() {
-			var alert_type = this.get('alert_type');
-	    if (alert_type == 2){
-	    	return 'flash-lesson';
-	  		}
-			else if (alert_type == 1){
-				return 'announcement';
-			}	
+  backgroundClass: (function() {
+		console.log('applying bg class');
+			var _class;
+			var alert_type = this.alert_type;
+		console.log(alert_type);	
+			switch(alert_type)
+			{
+			case 1:
+				_class = 'announcement';
+				break;				
+			case 2:
+				_class = 'flash-lesson';
+				break;
+			case 3:
+				_class =  'vaynerversary';
+				break;
+			}
+			return _class;
 		}).property(),
 
   url: (function() {
@@ -42,7 +54,7 @@ Discourse.Alert = Discourse.Model.extend({
   }).property(),
 
   rendered: (function() {
-      var html = " &#183; <a href='" + (this.get('url')) + "'>Click Here for More</a>"
+      var html = " &#183; <a href='" + (this.get('url')) + "'>Please Click Here</a>"
 			return new Handlebars.SafeString(html);
   }).property()
 

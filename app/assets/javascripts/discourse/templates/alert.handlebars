@@ -1,6 +1,5 @@
-{{#if view.currentUser.unread_alerts}}
-
-<div class="{{unbound view.alert.bgClass}}" id='discourse-pervasive-banner'>
+{{#if Discourse.currentUser.unread_alerts}}
+<div {{bindAttr class="view.alert.backgroundClass"}} id='discourse-pervasive-banner'>
 <div class='container'>
   <div class="contents clearfix">
   <div id='banner-text'>

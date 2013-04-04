@@ -6,7 +6,7 @@ require_dependency 'summarize'
 class User < ActiveRecord::Base
 
   attr_accessible :name, :username, :password, :email, :bio_raw, :website, :teams, :position, :short_position,
-                  :fact_one, :fact_two, :fact_three
+                  :fact_one, :fact_two, :fact_three, :start_date
 
  has_many :posts
   has_many :notifications
@@ -296,6 +296,7 @@ class User < ActiveRecord::Base
   end
   
   def publish_alerts_state
+    puts 'pub'
     MessageBus.publish("/alert/#{id}",
         { unread_alerts: unread_alerts },
         user_ids: [id] # only publish the notification to this user
