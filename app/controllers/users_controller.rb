@@ -238,6 +238,14 @@ class UsersController < ApplicationController
       raise ActiveRecord::RecordNotFound
     end
   end
+  
+  def custom_avatar_upload
+    user = fetch_user_from_params
+    file = params[:file] || params[:files].first
+    upload = Upload.create_for(user, file, params[:topic_id])
+    user.update_attribute(:custom_avatar_url, upload.url)
+    render_serialized(upload, UploadSerializer, root: false)
+  end
 
   def password_reset
     expires_now()

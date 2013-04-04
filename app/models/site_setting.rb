@@ -140,6 +140,8 @@ class SiteSetting < ActiveRecord::Base
   setting(:discourse_org_access_key, '')
   setting(:enable_s3_uploads, false)
   setting(:s3_upload_bucket, '')
+  
+  client_setting(:custom_avatars, false)
 
   setting(:default_trust_level, 0)
   setting(:default_invitee_trust_level, 1)

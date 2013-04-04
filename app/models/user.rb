@@ -397,6 +397,12 @@ class User < ActiveRecord::Base
   end
 
   def self.avatar_template(email)
+    if SiteSetting.custom_avatars?
+      user = User.find_by_email(email)
+      avatar = user.custom_avatar_url 
+      return avatar + '?s={size}' unless avatar.nil?
+    end     
+
     email_hash = self.email_hash(email)
     # robohash was possibly causing caching issues
     # robohash = CGI.escape("http://robohash.org/size_") << "{size}x{size}" << CGI.escape("/#{email_hash}.png")
