@@ -29,7 +29,7 @@ end
 
 desc 'create vaynerversary alerts'
 task "vm:users:vaynerversary" => :environment do
-  date = Date.new(2013, 2, 11)  #Time.now.in_time_zone('Eastern Time (US & Canada)').to_date
+  date = Time.now.in_time_zone('Eastern Time (US & Canada)').to_date
     if date.wday == 1
       @anniversaries = User.where("EXTRACT(DAY FROM start_date) <= ? AND EXTRACT(DAY FROM start_date) >= ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) != ?", date.day, (date - 1.day).day, date.month, date.year)
     elsif date.wday == 5
@@ -37,36 +37,27 @@ task "vm:users:vaynerversary" => :environment do
     else 
       @anniversaries = User.where("EXTRACT(DAY FROM start_date) = ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) != ?", date.day, date.month, date.year)
     end
-  usernames = @anniversaries.collect{|u| u.username }
   
-  sam = User.find_by_email('sam@vaynermedia.com')
+  unless @anniversaries.empty?
+    
+    usernames = @anniversaries.collect{|u| u.username }
+    
+    sam = User.find_by_email('sam@vaynermedia.com')
   
-  post = PostCreator.create(sam, {:raw => 'Celebrate the Vaynerversary of ' + usernames.map{|u| '@' + u}.to_sentence + '!',
-              :title => 'Happy Vaynerversary to ' + usernames.to_sentence + '!',
-              :archetype => 'regular'})
+    post = PostCreator.create(sam, {:raw => 'Celebrate the Vaynerversary of ' + usernames.map{|u| '@' + u}.to_sentence + '!',
+                :title => 'Happy Vaynerversary to ' + usernames.to_sentence + '!',
+                :archetype => 'regular'})
   
   
-  User.all.each do |u|
-  puts 'before: ' + u.unread_alerts.to_s
-
-    u.alerts.create(:alert_type => 3,
-                    :topic_id => post.topic.id,
-                    :post_number => 1,
-                    :message => post.topic.title,
-                    :data => { topic_title: post.topic.title}.to_json)
-  # MessageBus.publish("/alert/#{post.topic_id}",
-  #                     id: post.id,
-  #                     created_at: post.created_at,
-  #                     user: BasicUserSerializer.new(post.user).as_json(root: false),
-  #                     post_number: post.post_number)                  
-  puts 'after: ' + u.unread_alerts.to_s                  
-  puts "\n\n\n"
-
-puts 'pub'
-    MessageBus.publish("/alert/#{u.id}",
-        { unread_alerts: u.unread_alerts },
-        user_ids: [u.id] # only publish the notification to this user
-      ) 
+    User.all.each do |u|
+      u.alerts.create(:alert_type => 3,
+                      :topic_id => post.topic.id,
+                      :post_number => 1,
+                      :message => post.topic.title,
+                      :data => { topic_title: post.topic.title}.to_json)              
+                      
+    end
+  
   end
   
 end

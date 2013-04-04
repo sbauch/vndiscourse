@@ -4,7 +4,6 @@ class AlertsController < ApplicationController
   def index
     #TODO: prioritization of alerts
     alerts = current_user.alerts.unread.includes(:topic).first
-    # current_user.reload
     current_user.publish_alerts_state
 
     render_serialized(alerts, AlertSerializer, :root => false)
@@ -26,7 +25,7 @@ class AlertsController < ApplicationController
   def update
     @alert = Alert.find(params[:id])
     @alert.update_attribute(:read, true)
-    current_user.publish_notifications_state
+    # current_user.publish_alerts_state
     render :nothing => true
   end  
 

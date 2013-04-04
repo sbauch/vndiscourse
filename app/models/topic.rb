@@ -38,6 +38,8 @@ class Topic < ActiveRecord::Base
   has_many :posts
   has_many :topic_allowed_users
   has_many :allowed_users, through: :topic_allowed_users, source: :user
+  
+  has_many :alerts
 
   has_one :hot_topic
   belongs_to :user

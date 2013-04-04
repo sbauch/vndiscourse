@@ -13,16 +13,6 @@ Discourse.AlertView = Discourse.View.extend( Discourse.Animate, {
   topicBinding: 'Discourse.router.topicController.content',
 	templateName: 'alert',
 
-	didInsertElement: function(){
-		console.log('opn');
-		
-	},
-	
-	didDestroyElement: function(){
-		console.log('close');
-	},
-
-
 	observeCount: function() {
 		if (!Discourse.currentUser.unread_alerts == 0){
 			this.getAlerts();
@@ -66,7 +56,6 @@ Discourse.AlertView = Discourse.View.extend( Discourse.Animate, {
     	});
 				Discourse.currentUser.set('unread_alerts', count - 1);
 				_this.set('alert', null);
-				_this.destroy;
 			  
     }
 

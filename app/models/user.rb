@@ -298,9 +298,9 @@ class User < ActiveRecord::Base
   def publish_alerts_state
     puts 'pub'
     MessageBus.publish("/alert/#{id}",
-        { unread_alerts: unread_alerts },
-        user_ids: [id] # only publish the notification to this user
-      ) 
+                      { unread_alerts: unread_alerts },
+                        user_ids: [id] # only publish the notification to this user
+                        ) 
   end
   
   def publish_notifications_state

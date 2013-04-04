@@ -55,6 +55,8 @@ Discourse = Ember.Application.createWithMixins({
     // We don't want to receive any previous user notifications
     var bus = Discourse.MessageBus;
     bus.unsubscribe("/notification/*");
+		bus.unsubscribe("/alert/*");
+
     bus.callbackInterval = Discourse.SiteSettings.anon_polling_interval;
     bus.enableLongPolling = false;
 
@@ -70,13 +72,15 @@ Discourse = Ember.Application.createWithMixins({
       bus.subscribe("/notification/" + user.id, (function(data) {
         user.set('unread_notifications', data.unread_notifications);
         user.set('unread_private_messages', data.unread_private_messages);
+
       }), user.notification_channel_position);
 			
 			bus.subscribe("/alert/" + user.id, (function(data) {
         user.set('unread_alerts', data.unread_alerts);
-      }), user.notification_channel_position);
+      }), 0);
     }
   }.observes('currentUser'),
+
 
   // The classes of buttons to show on a post
   postButtons: function() {

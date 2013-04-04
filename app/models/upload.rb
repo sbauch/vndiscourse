@@ -15,7 +15,7 @@ class Upload < ActiveRecord::Base
     # TODO: Need specs/tests for this functionality
     return create_on_imgur(user, file, topic_id) if SiteSetting.enable_imgur?
     return create_on_s3(user, file, topic_id) if SiteSetting.enable_s3_uploads?
-    # return create_locally(user, file, topic_id)
+    return create_locally(user, file, topic_id)
   end
 
   # Store uploads on s3
