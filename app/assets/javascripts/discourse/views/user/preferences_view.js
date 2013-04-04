@@ -9,6 +9,7 @@
 Discourse.PreferencesView = Discourse.View.extend({
   templateName: 'user/preferences',
   classNames: ['user-preferences'],
+	updated: false,
 
 	upload: function(){
 		var _this = this;
@@ -29,7 +30,7 @@ Discourse.PreferencesView = Discourse.View.extend({
     });	
 
 		$uploadTarget.fileupload('send', { fileInput: $('#filename-input') });
-
+		this.set('updated', true);
 		return false;
 		},
 	

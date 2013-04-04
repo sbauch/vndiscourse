@@ -3,7 +3,7 @@ require_dependency 'avatar_lookup'
 class TopicList
   include ActiveModel::Serialization
 
-  def initialize(current_user, topics)
+  def initialize(filter, current_user, topics)
     attr_accessor :more_topics_url,
                   :draft,
                   :draft_key,

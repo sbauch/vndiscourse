@@ -56,6 +56,7 @@
            <input type="file" name="file" id="filename-input" value="browse"><br>
            <span class='description'>{{i18n user.custom_avatar.tip}}</span> 
            <a href="#" {{action upload target="view"}} class='btn'>Save</a><br>
+           {{#if view.updated}}<p>Avatar updated! Refresh to see your new avatar</p>{{/if}}
          </form>
       </div>
       <div class='instructions'>
