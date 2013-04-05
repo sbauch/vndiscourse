@@ -98,7 +98,7 @@ cs:
         ok: "Vaše jméno vypadá dobře"
       username:
         title: "Uživatelské jméno"
-        instructions: "Musí být unikátní a bez mezer. Ostatní vás mohou zmínit jako @{{username}}."
+        instructions: "Musí být unikátní a bez mezer. Ostatní vás mohou zmínit jako @username."
         short_instructions: "Ostatní vás mohou zmínit jako @{{username}}."
         available: "Toto uživatelské jméno je volné."
         global_match: "Emailová adresa odpovídá registrovaného uživatelskému jménu."
@@ -819,6 +819,7 @@ cs:
 
     admin:
       title: 'Discourse Administrace'
+      moderator: 'Moderátor'
 
       dashboard:
         title: "Administrátorský rozcestník"
@@ -939,6 +940,11 @@ cs:
         approve: 'Schválit'
         approved_by: "schválil"
         time_read: "Čas čtení"
+
+      site_content:
+        none: "Zvolte typ obsahu a můžete začít editovat."
+        title: 'Obsah webu'
+        edit: "Editovat obsah webu"
 
       site_settings:
         show_overriden: 'Zobrazit pouze změněná nastavení'
