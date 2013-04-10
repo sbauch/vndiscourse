@@ -1,21 +1,17 @@
 (function() {
   window.Discourse.User.reopenClass({
-    findAll: function(query, filter) {
-      var result;
-      result = Em.A();
-      jQuery.ajax({
-        url: "/directory.json",
-        data: {
-          filter: filter
-        },
-        success: function(users) {
-          return users.each(function(u) {
-            return result.pushObject(Discourse.User.create(u));
-          });
-        }
+  findAll: function(query, filter) {
+    var result = Em.A();
+    Discourse.ajax({
+      url: Discourse.getURL("/directory.json"),
+      data: { filter: filter }
+    }).then(function(users) {
+      users.each(function(u) {
+        result.pushObject(Discourse.AdminUser.create(u));
       });
-			console.log(result);
-      return result;
-    }
+			result.set('loaded', true)
+    });
+    return result;
+  }
   });
 }).call(this);

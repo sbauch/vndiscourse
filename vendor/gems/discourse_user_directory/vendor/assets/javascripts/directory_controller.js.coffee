@@ -5,9 +5,9 @@ window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.P
   selectAll: false
   content: null
   filterMode: 'directory'
-
+  
   filterUsers: Discourse.debounce(->
-    @refreshUsers()
+    @refreshUsers() 
   ,250).observes('username')
 
   orderChanged: (->
@@ -16,7 +16,8 @@ window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.P
 
   refreshUsers: ->
     @set 'content', Discourse.User.findAll(@get('query'), @get('username'))
-
+    console.log(@get 'content')
+    
   show: (term) ->
     if @get('query') == term
       @refreshUsers()

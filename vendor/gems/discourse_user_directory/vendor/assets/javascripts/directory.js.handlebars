@@ -10,6 +10,8 @@
     {{view Discourse.TextField valueBinding="controller.username"  styleKey='width:300px;' placeholder="Search for a Vayniac by name, position, or team..."}}
   </section>
 
+{{#if content}}  
+
   <section class="category-column first">
       {{#each contentOdd}}
 
@@ -59,15 +61,13 @@
  </table>
  
   {{/each}}
-</section>
-
-
-<div class='clearfix'></div>
-
-{{#if content.loading}}
-    <div class='spinner'>{{i18n loading}}</div>
+</section>  
 {{else}}
-  {{#unless content.length}}
-    <h3>We couldn't find any users - try a different search!</h3>
-  {{/unless}}  
+  {{#if content.loaded}}
+    <div class='clearfix'></div>
+    <h3>Nobody matches your search :(</h3>  
+  {{else}}
+    <div class='clearfix'></div>
+    <div class='spinner'>{{i18n loading}}</div>
+  {{/if}}
 {{/if}}
