@@ -39,7 +39,6 @@ task "vm:users:vaynerversary" => :environment do
     end
   
   unless @anniversaries.empty?
-    puts usernames
     usernames = @anniversaries.collect{|u| u.username }
     
     sam = User.find_by_email('sam@vaynermedia.com')
