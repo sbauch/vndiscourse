@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
   has_many :reservations
   has_many :topic_users
   has_many :topics
-  has_many :user_open_ids
+  has_many :user_open_ids, dependent: :destroy
   has_many :user_actions
   has_many :post_actions
   has_many :email_logs
@@ -25,8 +25,8 @@ class User < ActiveRecord::Base
   has_many :views
   has_many :user_visits
   has_many :invites
-  has_one :twitter_user_info
-  has_one :github_user_info
+  has_one :twitter_user_info, dependent: :destroy
+  has_one :github_user_info, dependent: :destroy
   belongs_to :approved_by, class_name: 'User'
 
   validates_presence_of :username
@@ -154,6 +154,15 @@ class User < ActiveRecord::Base
     find_available_username_based_on(name)
   end
 
+  def self.new_from_params(params)
+    user = User.new
+    user.name = params[:name]
+    user.email = params[:email]
+    user.password = params[:password]
+    user.username = params[:username]
+    user
+  end
+
   def self.create_for_email(email, opts={})
     username = suggest_username(email)
 
@@ -236,7 +245,9 @@ class User < ActiveRecord::Base
   end
 
   def self.find_by_username_or_email(username_or_email)
-    where("username_lower = :user or lower(username) = :user or lower(email) = :user or lower(name) = :user", user: username_or_email.downcase)
+    lower_user = username_or_email.downcase
+    lower_email = Email.downcase(username_or_email)
+    where("username_lower = :user or lower(username) = :user or email = :email or lower(name) = :user", user: lower_user, email: lower_email)
   end
 
   # tricky, we need our bus to be subscribed from the right spot
@@ -470,7 +481,9 @@ class User < ActiveRecord::Base
     posts.order("post_number desc").each do |p|
       if p.post_number == 1
         p.topic.destroy
+        # TODO: But the post is not destroyed. Why?
       else
+        # TODO: This should be using the PostDestroyer!
         p.destroy
       end
     end

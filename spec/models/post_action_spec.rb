@@ -3,6 +3,10 @@ require_dependency 'post_destroyer'
 
 describe PostAction do
 
+  before do
+    ImageSorcery.any_instance.stubs(:convert).returns(false)
+  end
+
   it { should belong_to :user }
   it { should belong_to :post }
   it { should belong_to :post_action_type }
@@ -12,6 +16,23 @@ describe PostAction do
   let(:codinghorror) { Fabricate(:coding_horror) }
   let(:post) { Fabricate(:post) }
   let(:bookmark) { PostAction.new(user_id: post.user_id, post_action_type_id: PostActionType.types[:bookmark] , post_id: post.id) }
+
+  describe "messaging" do
+    it "sends an email to all moderators if selected" do
+      PostAction.stubs(:create)
+      PostAction.expects(:target_moderators).returns("bob")
+      PostCreator.any_instance.expects(:create).returns(nil)
+      PostAction.act(build(:user), build(:post), PostActionType.types[:notify_moderators], "this is my special message");
+    end
+
+    it "sends an email to user if selected" do
+      PostAction.stubs(:create)
+      PostCreator.any_instance.expects(:create).returns(nil)
+      post = build(:post)
+      post.user = build(:user)
+      PostAction.act(build(:user), post, PostActionType.types[:notify_user], "this is my special message");
+    end
+  end
 
   describe "flag counts" do
     before do

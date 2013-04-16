@@ -76,7 +76,13 @@ Discourse = Ember.Application.createWithMixins({
 			bus.subscribe("/alert/" + user.id, (function(data) {
         user.set('unread_alerts', data.unread_alerts);
       }), 0);
-    }
+      
+			bus.subscribe("/categories", function(data){
+        Discourse.get('site').set('categories', data.categories.map(function(c){
+          return Discourse.Category.create(c);
+        }));
+      });
+ 		}
   }.observes('currentUser'),
 
 

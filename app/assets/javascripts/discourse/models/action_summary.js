@@ -9,7 +9,7 @@
 Discourse.ActionSummary = Discourse.Model.extend({
 
   // Description for the action
-  description: (function() {
+  description: function() {
     var action = this.get('actionType.name_key');
     if (this.get('acted')) {
       if (this.get('count') <= 1) {
@@ -20,12 +20,12 @@ Discourse.ActionSummary = Discourse.Model.extend({
     } else {
       return Em.String.i18n('post.actions.by_others.' + action, { count: this.get('count') });
     }
-  }).property('count', 'acted', 'actionType'),
+  }.property('count', 'acted', 'actionType'),
 
-  canAlsoAction: (function() {
+  canAlsoAction: function() {
     if (this.get('hidden')) return false;
     return this.get('can_act');
-  }).property('can_act', 'hidden'),
+  }.property('can_act', 'hidden'),
 
   // Remove it
   removeAction: function() {
@@ -37,12 +37,18 @@ Discourse.ActionSummary = Discourse.Model.extend({
 
   // Perform this action
   act: function(opts) {
+    var action = this.get('actionType.name_key');
 
     // Mark it as acted
     this.set('acted', true);
     this.set('count', this.get('count') + 1);
     this.set('can_act', false);
     this.set('can_undo', true);
+
+    if(action === 'notify_moderators' || action === 'notify_user') {
+      this.set('can_undo',false);
+      this.set('can_clear_flags',false);
+    }
 
     // Add ourselves to the users who liked it if present
     if (this.present('users')) {
@@ -80,18 +86,16 @@ Discourse.ActionSummary = Discourse.Model.extend({
   },
 
   clearFlags: function() {
-    var _this = this;
-    return Discourse.ajax({
-      url: Discourse.getURL("/post_actions/clear_flags"),
+    var actionSummary = this;
+    return Discourse.ajax(Discourse.getURL("/post_actions/clear_flags"), {
       type: "POST",
       data: {
         post_action_type_id: this.get('id'),
         id: this.get('post.id')
-      },
-      success: function(result) {
-        _this.set('post.hidden', result.hidden);
-        return _this.set('count', 0);
       }
+    }).then(function(result) {
+      actionSummary.set('post.hidden', result.hidden);
+      actionSummary.set('count', 0);
     });
   },
 
@@ -110,5 +114,4 @@ Discourse.ActionSummary = Discourse.Model.extend({
       });
     });
   }
-
 });

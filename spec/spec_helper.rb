@@ -45,7 +45,7 @@ Spork.prefork do
   load "#{Rails.root}/db/seeds.rb"
 
   RSpec.configure do |config|
-    
+
     config.fail_fast = ENV['RSPEC_FAIL_FAST'] == "1"
     config.include Helpers
     config.mock_framework = :mocha
@@ -99,6 +99,10 @@ Spork.each_run do
   $redis.client.reconnect
   MessageBus.reliable_pub_sub.pub_redis.client.reconnect
   Rails.cache.reconnect
+end
+
+def build(*args)
+  Fabricate.build(*args)
 end
 
 # --- Instructions ---

@@ -151,6 +151,13 @@ class Guardian
     true
   end
 
+  def can_delete_user?(user_to_delete)
+    return false unless @user.try(:admin?)
+    return false if user_to_delete.blank?
+    return false if user_to_delete.post_count > 0
+    true
+  end
+
   # Can we see who acted on a post in a particular way?
   def can_see_post_actors?(topic, post_action_type_id)
     return false unless topic.present?
@@ -302,6 +309,7 @@ class Guardian
     # You can only undo your own actions
     return false unless @user
     return false unless post_action.user_id == @user.id
+    return false if post_action.is_private_message?
 
     # Make sure they want to delete it within the window
     return post_action.created_at > SiteSetting.post_undo_action_window_mins.minutes.ago

@@ -2,15 +2,15 @@
 # example, inserting the onebox content, or image sizes.
 
 require_dependency 'oneboxer'
+require_dependency 'image_optimizer'
 
 class CookedPostProcessor
-  require 'open-uri'
 
   def initialize(post, opts={})
     @dirty = false
     @opts = opts
     @post = post
-    @doc = Nokogiri::HTML(post.cooked)
+    @doc = Nokogiri::HTML::fragment(post.cooked)
     @size_cache = {}
   end
 
@@ -23,13 +23,10 @@ class CookedPostProcessor
     args = {post_id: @post.id}
     args[:invalidate_oneboxes] = true if @opts[:invalidate_oneboxes]
 
-    Oneboxer.each_onebox_link(@doc) do |url, element|
-      onebox, preview = Oneboxer.onebox(url, args)
-      if onebox
-        element.swap onebox
-        @dirty = true
-      end
+    result = Oneboxer.apply(@doc) do |url, element|
+      Oneboxer.onebox(url, args)
     end
+    @dirty ||= result.changed?
   end
 
   # First let's consider the images
@@ -37,58 +34,59 @@ class CookedPostProcessor
     images = @doc.search("img")
     return unless images.present?
 
+    images.each do |img|
+      src = img['src']
+      src = Discourse.base_url_no_prefix + src if src[0] == "/"
+
+      if src.present?
+
+        if img['width'].blank? || img['height'].blank?
+          w, h = get_size_from_image_sizes(src, @opts[:image_sizes]) || image_dimensions(src)
+
+          if w && h
+            img['width'] = w.to_s
+            img['height'] = h.to_s
+            @dirty = true
+          end
+        end
+
+        if src != img['src']
+          img['src'] = src
+          @dirty = true
+        end
+
+        convert_to_link!(img)
+        img['src'] = optimize_image(img)
+
+      end
+    end
+
     # Extract the first image from the first post and use it as the 'topic image'
     if @post.post_number == 1
       img = images.first
       @post.topic.update_column :image_url, img['src'] if img['src'].present?
     end
 
-    images.each do |img|
-      src = img['src']
-      src = Discourse.base_url_no_prefix + src if src[0] == "/"
-
-      if src.present? && (img['width'].blank? || img['height'].blank?)
-
-        w,h =
-          get_size_from_image_sizes(src, @opts[:image_sizes]) ||
-          image_dimensions(src)
-
-        if w && h
-          img['width'] = w.to_s
-          img['height'] = h.to_s
-          @dirty = true
-        end
-      end
-
-      if src.present?
-        if src != img['src']
-          img['src'] = src
-          @dirty = true
-        end
-        convert_to_link!(img)
-        img.set_attribute('src', optimize_image(src))
-      end
-
-    end
   end
 
-  def optimize_image(src)
-    # uri = get_image_uri(src)
-    # uri.open(read_timeout: 20) do |f|
-    #
-    # end
+  def optimize_image(img)
+    src = img["src"]
 
-    src
+    # supports only local uploads
+    return src if SiteSetting.enable_imgur? || SiteSetting.enable_s3_uploads?
+
+    width, height = img["width"].to_i, img["height"].to_i
+
+    ImageOptimizer.new(src).optimized_image_url(width, height)
   end
 
   def convert_to_link!(img)
     src = img["src"]
-    width = img["width"].to_i
-    height = img["height"].to_i
+    width, height = img["width"].to_i, img["height"].to_i
 
     return unless src.present? && width > SiteSetting.auto_link_images_wider_than
 
-    original_width, original_height  = get_size(src)
+    original_width, original_height = get_size(src)
 
     return unless original_width.to_i > width && original_height.to_i > height
 
@@ -125,6 +123,10 @@ class CookedPostProcessor
 
   def html
     @doc.try(:to_html)
+  end
+
+  def doc
+    @doc
   end
 
   def get_size(url)

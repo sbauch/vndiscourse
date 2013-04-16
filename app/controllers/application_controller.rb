@@ -140,7 +140,7 @@ class ApplicationController < ActionController::Base
 
   def can_cache_content?
     # Don't cache unless we're in production mode
-    return false unless Rails.env.production?
+    return false unless Rails.env.production? || Rails.env == "profile"
 
     # Don't cache logged in users
     return false if current_user.present?
@@ -195,7 +195,7 @@ class ApplicationController < ActionController::Base
 
         # If we were given a serializer, add the class to the json that comes back
         if opts[:serializer].present?
-          json[obj.class.name.underscore] = opts[:serializer].new(obj).serializable_hash
+          json[obj.class.name.underscore] = opts[:serializer].new(obj, scope: guardian).serializable_hash
         end
 
         render json: MultiJson.dump(json)

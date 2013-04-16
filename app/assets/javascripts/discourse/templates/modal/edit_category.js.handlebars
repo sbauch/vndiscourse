@@ -1,5 +1,6 @@
 {{#with view.category}}
 
+<div {{bindAttr class="view.loading:invisible"}}>
   <div class="modal-body">
     <form>
       <section class='field'>
@@ -12,14 +13,12 @@
 
         {{#if description}}
           {{description}}
-          {{#if topic_url}}
-            <a href="#" {{action showCategoryTopic target="view"}}>{{i18n category.change_in_category_topic}}</a>
-          {{/if}}
         {{else}}
           {{i18n category.no_description}}
-            {{#if topic_url}}
-            <a {{action showCategoryTopic target="view"}} href="#">{{i18n category.change_in_category_topic}}</a>
-            {{/if}}}
+        {{/if}}
+        {{#if topic_url}}
+          <br/>
+          <button class="btn btn-small" {{action showCategoryTopic target="view"}}>{{i18n category.change_in_category_topic}}</button>
         {{/if}}
       </section>
 
@@ -37,7 +36,7 @@
           <div class='input-prepend input-append' style="margin-top: 10px;">
             <span class='color-title'>{{i18n category.background_color}}:</span>
             <span class='add-on'>#</span>{{view Discourse.TextField valueBinding="color" placeholderKey="category.color_placeholder" maxlength="6"}}
-            {{view Discourse.ColorsView colorsBinding="view.backgroundColors" valueBinding="color"}}
+            {{view Discourse.ColorsView colorsBinding="view.backgroundColors" usedColorsBinding="view.usedBackgroundColors" valueBinding="color"}}
           </div>
 
           <div class='input-prepend input-append'>
@@ -52,6 +51,10 @@
   </div>
   <div class="modal-footer">
     <button class='btn btn-primary' {{bindAttr disabled="view.disabled"}} {{action saveCategory target="view"}}>{{view.buttonTitle}}</button>
+    {{#if view.deleteVisible}}
+      <button class='btn btn-danger pull-right' {{bindAttr disabled="view.deleteDisabled"}} {{action deleteCategory target="view"}}><i class="icon icon-trash"></i>{{view.deleteButtonTitle}}</button>
+    {{/if}}
   </div>
+</div>
 
 {{/with}}

@@ -3,6 +3,7 @@ require_dependency 'avatar_lookup'
 require_dependency 'topic_view'
 require_dependency 'rate_limiter'
 require_dependency 'text_sentinel'
+require_dependency 'text_cleaner'
 
 class Topic < ActiveRecord::Base
   include ActionView::Helpers
@@ -27,7 +28,7 @@ class Topic < ActiveRecord::Base
 
   validate :title_quality
   validates_presence_of :title
-  validates :title, length: { in: SiteSetting.topic_title_length }
+  validate :title, -> { SiteSetting.topic_title_length.include? :length }
 
   serialize :meta_data, ActiveRecord::Coders::Hstore
 
@@ -148,8 +149,8 @@ class Topic < ActiveRecord::Base
 
     sentinel = TextSentinel.title_sentinel(title)
     if sentinel.valid?
-      # It's possible the sentinel has cleaned up the title a bit
-      self.title = sentinel.text
+      # clean up the title
+      self.title = TextCleaner.clean_title(sentinel.text)
     else
       errors.add(:title, I18n.t(:is_invalid))
     end
@@ -402,10 +403,8 @@ class Topic < ActiveRecord::Base
   # Invite a user by email and return the invite. Return the previously existing invite
   # if already exists. Returns nil if the invite can't be created.
   def invite_by_email(invited_by, email)
-    lower_email = email.downcase
-
+    lower_email = Email.downcase(email)
     invite = Invite.with_deleted.where('invited_by_id = ? and email = ?', invited_by.id, lower_email).first
-
 
     if invite.blank?
       invite = Invite.create(invited_by: invited_by, email: lower_email)
@@ -554,12 +553,16 @@ class Topic < ActiveRecord::Base
       @posters_summary << al[last_post_user_id]
     end
     @posters_summary.map! do |p|
-      result = TopicPoster.new
-      result.user = p
-      result.description = descriptions[p.id].join(', ')
-      result.extras = "latest" if al[last_post_user_id] == p
-      result
-    end
+      if p
+        result = TopicPoster.new
+        result.user = p
+        result.description = descriptions[p.id].join(', ')
+        result.extras = "latest" if al[last_post_user_id] == p
+        result
+      else
+        nil
+      end
+    end.compact!
 
     @posters_summary
   end

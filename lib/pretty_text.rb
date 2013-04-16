@@ -79,6 +79,7 @@ module PrettyText
 
     @ctx["helpers"] = Helpers.new
 
+    @ctx.load(app_root + "app/assets/javascripts/external/md5.js")
     @ctx.load(app_root + "app/assets/javascripts/external/Markdown.Converter.js")
     @ctx.load(app_root + "app/assets/javascripts/external/twitter-text-1.5.0.js")
     @ctx.load(app_root + "lib/headless-ember.js")
@@ -86,7 +87,7 @@ module PrettyText
     @ctx.load(Rails.configuration.ember.handlebars_location)
     #@ctx.load(Rails.configuration.ember.ember_location)
 
-    @ctx.load(app_root + "app/assets/javascripts/external/sugar-1.3.5.js")
+    @ctx.load(app_root + "app/assets/javascripts/external_production/sugar-1.3.5.js")
     @ctx.eval("var Discourse = {}; Discourse.SiteSettings = #{SiteSetting.client_settings_json};")
     @ctx.eval("var window = {}; window.devicePixelRatio = 2;") # hack to make code think stuff is retina
 
