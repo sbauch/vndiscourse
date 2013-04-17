@@ -92,12 +92,18 @@ class UsersController < ApplicationController
 
   def check_username
     requires_parameter(:username)
+    
+    # Hit VM API to get correct username
+    resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{params[:email]}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
+    
+    username = resp['full_name'].gsub(' ','')
+    
+    validator = UsernameValidator.new(username)
 
-    validator = UsernameValidator.new(params[:username])
     if !validator.valid_format?
       render json: {errors: validator.errors}
     elsif !SiteSetting.call_discourse_hub?
-      if User.username_available?(params[:username])
+      if User.username_available?(username)
         render json: {available: true}
       else
         render json: {available: false, suggestion: User.suggest_username(params[:username])}

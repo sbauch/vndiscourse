@@ -153,6 +153,8 @@ class Users::OmniauthCallbacksController < ApplicationController
     name = data[:name] || data[:email]
     username = data[:nickname] || data[:email]
 
+    resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{email.downcase}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
+
     user_open_id = UserOpenId.find_by_url(identity_url)
 
     if user_open_id.blank? && user = User.find_by_email(email)
@@ -169,7 +171,6 @@ class Users::OmniauthCallbacksController < ApplicationController
       if Guardian.new(user).can_access_forum?
         log_on_user(user)
         
-        resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{user.email.downcase}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
         user.update_attributes(:teams => resp['teams'], 
                                :position => resp['function'])
         if user.fact_one.nil?                        
@@ -186,8 +187,8 @@ class Users::OmniauthCallbacksController < ApplicationController
     else
       @data = {
         email: email,
-        name: User.suggest_name(name),
-        username: User.suggest_username(username),
+        name: resp['full_name'],
+        username: resp['full_name'].gsub(' ',''),
         email_valid: true ,
         auth_provider: data[:provider] || params[:provider].try(:capitalize)
       }

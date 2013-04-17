@@ -34,16 +34,16 @@ Discourse::Application.configure do
   # this will cause all handlebars templates to be pre-compiles, making your page faster
   config.handlebars.precompile = true
   
-  # config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.default_url_options = { :host => 'vaynermedia.com' }
-  # ActionMailer::Base.smtp_settings = {
-  #   :address        => "smtp.sendgrid.net",
-  #   :port           => "25",
-  #   :authentication => :plain,
-  #   :user_name      => ENV['SENDGRID_USERNAME'],
-  #   :password       => ENV['SENDGRID_PASSWORD'],
-  #   :domain => 'heroku.com'
-  # }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.default_url_options = { :host => 'vaynermedia.com' }
+  ActionMailer::Base.smtp_settings = {
+    :address        => "smtp.sendgrid.net",
+    :port           => "25",
+    :authentication => :plain,
+    :user_name      => ENV['SENDGRID_USERNAME'],
+    :password       => ENV['SENDGRID_PASSWORD'],
+    :domain => 'heroku.com'
+  }
 
   # this setting enables rack_cache so it caches various requests in redis
   config.enable_rack_cache = true

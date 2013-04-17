@@ -127,7 +127,7 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
     }
 
     // If too long
-    if (this.get('accountUsername').length > 15) {
+    if (this.get('accountUsername').length > 25) {
       return Discourse.InputValidation.create({
         failed: true,
         reason: Em.String.i18n('user.username.too_long')
