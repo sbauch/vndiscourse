@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <div class="control-group">
+  <!-- <div class="control-group">
     <label class="control-label">{{i18n user.name.title}}</label>
     <div class="controls">
       {{view Ember.TextField valueBinding="content.name" classNames="input-xxlarge"}}
@@ -45,7 +45,7 @@
     <div class="controls">
       <a href="#" {{action changePassword target="controller"}} class='btn'>{{i18n user.change_password.action}}</a> {{controller.passwordProgress}}
     </div>
-  </div>
+  </div> -->
 
   <div class="control-group">
     <label class="control-label">{{i18n user.avatar.title}}</label>
@@ -72,13 +72,14 @@
     {{/if}}
   </div>
 
-  <div class="control-group">
+  <!-- <div class="control-group">
     <label class="control-label">{{i18n user.bio}}</label>
     <div class="controls">
       {{view Discourse.PagedownEditor valueBinding="content.bio_raw"}}
     </div>
-  </div>
+  </div> -->
 <!-- begin VM custom -->
+<form class="form-horizontal">
   <div class="control-group">
     <label class="control-label">Fact One</label>
     <div class="controls">

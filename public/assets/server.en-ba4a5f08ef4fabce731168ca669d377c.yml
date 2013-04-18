@@ -725,11 +725,11 @@ en:
         Enjoy your stay!
 
     welcome_user:
-      subject_template: "Welcome to %{site_name}!"
+      subject_template: "Welcome to %{site_name} 2.0!"
       text_body_template: |
         Hi there!
 
-        Thanks for joining %{site_name}, and welcome to our discussion forum!
+        Thanks for joining %{site_name} 2.0, and welcome to our new discussion and knowledge sharing platform!
 
         %{new_user_tips}
 

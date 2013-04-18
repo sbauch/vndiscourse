@@ -36,7 +36,7 @@ vmlogo-wide.png: 6dc35bdc12158d738fc010a7c29c983b
 wmd-buttons.png: c022381726db8df31145b486ec341de8
 wmd-quote-post.gif: 458e5d151f5754c6050e44b97940e188
 admin.js: 9e10801ce674115a62989e9d39ef841f
-application.js: d6fd90aaab02d8a35376e7481bac0a87
+application.js: ac380c0a96dcb6b1d929ff7571db2f27
 defer/html-sanitizer-bundle.js: a9f5744724a68008a2415e674d645739
 discourse/templates/application.js: 415a775783ce1c8449f55e6feaba4c6d
 docs/yuidoc.json: 8f6685944eebb5e039e5d3648bbe331d
@@ -1768,7 +1768,7 @@ plurals.rb: 61a7b353401dd07d8c0546713bee98a2
 server.cs.yml: 3a476c35bc96be4203376cd345446b7f
 server.da.yml: 00fe0d31f08f48493057e3132932be9a
 server.de.yml: e576ec643e0b19bbe50846e30027e729
-server.en.yml: 3bde884be67d4f9cde44d22b5933c205
+server.en.yml: ba4a5f08ef4fabce731168ca669d377c
 server.es.yml: 79674b22dc2bc872384fe5e63bcd3ee1
 server.fr.yml: ffeb745447c1a9455f735149bdc3f7a9
 server.id.yml: b42a92cd7c00a11dbfa290cb6a3e0ae6

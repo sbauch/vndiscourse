@@ -73,8 +73,8 @@ wmd-quote-post.gif: wmd-quote-post-458e5d151f5754c6050e44b97940e188.gif
 wmd-quote-post/index.gif: wmd-quote-post-458e5d151f5754c6050e44b97940e188.gif
 admin.js: admin-6c1bb045ce3c2b2ba2e06cf0e06a259d.js
 admin/index.js: admin-6c1bb045ce3c2b2ba2e06cf0e06a259d.js
-application.js: application-adeaa9998b8f8c170747ed2aafae66be.js
-application/index.js: application-adeaa9998b8f8c170747ed2aafae66be.js
+application.js: application-c05dcf808d5dce5d5d8b7e2de4b97a0b.js
+application/index.js: application-c05dcf808d5dce5d5d8b7e2de4b97a0b.js
 defer/html-sanitizer-bundle.js: defer/html-sanitizer-bundle-953147bc7c7dbd81b42df6c323947dd5.js
 defer/html-sanitizer-bundle/index.js: defer/html-sanitizer-bundle-953147bc7c7dbd81b42df6c323947dd5.js
 discourse/templates/application.js: discourse/templates/application-b661236a7f47ee938b8222ef37ae5741.js
@@ -3537,8 +3537,8 @@ server.da.yml: server.da-00fe0d31f08f48493057e3132932be9a.yml
 server/index.da.yml: server.da-00fe0d31f08f48493057e3132932be9a.yml
 server.de.yml: server.de-e576ec643e0b19bbe50846e30027e729.yml
 server/index.de.yml: server.de-e576ec643e0b19bbe50846e30027e729.yml
-server.en.yml: server.en-3bde884be67d4f9cde44d22b5933c205.yml
-server/index.en.yml: server.en-3bde884be67d4f9cde44d22b5933c205.yml
+server.en.yml: server.en-ba4a5f08ef4fabce731168ca669d377c.yml
+server/index.en.yml: server.en-ba4a5f08ef4fabce731168ca669d377c.yml
 server.es.yml: server.es-79674b22dc2bc872384fe5e63bcd3ee1.yml
 server/index.es.yml: server.es-79674b22dc2bc872384fe5e63bcd3ee1.yml
 server.fr.yml: server.fr-ffeb745447c1a9455f735149bdc3f7a9.yml
