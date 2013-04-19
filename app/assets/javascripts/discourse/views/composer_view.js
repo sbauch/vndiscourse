@@ -167,17 +167,7 @@ Discourse.ComposerView = Discourse.View.extend({
 
     $LAB.script(assetPath('defer/html-sanitizer-bundle'));
     Discourse.ComposerView.trigger("initWmdEditor");
-    template = Handlebars.compile("<div class='autocomplete'>" +
-                                    "<ul>" +
-                                    "{{#each options}}" +
-                                      "<li>" +
-                                          "<a href='#'>{{avatar this imageSize=\"tiny\"}} " +
-                                          "<span class='username'>{{this.username}}</span> " +
-                                          "<span class='name'>{{this.name}}</span></a>" +
-                                      "</li>" +
-                                      "{{/each}}" +
-                                    "</ul>" +
-                                  "</div>");
+    template = Discourse.UserSelector.templateFunction();
 
     transformTemplate = Handlebars.compile("{{avatar this imageSize=\"tiny\"}} {{this.username}}");
     $wmdInput.data('init', true);

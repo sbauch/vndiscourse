@@ -297,7 +297,7 @@ en:
 
       users_placeholder: "Add a user"
       title_placeholder: "Type your title here. What is this discussion about in one brief sentence?"
-      reply_placeholder: "Type your reply here. Use Markdown or BBCode to format. Drag or paste an image here to upload it."
+      reply_placeholder: "Type here. Use Markdown or BBCode to format. Drag or paste an image to upload it."
       view_new_post: "View your new post."
       saving: "Saving..."
       saved: "Saved!"
@@ -333,6 +333,7 @@ en:
       undo_title: "Undo"
       redo_title: "Redo"
       help: "Markdown Editing Help"
+      toggler: "hide or show the composer panel"
 
     notifications:
       title: "notifications of @name mentions, replies to your posts and topics, private messages, etc"
@@ -348,13 +349,16 @@ en:
       invited_to_private_message: "{{username}} invited you to a private conversation: {{link}}"
       invitee_accepted: "<i title='accepted your invitation' class='icon icon-signin'></i> {{username}} accepted your invitation"
       moved_post: "<i title='moved post' class='icon icon-arrow-right'></i> {{username}} moved post to {{link}}"
+      total_flagged: "total flagged posts"
 
     image_selector:
       title: "Insert Image"
       from_my_computer: "From My Device"
       from_the_web: "From The Web"
       add_image: "Add Image"
+      remote_title: "remote image"
       remote_tip: "enter address of an image in the form http://example.com/image.jpg"
+      local_title: "local image"
       local_tip: "click to select an image from your device."
       upload: "Upload"
       uploading_image: "Uploading image"
@@ -528,6 +532,7 @@ en:
 
       invite_reply:
         title: 'Invite Friends to Reply'
+        action: 'Email Invite'
         help: 'send invitations to friends so they can reply to this topic with a single click'
         email: "We'll send your friend a brief email allowing them to reply to this topic by clicking a link."
         email_placeholder: 'email address'
@@ -583,6 +588,7 @@ en:
       continue_discussion: "Continuing the discussion from {{postLink}}:"
       follow_quote: "go to the quoted post"
       deleted_by_author: "(post removed by author)"
+      expand_collapse: "expand/collapse"
 
       has_replies:
         one: "Reply"
@@ -605,7 +611,7 @@ en:
         reply: "begin composing a reply to this post"
         like: "like this post"
         edit: "edit this post"
-        flag: "flag this post for moderator attention"
+        flag: "flag this post for attention"
         delete: "delete this post"
         undelete: "undelete this post"
         share: "share a link to this post"
@@ -733,13 +739,14 @@ en:
       delete_error: "There was an error deleting the category."
       list: "List Categories"
       no_description: "There is no description for this category."
-      change_in_category_topic: "visit category topic to edit the description"
+      change_in_category_topic: "Edit Description"
       hotness: "Hotness"
       already_used: 'This color has been used by another category'
 
     flagging:
       title: 'Why are you flagging this post?'
       action: 'Flag Post'
+      notify_action: 'Notify'
       cant: "Sorry, you can't flag this post at this time."
       custom_placeholder_notify_user: "Why does this post require you to speak to this user directly and privately? Be specific, be constructive, and always be kind."
       custom_placeholder_notify_moderators: "Why does this post require moderator attention? Let us know specifically what you are concerned about, and provide relevant links where possible."
@@ -751,6 +758,8 @@ en:
     topic_summary:
       title: "Topic Summary"
       links_shown: "show all {{totalLinks}} links..."
+      clicks: "clicks"
+      topic_link: "topic link"
 
     topic_statuses:
       locked:
@@ -844,13 +853,14 @@ en:
         please_upgrade: "Please upgrade!"
         installed_version: "Installed"
         latest_version: "Latest"
-        update_often: 'Please update often!'
         problems_found: "Some problems have been found with your installation of Discourse:"
         last_checked: "Last checked"
         refresh_problems: "Refresh"
         no_problems: "No problems were found."
         moderators: 'Moderators:'
         admins: 'Admins:'
+        private_messages_short: "PMs"
+        private_messages_title: "Private Messages"
 
         reports:
           today: "Today"
@@ -865,7 +875,7 @@ en:
           view_chart: "View as Bar Chart"
 
       commits:
-        latest_changes: "Latest changes."
+        latest_changes: "Latest changes: please update often!"
         by: "by"
 
       flags:
@@ -878,6 +888,11 @@ en:
         delete_title: "delete post (if its the first post delete topic)"
         flagged_by: "Flagged by"
         error: "Something went wrong"
+
+      groups:
+        title: "Groups"
+        edit: "Edit Groups"
+        selector_placeholder: "add users"
 
       api:
         title: "API"
