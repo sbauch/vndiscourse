@@ -163,12 +163,12 @@ class UsersController < ApplicationController
     user = User.new_from_params(params)
 
     auth = session[:authentication]
-    puts auth
-    puts valid_session_authentication?(auth, params[:email])
+    puts 'auth' + auth
+    puts 'valid?' + valid_session_authentication?(auth, params[:email])
     if valid_session_authentication?(auth, params[:email])
       user.active = true
     end
-    # user.password_required! unless valid_session_authentication?(auth, params[:email])
+    user.password_required! unless valid_session_authentication?(auth, params[:email])
 
     if user.valid? && SiteSetting.call_discourse_hub?
       DiscourseHub.register_nickname(user.username, user.email)
@@ -380,6 +380,7 @@ class UsersController < ApplicationController
     end
 
     def valid_session_authentication?(auth, email)
+      raise [auth[:email], auth, email].inspect
       auth && auth[:email] == email && auth[:email_valid]
     end
 
