@@ -168,7 +168,7 @@ class UsersController < ApplicationController
     if valid_session_authentication?(auth, params[:email])
       user.active = true
     end
-    user.password_required! unless valid_session_authentication?(auth, params[:email])
+    user.password_required! unless auth
 
     if user.valid? && SiteSetting.call_discourse_hub?
       DiscourseHub.register_nickname(user.username, user.email)
