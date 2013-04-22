@@ -163,8 +163,8 @@ class UsersController < ApplicationController
     user = User.new_from_params(params)
 
     auth = session[:authentication]
-    puts 'auth' + auth
-    puts 'valid?' + valid_session_authentication?(auth, params[:email])
+    puts 'auth' + auth.to_s
+    puts 'valid?' + valid_session_authentication?(auth, params[:email]).to_s
     if valid_session_authentication?(auth, params[:email])
       user.active = true
     end
@@ -380,7 +380,6 @@ class UsersController < ApplicationController
     end
 
     def valid_session_authentication?(auth, email)
-      raise [auth[:email], auth, email].inspect
       auth && auth[:email] == email && auth[:email_valid]
     end
 
