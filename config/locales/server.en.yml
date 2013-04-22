@@ -698,7 +698,9 @@ en:
 
     usage_tips:
       text_body_template: |
-        This private message has a few quick tips to get you started:
+        ### Tips & Tricks
+
+        Here are a few tips for using the new platform which can also be found in our [FAQ](%{base_url}/faq):
 
         ### Keep Scrolling
 
@@ -708,33 +710,33 @@ en:
 
         ### How Do I Reply?
 
-        - To reply to a specific post, use the Reply button at the bottom of that post.
+        To reply to a specific post, use the Reply button at the bottom of that post.
 
-        - If you want to reply to the overall *theme* of the topic, rather than any specific person in the topic, use the Reply button at the very bottom of the topic.
+        If you want to reply to the overall theme of the topic, rather than any specific person in the topic, use the Reply button at the very bottom of the topic.
 
-        - If you want to take the conversation in a different direction, but keep them linked together, use Reply as New Topic to the right of the post.
+        If you want to take the conversation in a different direction, but keep them linked together, use Reply as New Topic to the right of the post.
 
         ### Who is Talking to Me?
 
         When someone replies to your post, quotes you, or mentions your @username, a notification will appear at the top of the page. Click or tap the notification number to see who's talking to you, and where. Join the conversation!
 
-        - To mention someone's name, start typing `@` and an autocompleter will pop up.
+        To mention someone's name, start typing @ and an autocompleter will pop up.
 
-        - To quote an entire post, use the Import Quote button on the composer toolbar.
+        To quote an entire post, use the Import Quote button on the composer toolbar.
 
-        - To quote just a section of a post, highlight it, then click the Reply button that appears over the highlight.
+        To quote just a section of a post, highlight it, then click the Reply button that appears over the highlight.
 
         ### Look at That Post!
 
-        To let someone know that you enjoyed their post, click the like button at the bottom of the post. If you see a problem with a post, don't hesitate to click the flag button and let the moderators -- and your fellow community members -- know about it.
+        To let someone know that you enjoyed their post, click the like button at the bottom of the post. If you see a problem with a post, dont hesitate to click the flag button and let the moderators -- and your fellow community members -- know about it.
 
         ### Where am I?
 
-        - To get back to the home page at any time, **click the icon at the upper left.**
+        To get back to the home page at any time, click the icon at the upper left.
 
-        - To search, visit your user page, or otherwise navigate, click on the icons at the upper right.
+        To search, visit your user page, or otherwise navigate, click on the icons at the upper right.
 
-        - While reading a topic, you can move to the top by clicking its title at the top of the page. To reach the *bottom*, click the down arrow on the topic progress indicator at the bottom of the page, or click the last post field on the topic summary under the first post.
+        While reading a topic, you can move to the top by clicking its title at the top of the page. To reach the bottom, click the down arrow on the topic progress indicator at the bottom of the page, or click the last post field on the topic summary under the first post.
 
     welcome_approved:
       subject_template: "You've been approved on %{site_name}!"
@@ -750,17 +752,28 @@ en:
         Enjoy your stay!
 
     welcome_user:
-      subject_template: "Welcome to %{site_name} 2.0!"
+      subject_template: Welcome to VaynerNet 2.0!
       text_body_template: |
-        Hi there!
+        Welcome to VaynerNet 2.0, our new, bigger, better, badder, open-communication, discussion, and knowledge-sharing platform!
 
-        Thanks for joining %{site_name} 2.0, and welcome to our new discussion and knowledge sharing platform!
+        We’re very excited to launch this tool, which we’ve been developing over the past couple of months. From a high-level, we hope the new VaynerNet improves on the previous network by being more user-friendly across the board, all while making content and knowledge more lasting, permanent, and searchable.
+
+        VaynerNet 2.0 is in its beginning stages. We want your feedback! After you’re all set up, take a look around, get going, and please send your thoughts/suggestions to vaynernet@vaynermedia.com (Sam B, Andy K, & Sam T).
+
+        ### Finalizing Your Account
+
+        Please do the following:
+
+          1. Your profile information should have been imported from the old Vaynernet. Please click on your name in the upper-right hand corner of the page to view your profile and ensure your information has been imported correctly.
+          
+          2. If you have not filled out your three facts, please do so by clicking on the Preferences button from your profile.
+          
+          3. Add an Avatar that clearly shows your face! This can also be done via the Preferences page. Or, if you prefer, you can use a Gravatar with your @vaynermedia.com email address.
+
+        Note that we do not allow you to change your name or username. We are enforcing a FirstLast convention for consistency and ease of use.
+
 
         %{new_user_tips}
-
-        We believe in [civilized community behavior](%{base_url}/faq) at all times.
-
-        Enjoy your stay!
 
     welcome_invite:
       subject_template: "Welcome to %{site_name}!"
