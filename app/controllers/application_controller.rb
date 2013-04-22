@@ -219,6 +219,7 @@ class ApplicationController < ActionController::Base
       unless params[:api_key].present?
         if SiteSetting.access_password.present? && cookies[:_access] != SiteSetting.access_password
           redirect_to request_access_path(return_path: request.fullpath)
+          puts 'failed restricted access'
           return false
         end
       end

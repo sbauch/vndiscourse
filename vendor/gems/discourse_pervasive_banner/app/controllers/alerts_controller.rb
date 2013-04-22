@@ -25,7 +25,6 @@ class AlertsController < ApplicationController
   def update
     @alert = Alert.find(params[:id])
     @alert.update_attribute(:read, true)
-    # current_user.publish_alerts_state
     render :nothing => true
   end  
 
