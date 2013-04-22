@@ -14,13 +14,13 @@ Discourse.Alert = Discourse.Model.extend({
 		switch(alert_type)
 			{
 			case 1:
-			  html = "<i class='icon icon-exclamation-sign'></i><span style='margin-left:15px'>Important Notice!</span>";
+			  html = "<i class='icon icon-exclamation-sign'></i><span style='margin-left:15px'>*IMPORTANT* Please read! </span>";
 				break;
 			case 2:
-				html = "<i class='icon icon-calendar'></i><span style='margin-left:15px'>Heads up! - Flash Lessons Today:</span>";
+				html = "<i class='icon icon-calendar'></i><span style='margin-left:15px'Save the Date! </span>";
 				break;
 			case 3:
-				html = "<i class='icon icon-gift'></i><span style='margin-left:15px'>Celebrate!</span>";
+				html = "<i class='icon icon-gift'></i><span style='margin-left:15px'>Woo-hoo!! </span>";
 				break;
 			}
 		return new Handlebars.SafeString(html);
@@ -54,7 +54,7 @@ Discourse.Alert = Discourse.Model.extend({
   }).property(),
 
   rendered: (function() {
-      var html = " &#183; <a href='" + (this.get('url')) + "'>Please Click Here</a>"
+      var html = " <a href='" + (this.get('url')) + "'>" + this.get('data.topic_title') + "</a>"
 			return new Handlebars.SafeString(html);
   }).property()
 
