@@ -694,7 +694,7 @@ en:
 
         However, if the post is hidden by the community a second time, the moderators will be notified -- and there may be further action, including the possible suspension of your account.
 
-        For additional guidance, please refer to our [FAQ](%{base_url}/faq).
+        For additional guidance, please refer to our [FAQ](/faq).
 
     usage_tips:
       text_body_template: |
@@ -740,7 +740,7 @@ en:
         
         Thanks for reading! :smiley: 
           
-        If you have any questions or ideas, feel free to shoot an email to vaynernet@vaynermedia.com, PM @SamBauch / @AndyKopas / @SamTaggart or post a new thread in the Meta category.
+        If you have any questions or ideas, feel free to shoot an email to vaynernet@vaynermedia.com, PM @SamBauch, @AndyKopas, and @SamTaggart or post a new thread in the Meta category.
         
         
     welcome_approved:
