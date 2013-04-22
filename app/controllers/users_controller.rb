@@ -163,6 +163,8 @@ class UsersController < ApplicationController
     user = User.new_from_params(params)
 
     auth = session[:authentication]
+    puts auth
+    puts valid_session_authentication?(auth, params[:email])
     if valid_session_authentication?(auth, params[:email])
       user.active = true
     end
