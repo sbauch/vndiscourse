@@ -34,7 +34,9 @@ task "vm:users:vaynerversary" => :environment do
       @anniversaries = User.where("EXTRACT(DAY FROM start_date) <= ? AND EXTRACT(DAY FROM start_date) >= ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) != ?", date.day, (date - 1.day).day, date.month, date.year)
     elsif date.wday == 5
       @anniversaries = User.where("EXTRACT(DAY FROM start_date) <= ? AND EXTRACT(DAY FROM start_date) >= ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) != ?", (date + 1.day).day, date.day, date.month, date.year)
-    else 
+    elsif date.wday == (0 || 6)
+      @anniveraaries = []
+    else   
       @anniversaries = User.where("EXTRACT(DAY FROM start_date) = ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) != ?", date.day, date.month, date.year)
     end
   

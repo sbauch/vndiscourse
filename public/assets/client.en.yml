@@ -53,7 +53,6 @@ en:
       "6": "Responses"
 
     user:
-      information: "User Information"
       profile: Profile
       title: "User"
       mute: Mute
@@ -611,7 +610,7 @@ en:
         reply: "begin composing a reply to this post"
         like: "like this post"
         edit: "edit this post"
-        flag: "flag this post for attention"
+        flag: "flag this post for attention or send a notification about it"
         delete: "delete this post"
         undelete: "undelete this post"
         share: "share a link to this post"
@@ -642,8 +641,10 @@ en:
           off_topic: "{{icons}} marked this as off-topic"
           spam: "{{icons}} marked this as spam"
           inappropriate: "{{icons}} marked this as inappropriate"
-          notify_moderators: "{{icons}} flagged this"
+          notify_moderators: "{{icons}} notified moderators"
+          notify_moderators_with_url: "{{icons}} <a href='{{postUrl}}'>notified moderators</a>"
           notify_user: "{{icons}} started a private conversation"
+          notify_user_with_url: "{{icons}} started a <a href='{{postUrl}}'>private conversation</a>"
           bookmark: "{{icons}} bookmarked this"
           like: "{{icons}} liked this"
           vote: "{{icons}} voted for this"
@@ -845,7 +846,7 @@ en:
       moderator: 'Moderator'
 
       dashboard:
-        title: "Admin Dashboard"
+        title: "Dashboard"
         version: "Version"
         up_to_date: "You're up to date!"
         critical_available: "A critical update is available."
@@ -959,7 +960,6 @@ en:
         grant_admin: 'Grant Admin'
         revoke_moderation: 'Revoke Moderation'
         grant_moderation: 'Grant Moderation'
-        basics: Basics
         reputation: Reputation
         permissions: Permissions
         activity: Activity

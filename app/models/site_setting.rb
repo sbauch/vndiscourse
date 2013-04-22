@@ -48,7 +48,7 @@ class SiteSetting < ActiveRecord::Base
   client_setting(:max_upload_size_kb, 1024)
 
   # settings only available server side
-  setting(:auto_track_topics_after, 300000)
+  setting(:auto_track_topics_after, 240000)
   setting(:new_topic_duration_minutes, 60 * 48)
   setting(:long_polling_interval, 15000)
   setting(:flags_required_to_hide_post, 3)
@@ -97,7 +97,7 @@ class SiteSetting < ActiveRecord::Base
   setting(:max_favorites_per_day, 20)
   setting(:auto_link_images_wider_than, 50)
 
-  setting(:email_time_window_mins, 5)
+  setting(:email_time_window_mins, 10)
 
   # How many characters we can import into a onebox
   setting(:onebox_max_chars, 5000)
