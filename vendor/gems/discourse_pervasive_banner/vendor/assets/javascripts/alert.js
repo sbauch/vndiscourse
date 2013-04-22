@@ -17,7 +17,7 @@ Discourse.Alert = Discourse.Model.extend({
 			  html = "<i class='icon icon-exclamation-sign'></i><span style='margin-left:15px'>*IMPORTANT* Please read! </span>";
 				break;
 			case 2:
-				html = "<i class='icon icon-calendar'></i><span style='margin-left:15px'Save the Date! </span>";
+				html = "<i class='icon icon-calendar'></i><span style='margin-left:15px'>Save the Date! </span>";
 				break;
 			case 3:
 				html = "<i class='icon icon-gift'></i><span style='margin-left:15px'>Woo-hoo!! </span>";
