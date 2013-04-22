@@ -27,8 +27,8 @@ task "vm:users:update" => :environment do
   end
 end
 
-desc 'create vaynerversary alerts'
-task "vm:users:vaynerversary" => :environment do
+  desc 'create vaynerversary alerts'
+  task "vm:users:vaynerversary" => :environment do
   date = Time.now.in_time_zone('Eastern Time (US & Canada)').to_date
     if date.wday == 1
       @anniversaries = User.where("EXTRACT(DAY FROM start_date) <= ? AND EXTRACT(DAY FROM start_date) >= ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) != ?", date.day, (date - 1.day).day, date.month, date.year)
@@ -40,28 +40,63 @@ task "vm:users:vaynerversary" => :environment do
       @anniversaries = User.where("EXTRACT(DAY FROM start_date) = ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) != ?", date.day, date.month, date.year)
     end
   
-  unless @anniversaries.empty?
-    usernames = @anniversaries.collect{|u| u.username }
+    unless @anniversaries.empty?
+      usernames = @anniversaries.collect{|u| u.username }
     
-    sam = User.find_by_email('sam@vaynermedia.com')
+      sam = User.find_by_email('sam@vaynermedia.com')
   
-    post = PostCreator.create(sam, {:raw => 'Celebrate the Vaynerversary of ' + usernames.map{|u| '@' + u}.to_sentence + '!',
-                :title => 'Happy Vaynerversary to ' + usernames.to_sentence + '!',
-                :archetype => 'regular'})
+      post = PostCreator.create(sam, {:raw => 'Celebrate the Vaynerversary of ' + usernames.map{|u| '@' + u}.to_sentence + '!',
+                  :title => 'Happy Vaynerversary to ' + usernames.to_sentence + '!',
+                  :archetype => 'regular'})
   
   
-    User.all.each do |u|
-      u.alerts.create(:alert_type => 3,
-                      :topic_id => post.topic.id,
-                      :post_number => 1,
-                      :message => post.topic.title,
-                      :data => { topic_title: post.topic.title}.to_json)              
-                      
+      User.all.each do |u|
+        u.alerts.create(:alert_type => 3,
+                        :topic_id => post.topic.id,
+                        :post_number => 1,
+                        :message => post.topic.title,
+                        :data => { topic_title: post.topic.title}.to_json)              
+      
+        u.publish_alerts_state                                              
+      end
     end
-  
   end
   
-end
+  desc 'create new employee alerts'
+  task "vm:users:new_employees" => :environment do
+  date = Time.now.in_time_zone('Eastern Time (US & Canada)').to_date
+    if date.wday == 1
+      @anniversaries = User.where("EXTRACT(DAY FROM start_date) <= ? AND EXTRACT(DAY FROM start_date) >= ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) = ?", date.day, (date - 1.day).day, date.month, date.year)
+    elsif date.wday == 5
+      @anniversaries = User.where("EXTRACT(DAY FROM start_date) <= ? AND EXTRACT(DAY FROM start_date) >= ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) = ?", (date + 1.day).day, date.day, date.month, date.year)
+    elsif date.wday == (0 || 6)
+      @anniveraaries = []
+    else   
+      @anniversaries = User.where("EXTRACT(DAY FROM start_date) = ? AND EXTRACT(MONTH FROM start_date) = ? AND EXTRACT(YEAR FROM start_date) = ?", date.day, date.month, date.year)
+    end
+  
+    unless @anniversaries.empty?
+      usernames = @anniversaries.collect{|u| u.username }
+    
+      sam = User.find_by_email('sam@vaynermedia.com')
+  
+      post = PostCreator.create(sam, {:raw => 'Welcome your new teammates ' + usernames.map{|u| '@' + u}.to_sentence + '!',
+                  :title => 'Welcome to the team ' + usernames.to_sentence + '!',
+                  :archetype => 'regular'})
+  
+  
+      User.all.each do |u|
+        u.alerts.create(:alert_type => 3,
+                        :topic_id => post.topic.id,
+                        :post_number => 1,
+                        :message => post.topic.title,
+                        :data => { topic_title: post.topic.title}.to_json)
+      
+        u.publish_alerts_state                              
+                      
+      end
+    end  
+  end
 
 
 

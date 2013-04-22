@@ -92,7 +92,11 @@ class TopicViewSerializer < ApplicationSerializer
   end
   
   def user_rsvp_status
-    options[:scope].user.attendance_status(object.topic)
+    begin
+      options[:scope].user.attendance_status(object.topic)
+    rescue 
+      raise Discourse::NotLoggedIn.new
+    end  
   end
   
   def post_creator

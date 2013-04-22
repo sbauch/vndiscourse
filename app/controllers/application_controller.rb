@@ -22,7 +22,8 @@ class ApplicationController < ActionController::Base
   before_filter :preload_json
   before_filter :check_xhr
   before_filter :set_locale
-
+  before_filter :ensure_logged_in
+  
   rescue_from Exception do |exception|
     unless [ ActiveRecord::RecordNotFound, ActionController::RoutingError,
              ActionController::UnknownController, AbstractController::ActionNotFound].include? exception.class

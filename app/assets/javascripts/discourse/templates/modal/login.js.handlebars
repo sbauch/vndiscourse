@@ -2,7 +2,7 @@
   {{#if view.hasAtLeastOneLoginButton}}
     <div id="login-buttons">
       {{#if Discourse.SiteSettings.enable_google_logins}}
-        <button class="btn btn-social google" title="{{i18n login.google.title}}" {{action openidLogin "google" target="view"}}>{{i18n login.google.title}}</button>
+        <button style='width:100%;' class="btn btn-social google" title="{{i18n login.google.title}}" {{action openidLogin "google" target="view"}}>Log in with your @vaynermedia gmail account!</button>
       {{/if}}
       {{#if Discourse.SiteSettings.enable_facebook_logins}}
         <button class="btn btn-social facebook" title="{{i18n login.facebook.title}}" {{action "facebookLogin" target="view"}}>{{i18n login.facebook.title}}</button>

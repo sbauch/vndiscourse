@@ -4,7 +4,8 @@ require_dependency 'promotion'
 class TopicsController < ApplicationController
 
   # Avatar is an image request, not XHR
-  before_filter :ensure_logged_in, only: [:timings,
+  before_filter :ensure_logged_in, only: [:show,
+                                          :timings,
                                           :destroy_timings,
                                           :update,
                                           :star,

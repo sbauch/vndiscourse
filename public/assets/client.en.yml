@@ -92,20 +92,20 @@ en:
         
       email:
         title: "Email"
-        instructions: "Your email will never be shown to the public."
+        instructions: "Your @vaynermedia.com email address."
         ok: "Looks good. We will email you to confirm."
-        invalid: "Please enter a valid email address."
-        authenticated: "Your email has been authenticated by {{provider}}."
+        invalid: "You must use your @vaynermedia.com account."
+        authenticated: "Your email checks out."
         frequency: "We'll only email you if we haven't seen you recently and you haven't already seen the thing we're emailing you about."
 
       name:
         title: "Name"
-        instructions: "The longer version of your name; does not need to be unique. Used for alternate @name matching and shown only on your user page."
+        instructions: "Your first and last name."
         too_short: "Your name is too short."
-        ok: "Your name looks good."
+        ok: "Looks good. Contact HR for changes."
       username:
         title: "Username"
-        instructions: "Must be unique, no spaces. People can mention you as @username."
+        instructions: "Sorry, this is required to be FirstNameLastName. People can mention you as @username."
         short_instructions: "People can mention you as @{{username}}."
         available: "Your username is available."
         global_match: "Email matches the registered username."
