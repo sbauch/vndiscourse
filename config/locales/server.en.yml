@@ -726,9 +726,7 @@ en:
 
         To quote just a section of a post, highlight it, then click the Reply button that appears over the highlight.
 
-        ### Look at That Post!
-
-        To let someone know that you enjoyed their post, click the like button at the bottom of the post. If you see a problem with a post, dont hesitate to click the flag button and let the moderators -- and your fellow community members -- know about it.
+        To let someone know that you enjoyed their post, click the like button at the bottom of the post.
 
         ### Where am I?
 
@@ -737,7 +735,14 @@ en:
         To search, visit your user page, or otherwise navigate, click on the icons at the upper right.
 
         While reading a topic, you can move to the top by clicking its title at the top of the page. To reach the bottom, click the down arrow on the topic progress indicator at the bottom of the page, or click the last post field on the topic summary under the first post.
-
+        
+        ### That's it!
+        
+        Thanks for reading! :smiley: 
+          
+        If you have any questions or ideas, feel free to shoot an email to vaynernet@vaynermedia.com, PM @SamBauch / @AndyKopas / @SamTaggart or post a new thread in the Meta category.
+        
+        
     welcome_approved:
       subject_template: "You've been approved on %{site_name}!"
       text_body_template: |
@@ -758,7 +763,7 @@ en:
 
         We’re very excited to launch this tool, which we’ve been developing over the past couple of months. From a high-level, we hope the new VaynerNet improves on the previous network by being more user-friendly across the board, all while making content and knowledge more lasting, permanent, and searchable.
 
-        VaynerNet 2.0 is in its beginning stages. We want your feedback! After you’re all set up, take a look around, get going, and please send your thoughts/suggestions to vaynernet@vaynermedia.com (@SamBauch, @AndyKopas, & @SamTaggart).
+        VaynerNet 2.0 is in its beginning stages. We want your feedback! After you’re all set up, take a look around, get going, and please send your thoughts/suggestions to vaynernet@vaynermedia.com ( @SamBauch, @AndyKopas, & @SamTaggart ).
 
         ### Finalizing Your Account
 
