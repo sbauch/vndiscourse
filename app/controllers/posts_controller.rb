@@ -5,7 +5,7 @@ class PostsController < ApplicationController
 
   # Need to be logged in for all actions here
   before_filter :ensure_logged_in, except: [:show, :replies, :by_number]
-
+  protect_from_forgery :except => :create 
 
   def create
     requires_parameter(:post)
