@@ -700,7 +700,7 @@ en:
       text_body_template: |
         ### Tips & Tricks
 
-        Here are a few tips for using the new platform which can also be found in our [FAQ](%{base_url}/faq):
+        Here are a few tips for using the new platform which can also be found in our [FAQ](/faq):
 
         ### Keep Scrolling
 
