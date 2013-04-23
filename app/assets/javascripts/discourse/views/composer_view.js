@@ -183,39 +183,6 @@ Discourse.ComposerView = Discourse.View.extend({
       transformComplete: function(v) { return v.username; }
     });
 
-    selected = [];
-    $('#private-message-users').val(this.get('content.targetUsernames')).autocomplete({
-      template: template,
-
-      dataSource: function(term) {
-        return Discourse.UserSearch.search({
-          term: term,
-          topicId: _this.get('controller.controllers.topic.content.id'),
-          exclude: selected.concat([Discourse.get('currentUser.username')])
-        });
-      },
-
-      onChangeItems: function(items) {
-        items = $.map(items, function(i) {
-          if (i.username) {
-            return i.username;
-          } else {
-            return i;
-          }
-        });
-        _this.set('content.targetUsernames', items.join(","));
-				console.log(items.join(","));
-        selected = items;
-      },
-
-      transformComplete: transformTemplate,
-
-      reverseTransform: function(i) {
-        return { username: i };
-      }
-
-    });
-
     topic = this.get('topic');
     this.editor = editor = Discourse.Markdown.createEditor({
       lookupAvatar: function(username) {

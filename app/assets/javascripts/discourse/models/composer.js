@@ -195,7 +195,7 @@ Discourse.Composer = Discourse.Model.extend({
        topic   - The topic we're replying to, if present
        quote    - If we're opening a reply from a quote, the quote we're making
   */
-  open: function(opts) {
+    open: function(opts) {
     var topicId;
     if (!opts) opts = {};
 
@@ -225,6 +225,7 @@ Discourse.Composer = Discourse.Model.extend({
     this.set('action', opts.action);
     this.set('topic', opts.topic);
     this.set('targetUsernames', opts.usernames);
+		console.log(this.get('targetUsernames'));
     if (opts.post) {
       this.set('post', opts.post);
       if (!this.get('topic')) {
