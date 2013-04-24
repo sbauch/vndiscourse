@@ -23,7 +23,7 @@ desc 'update user info nightly'
 task "vm:users:update" => :environment do
   User.all.each do |u|
     resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{u.email}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
-    u.update_attributes(:teams => resp['teams'], :position => resp['function'], :start_date => resp['start_date'] )
+    u.update_attributes(:teams => resp['teams'], :position => resp['function'], :start_date => resp['start_date'], :short_position => VmUserService.short_position(resp['function']) )
   end
 end
 

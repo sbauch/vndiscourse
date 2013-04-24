@@ -172,7 +172,8 @@ class Users::OmniauthCallbacksController < ApplicationController
         log_on_user(user)
         
         user.update_attributes(:teams => resp['teams'], 
-                               :position => resp['function'])
+                               :position => resp['function'],
+                               :short_position => VmUserService.short_position(resp['function']))
         if user.fact_one.nil?                        
           user.update_attributes(:fact_one => resp['fact_one'], 
                                  :fact_two => resp['fact_two'],

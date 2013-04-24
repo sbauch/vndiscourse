@@ -7,7 +7,7 @@
       data: { filter: filter }
     }).then(function(users) {
       users.each(function(u) {
-        result.pushObject(Discourse.AdminUser.create(u));
+        result.pushObject(Discourse.User.create(u));
       });
 			result.set('loaded', true)
     });
