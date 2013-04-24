@@ -73,8 +73,8 @@ wmd-quote-post.gif: wmd-quote-post-c55d17fa8643b6c52be21511151ee7c7.gif
 wmd-quote-post/index.gif: wmd-quote-post-c55d17fa8643b6c52be21511151ee7c7.gif
 admin.js: admin-37b1616c8d0592ba821fb954d77bea44.js
 admin/index.js: admin-37b1616c8d0592ba821fb954d77bea44.js
-application.js: application-c5aa1e43489a9f2ee530695b7764f3b0.js
-application/index.js: application-c5aa1e43489a9f2ee530695b7764f3b0.js
+application.js: application-ee1940b0eba4809a4432fd60a7cbb72e.js
+application/index.js: application-ee1940b0eba4809a4432fd60a7cbb72e.js
 defer/html-sanitizer-bundle.js: defer/html-sanitizer-bundle-7c81c4436b5d8eefbe56cb4ca8ecacf5.js
 defer/html-sanitizer-bundle/index.js: defer/html-sanitizer-bundle-7c81c4436b5d8eefbe56cb4ca8ecacf5.js
 discourse/templates/application.js: discourse/templates/application-9739d1b94d76d2cd64f4c54a981de45d.js
@@ -93,8 +93,8 @@ locales/en.js: locales/en-fc92ec71f218aebe8440131917b0d12a.js
 locales/en/index.js: locales/en-fc92ec71f218aebe8440131917b0d12a.js
 locales/es.js: locales/es-36c3e60f2f8d173efad739738d30a1e2.js
 locales/es/index.js: locales/es-36c3e60f2f8d173efad739738d30a1e2.js
-locales/fr.js: locales/fr-f8da7bf5a9f71e9a2b132327a95a4bb5.js
-locales/fr/index.js: locales/fr-f8da7bf5a9f71e9a2b132327a95a4bb5.js
+locales/fr.js: locales/fr-0dccfddd43e3af365a33a003e0a57e1d.js
+locales/fr/index.js: locales/fr-0dccfddd43e3af365a33a003e0a57e1d.js
 locales/id.js: locales/id-915d801948d581301a37e674ab8984db.js
 locales/id/index.js: locales/id-915d801948d581301a37e674ab8984db.js
 locales/it.js: locales/it-877f3c4b3ac39019a1281fe2008d96bf.js
@@ -115,8 +115,8 @@ preload_store.js: preload_store-e67c1afe60d18091c15080bd7de02db5.js
 preload_store/index.js: preload_store-e67c1afe60d18091c15080bd7de02db5.js
 admin.css: admin-3433515e46cc392e4b5e8d1e6744df44.css
 admin/index.css: admin-3433515e46cc392e4b5e8d1e6744df44.css
-application.css: application-662f97140fdb70ad48f0da946f39cdf0.css
-application/index.css: application-662f97140fdb70ad48f0da946f39cdf0.css
+application.css: application-7e84f19844451b9ba669152413aa2f68.css
+application/index.css: application-7e84f19844451b9ba669152413aa2f68.css
 emoji/+1.png: emoji/+1-9ef5e67e747a0ed98c96c428c9594403.png
 emoji/+1/index.png: emoji/+1-9ef5e67e747a0ed98c96c428c9594403.png
 emoji/-1.png: emoji/-1-a837183ae8098ee8a62ee424ecd9db57.png
@@ -3511,8 +3511,8 @@ client.en.yml: client.en-c6092ea6fc1bac74435f8f16731c76fc.yml
 client/index.en.yml: client.en-c6092ea6fc1bac74435f8f16731c76fc.yml
 client.es.yml: client.es-a8224da6ab5465369c34ca0bc3c3ae77.yml
 client/index.es.yml: client.es-a8224da6ab5465369c34ca0bc3c3ae77.yml
-client.fr.yml: client.fr-75c9c9b6d4d5d7f744d6c9ee9fe6b2cf.yml
-client/index.fr.yml: client.fr-75c9c9b6d4d5d7f744d6c9ee9fe6b2cf.yml
+client.fr.yml: client.fr-7b15bd878aceacd56fdc5db7faa32a01.yml
+client/index.fr.yml: client.fr-7b15bd878aceacd56fdc5db7faa32a01.yml
 client.id.yml: client.id-e07348e0957079cbb7ccbe7659357b2b.yml
 client/index.id.yml: client.id-e07348e0957079cbb7ccbe7659357b2b.yml
 client.it.yml: client.it-1239c8348bfe240b5a49d2db6c461111.yml
@@ -3541,8 +3541,8 @@ server.en.yml: server.en-0f1f8b62c5e6c8ff528320c37d15f975.yml
 server/index.en.yml: server.en-0f1f8b62c5e6c8ff528320c37d15f975.yml
 server.es.yml: server.es-9ec439bbb11d23b6e66f8dfab109c563.yml
 server/index.es.yml: server.es-9ec439bbb11d23b6e66f8dfab109c563.yml
-server.fr.yml: server.fr-83ee9a484d787f7f8fe1b1faecab327a.yml
-server/index.fr.yml: server.fr-83ee9a484d787f7f8fe1b1faecab327a.yml
+server.fr.yml: server.fr-247834048b257783925aea159d47010c.yml
+server/index.fr.yml: server.fr-247834048b257783925aea159d47010c.yml
 server.id.yml: server.id-9af1fd2d05647ce2dc33f69df60e4510.yml
 server/index.id.yml: server.id-9af1fd2d05647ce2dc33f69df60e4510.yml
 server.it.yml: server.it-e0712aee26e374a9f293f3f4406f6228.yml

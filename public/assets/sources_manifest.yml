@@ -36,7 +36,7 @@ vmlogo-wide.png: 866440352d2632c05d118b859ca6fa78
 wmd-buttons.png: febb3b94eb7388d2a296642f14d9fa37
 wmd-quote-post.gif: c55d17fa8643b6c52be21511151ee7c7
 admin.js: 74087f2be12f1061aa1e553961b20733
-application.js: 3231f0fdeb48fb8a4daa39ab15311a59
+application.js: 7d1d476dfbb5a4d6acee2e8bec61f09d
 defer/html-sanitizer-bundle.js: 0021d1e0962fb52a3b421d2e610a02bb
 discourse/templates/application.js: adf2effa02a05a7394c61b7fb4ca5cdd
 docs/yuidoc.json: a56c4fa93cb2aa4c42387ed904600c97
@@ -46,7 +46,7 @@ locales/da.js: 577e16eea1f8492bbf847a659cac2b5c
 locales/de.js: 8d72caaaa148d2653c3ae758242bb979
 locales/en.js: e15f9b1fa46fb16a0ec72ee53e78d58e
 locales/es.js: 4816b4ae1daf4c26edb9697b08d4e6d7
-locales/fr.js: af7c5564f1961c7c0fbfbf53b41f5998
+locales/fr.js: 53e0354aa3b196de7a88e4236de34e1c
 locales/id.js: ea71f6feb12702a861a8b205fe249bb9
 locales/it.js: 75e24b7f243d5751478c400364562329
 locales/nl.js: 51039aa0ab50e2b425c986d7966bf874
@@ -57,7 +57,7 @@ locales/zh_CN.js: 44ce2a65132e6748d6b81635bb068f78
 locales/zh_TW.js: 5e373ab18b836552322f64c0a8d69f7b
 preload_store.js: 6517003610c6d91a63ae250e6d117b7b
 admin.css: 56237a216985b12f58443750f4e0cf5b
-application.css: a9e94d54f17e2ac739b2928335994def
+application.css: ae998e7bccdaa10151764eea809a76d3
 emoji/+1.png: 9ef5e67e747a0ed98c96c428c9594403
 emoji/-1.png: a837183ae8098ee8a62ee424ecd9db57
 emoji/100.png: d4597336d24c7f3a74571ad0dbf28923
@@ -1755,7 +1755,7 @@ client.da.yml: 99594f4b3498462107652bd937ed9cba
 client.de.yml: a4f7a76623b04e0a46ea7a3cd4d4efb6
 client.en.yml: c6092ea6fc1bac74435f8f16731c76fc
 client.es.yml: a8224da6ab5465369c34ca0bc3c3ae77
-client.fr.yml: 75c9c9b6d4d5d7f744d6c9ee9fe6b2cf
+client.fr.yml: 7b15bd878aceacd56fdc5db7faa32a01
 client.id.yml: e07348e0957079cbb7ccbe7659357b2b
 client.it.yml: 1239c8348bfe240b5a49d2db6c461111
 client.nl.yml: dcee86446daf85d27d9cd2545c3f5d0e
@@ -1770,7 +1770,7 @@ server.da.yml: 611f34b041d1bed1ee5f6e9970ce5eb2
 server.de.yml: 1bf14735797bdd8f857f5919c0fc8870
 server.en.yml: 0f1f8b62c5e6c8ff528320c37d15f975
 server.es.yml: 9ec439bbb11d23b6e66f8dfab109c563
-server.fr.yml: 83ee9a484d787f7f8fe1b1faecab327a
+server.fr.yml: 247834048b257783925aea159d47010c
 server.id.yml: 9af1fd2d05647ce2dc33f69df60e4510
 server.it.yml: e0712aee26e374a9f293f3f4406f6228
 server.nl.yml: 64b6621f7515c2d6b2f96d15ca498691
