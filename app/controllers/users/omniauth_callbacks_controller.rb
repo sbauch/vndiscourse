@@ -191,7 +191,13 @@ class Users::OmniauthCallbacksController < ApplicationController
         name: resp['full_name'],
         username: resp['full_name'].gsub(' ',''),
         email_valid: true ,
-        auth_provider: data[:provider] || params[:provider].try(:capitalize)
+        auth_provider: data[:provider] || params[:provider].try(:capitalize),
+        teams: resp['teams'], 
+        position: resp['function'],
+        short_position: VmUserService.short_position(resp['function']),
+        fact_one: resp['fact_one'], 
+        fact_two: resp['fact_two'],
+        fact_three: resp['fact_three']
       }
       session[:authentication] = {
         email: @data[:email],
