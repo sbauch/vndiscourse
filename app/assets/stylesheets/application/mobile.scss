@@ -1,6 +1,36 @@
 @media only screen
 and (min-device-width : 320px)
 and (max-device-width : 540px) {
+  .d-header {
+    width: 100%;
+    .contents{ margin: 10px; }
+  }
+  .inner{ margin: 10px; }
+  .posts-wrapper { margin: 0 18px 0 24px; }
+  .span5.gutter { display:none; }
+  #topic-progress-wrapper { display: none; }
+  .topic-body { width: 780px !important; }
+  .topic-post {
+    article.boxed {
+      .read-icon {
+        right: 10% !important;
+        }
+      }
+    }
+  .topic-meta-data{
+    .post-info{
+      line-height: 14px !important;
+    }
+  }
+  #topic-footer-buttons {
+    margin: 20px 0 60px 127px !important;
+    }
+  #suggested-topics {
+    display: none;
+    # margin: 40px 0 40px 24px !important;
+    # width: 880px !important;
+  }  
+  
   #reply-control {
     .toggle-preview { display:none; }
     #reply-title { width: 250px; }
