@@ -1,9 +1,11 @@
-@media only screen
-and (min-device-width : 320px)
-and (max-device-width : 540px) {
+@media only screen and (max-device-width: 540px), only screen and (min-device-width: 560px) and (max-device-width: 1136px) and (-webkit-min-device-pixel-ratio: 2) {
   .d-header {
     width: 100%;
     .contents{ margin: 10px; }
+  }
+  #topic-title h1, .extra-info-wrapper h1 {
+    max-width: 570px;
+    display: inline-block;
   }
   .inner{ margin: 10px; }
   .posts-wrapper { margin: 0 18px 0 24px; }
