@@ -16,7 +16,8 @@
     	text-overflow: ellipsis;  // IE 6+, FF 7+, Op 11+, Saf 1.3+, Chr 1+
       -o-text-overflow: ellipsis;  // for Opera 9 & 10
     }
-    .container { margin: 10px; }
+        .posts-wrapper { width: 320px !important; }
+    .container { margin: 10px;}
     .contents{ margin: 10px; }
     .panel {
       .current-username{ display: none; }
@@ -25,16 +26,31 @@
       right: 5px;
     }
   }
-  .inner{ 
-    margin: 10px 0 10px 24px; 
-    h1{ min-width: 320px;}
+  #show-topic-admin{display:none !important;}
+  #topic-title{ 
+    width: 320px !important;
+    margin-left: 8px;
+    h1{max-width:320px !important;}
   }
-  
+  .extra-info{ a{ display: none; }}
+  .topic-meta-data { 
+    transform: scale(.5, .5);
+    -moz-transform: scale(.5, .5);
+    -ms-transform: scale(.5, .5);
+    -webkit-transform: scale(.5, .5);
+    -o-transform: scale(.5, .5);
+    margin-left: -18px !important;
+    margin-top: -10px !important;
+  }
   .topic-summary {display: none; }
   .posts-wrapper { margin: 0 18px 0 24px; }
   .span5.gutter { display:none; }
   #topic-progress-wrapper { display: none; }
-  .topic-body { width: 44% !important; }
+  .topic-body { 
+    width: 28% !important; 
+    margin-left: -24px;
+    }
+  
   .topic-post {
     width: 100%;
     article.boxed {
@@ -52,10 +68,10 @@
     }
   }
   #topic-footer-buttons {
-    margin: 10px 0 100px 127px !important;
+    margin: 24px 0 100px 27px !important;
     p {
       line-height: 18px !important;
-      width: 280px;
+      width: 126px;
     }
   }
   #suggested-topics {
