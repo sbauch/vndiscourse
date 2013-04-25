@@ -2,10 +2,14 @@
   .d-header {
     width: 320px;
     .contents{ margin: 10px; }
+    .panel {
+      float: right;
+      position: fixed;
+      right: 5px;
+    }
   }
   #topic-title h1, .extra-info-wrapper h1 {
-    max-width: 570px;
-    display: inline-block;
+    display: none;
   }
   .inner{ margin: 10px; }
   .posts-wrapper { margin: 0 18px 0 24px; }
