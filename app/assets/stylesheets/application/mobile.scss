@@ -4,6 +4,10 @@
     max-width: 320px !important;
     overflow: hidden;
   }
+  .full-width{width:320px !important;}
+  #main-outlet {
+    padding-top: 95px;
+  }
   .regular { width: 100% !important;}
   .d-header {
     width: 320px;
@@ -61,7 +65,40 @@
   }  
   .embedded-posts.parent-post{
     margin-left: 50px !important;
-    width: 263px !important;
+    width: 262px !important;
+  }
+  
+  #list-controls .nav {
+    li{
+      margin: 0 !important;
+      float: none !important;
+      display: inline-block;}
+    text-align:center;
+    width: 320px;
+    margin-bottom: 40px !important;
+    .btn.btn-default:second{display:none;}
+  }
+  
+  #topic-list{ 
+    thead{ display: none; }
+    width: 320px !important;
+  }
+  
+  td.main-link.clearfix{
+    width: 280px !important;
+  }
+  td.star{width:2px;}
+  
+  td.category,td.posters,td.num{
+    display: none;
+  }
+  
+  #list-area h3{display: none;}
+  #list-controls .btn {
+        position: absolute;
+        top: 190px;
+        right: 16px;
+        width: 90%;
   }
   
   .topic-post {
@@ -92,14 +129,21 @@
     #margin: 40px 0 40px 24px !important;
     # width: 880px !important;
   }  
-  
+  .reply-area .form-element{
+    width:320px;
+  }
   #reply-control {
+    .category-combobox{ 
+      width: 271px;
+      z-index: 99999;
+    }
     .toggle-preview { display:none; }
     #reply-title { width: 250px; }
     .wmd-controls {
       #wmd-input {
         width: 100%;
         border-top: 0;
+        margin-top: 40px;
       }
       .preview-wrapper {
         display: none;
