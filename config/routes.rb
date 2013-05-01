@@ -130,7 +130,6 @@ Discourse::Application.routes.draw do
   end
 
   get 'p/:post_id/:user_id' => 'posts#short_link'
-  get 'st/:topic_id/:user_id' => 'topics#short_link'
 
   resources :notifications
   resources :alerts
@@ -211,6 +210,8 @@ Discourse::Application.routes.draw do
   delete 't/:topic_id/timings' => 'topics#destroy_timings', constraints: {topic_id: /\d+/}
 
   post 't/:topic_id/notifications' => 'topics#set_notifications' , constraints: {topic_id: /\d+/}
+
+  get 'md/:topic_id(/:post_number)' => 'posts#markdown'
 
 
   resources :invites

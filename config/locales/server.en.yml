@@ -54,7 +54,7 @@ en:
 
       Keep in mind as you compose your topic:
 
-      - Is your title interesting? Does it accurately describe what will be in your topic?
+      - Does the title accurately describe your topic? Does it sound interesting?
 
       - What is this about? Who would be interested in it? Why does it matter? What kind of responses are you hoping for from the community?
 
@@ -348,6 +348,9 @@ en:
     github_config_warning: 'The server is configured to allow signup and log in with GitHub (enable_github_logins), but the client id and secret values are not set. Go to <a href="/admin/site_settings">the Site Settings</a> and update the settings. <a href="https://github.com/discourse/discourse/wiki/The-Discourse-Admin-Quick-Start-Guide" target="_blank">See this guide to learn more</a>.'
     failing_emails_warning: "There are %{num_failed_jobs} email jobs that failed. Check your config/production.rb file and ensure that the config.action_mailer settings are correct."
     default_logo_warning: "You haven't customized the logo images for your site. Update logo_url, logo_small_url, and favicon_url in the <a href='/admin/site_settings'>Site Settings</a>."
+    contact_email_missing: "You haven't provided a contact email for your site. Please update contact_email in the <a href='/admin/site_settings'>Site Settings</a>."
+    contact_email_invalid: "The site contact email is invalid. Please update contact_email in the <a href='/admin/site_settings'>Site Settings</a>."
+    title_nag: "The title Site Setting is still set to the default value. Please update it with your site's title in the <a href='/admin/site_settings'>Site Settings</a>."
 
   content_types:
     education_new_reply:
@@ -385,6 +388,7 @@ en:
     discourse_org_access_key: "The access key used to access the Discourse Hub nickname registry at discourse.org"
     educate_until_posts: "Show pop-up composer education panel until the user has made this many posts"
     title: "Title of this site, will be used in the title tag and elsewhere"
+    contact_email: "The email address of someone who can be contacted about the site. Important notices from Discourse.org regarding critical updates will be sent to this address."
     company_full_name: "The full name of the company that runs this site, used in legal documents like the /tos"
     company_short_name: "The short name of the company that runs this site, used in legal documents like the /tos"
     company_domain: "The domain name owned by the company that runs this site, used in legal documents like the /tos"
@@ -416,7 +420,7 @@ en:
     best_of_posts_required: "Minimum posts in a topic before 'best of' mode is enabled"
     best_of_likes_required: "Minimum likes in a topic before the 'best of' mode will be enabled"
     best_of_percent_filter: "When a user clicks best of, show the top % of posts"
-    enable_private_messages: "Allow basic (1) trust level users to create private messages and reply to private conversations"
+    enable_private_messages: "Allow basic (1) trust level users to create private messages and reply to private messages"
 
     enable_long_polling: "Message bus used for notification can use long polling"
     long_polling_interval: "Interval before a new long poll is issued in milliseconds "
@@ -429,7 +433,7 @@ en:
     flags_required_to_hide_post: "Number of flags that cause a post to be automatically hidden and PM sent to the user (0 for never)"
     cooldown_minutes_after_hiding_posts: "Number of minutes a user must wait before they can edit the post that was hidden due to flagging"
 
-    traditional_markdown_linebreaks: "Use traditional linebreaks in Markdown, instead of requiring two trailing spaces for a linebreak"
+    traditional_markdown_linebreaks: "Use traditional linebreaks in Markdown, which require two trailing spaces for a linebreak"
     post_undo_action_window_mins: "Number of seconds users are allowed to reverse actions on a post (like, flag, etc)"
     must_approve_users: "Admins must approve all users before they gain access"
     ga_tracking_code: "Google analytics tracking code code, eg: UA-12345678-9; see http://google.com/analytics"
@@ -539,6 +543,9 @@ en:
     topic_views_heat_medium: "The number of views after which a topic's heat level is medium."
     topic_views_heat_high: "The number of views after which a topic's heat level is high."
 
+    tos_url: "If you have a Terms of Service document hosted elsewhere that you want to use, provide the full URL here."
+    privacy_policy_url: "If you have a Privacy Policy document hosted elsewhere that you want to use, provide the full URL here."
+
   notification_types:
     mentioned: "%{display_username} mentioned you in %{link}"
     liked: "%{display_username} liked your post in %{link}"
@@ -562,31 +569,6 @@ en:
   most_recent_poster: "Most Recent Poster"
   frequent_poster: "Frequent Poster"
 
-  user_action_descriptions:
-    bookmarks: "Bookmarks"
-    topics: "Topics"
-    likes_received: "Likes Received"
-    likes_given: "Likes Given"
-    responses: "Responses"
-    topic_responses: "Topic Responses"
-    posts: "Posts"
-    mentions: "Mentions"
-    quotes: "Quotes"
-    edits: "Edits"
-    favorites: "Favorites"
-    sent_items: "Sent Items"
-    inbox: "Inbox"
-
-    was_liked: "was liked"
-    liked: "liked"
-    bookmarked: "bookmarked"
-    posted: "posted"
-    responded_to: "replied to"
-    mentioned: "mentioned"
-    quoted: "quoted"
-    favorited: "favorited"
-    edited: "edited"
-
   move_posts:
     moderator_post:
       one: "I moved a post to a new topic: %{topic_link}"
@@ -597,7 +579,7 @@ en:
     archived_disabled: "This topic is now unarchived. It is no longer frozen, and can be changed."
     closed_enabled: "This topic is now closed. New replies are no longer allowed."
     closed_disabled: "This topic is now opened. New replies are allowed."
-    pinned_enabled: "This topic is now pinned. It will appear at the top of its category until it is either unpinned by a moderator, or cleared by each user using the Clear Pin button."
+    pinned_enabled: "This topic is now pinned. It will appear at the top of its category until it is either unpinned by a moderator, or the Clear Pin button is pressed."
     pinned_disabled: "This topic is now unpinned. It will no longer appear at the top of its category."
     visible_enabled: "This topic is now visible. It will be displayed in topic lists."
     visible_disabled: "This topic is now invisible. It will no longer be displayed in any topic lists. The only way to access this topic is via direct link."
@@ -826,9 +808,9 @@ en:
       description: "Not interested in getting these emails? No problem! Click below to unsubscribe instantly:"
 
     user_invited_to_private_message:
-      subject_template: "[%{site_name}] %{username} invited you to a private conversation '%{topic_title}'"
+      subject_template: "[%{site_name}] %{username} invited you to a private message '%{topic_title}'"
       text_body_template: |
-        %{username} invited you to a private conversation '%{topic_title}' on %{site_name}:
+        %{username} invited you to a private message '%{topic_title}' on %{site_name}:
 
         Please visit this link to view the topic: %{base_url}%{url}
 
@@ -940,3 +922,9 @@ en:
     miscellaneous: "This Agreement constitutes the entire agreement between %{company_short_name} and you concerning the subject matter hereof, and they may only be modified by a written amendment signed by an authorized executive of %{company_short_name}, or by the posting by %{company_short_name} of a revised version. Except to the extent applicable law, if any, provides otherwise, this Agreement, any access to or use of the Website will be governed by the laws of the state of California, U.S.A., excluding its conflict of law provisions, and the proper venue for any disputes arising out of or relating to any of the same will be the state and federal courts located in San Francisco County, California. Except for claims for injunctive or equitable relief or claims regarding intellectual property rights (which may be brought in any competent court without the posting of a bond), any dispute arising under this Agreement shall be finally settled in accordance with the Comprehensive Arbitration Rules of the Judicial Arbitration and Mediation Service, Inc. (“JAMS”) by three arbitrators appointed in accordance with such Rules. The arbitration shall take place in San Francisco, California, in the English language and the arbitral decision may be enforced in any court. The prevailing party in any action or proceeding to enforce this Agreement shall be entitled to costs and attorneys’ fees. If any part of this Agreement is held invalid or unenforceable, that part will be construed to reflect the parties’ original intent, and the remaining portions will remain in full force and effect. A waiver by either party of any term or condition of this Agreement or any breach thereof, in any one instance, will not waive such term or condition or any subsequent breach thereof. You may assign your rights under this Agreement to any party that consents to, and agrees to be bound by, its terms and conditions; %{company_short_name} may assign its rights under this Agreement without condition. This Agreement will be binding upon and will inure to the benefit of the parties, their successors and permitted assigns."
 
   deleted: 'deleted'
+
+  upload:
+    image:
+      fetch_failure: "Sorry, there has been an error while fetching the image."
+      unknown_image_type: "Sorry, but the file you tried to upload doesn't appear to be an image."
+      size_not_found: "Sorry, but we couldn't determine the size of the image. Maybe your image is corrupted?"

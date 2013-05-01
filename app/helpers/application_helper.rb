@@ -43,7 +43,7 @@ module ApplicationHelper
     result =  tag(:meta, property: 'og:site_name', content: SiteSetting.title) << "\n"
 
     result << tag(:meta, name: 'twitter:card', content: "summary")
-    [:image, :url, :title, :description].each do |property|
+    [:image, :url, :title, :description, 'image:width', 'image:height'].each do |property|
       if opts[property].present?
         escape = (property != :image)
         result << tag(:meta, {property: "og:#{property}", content: opts[property]}, nil, escape) << "\n"
@@ -63,11 +63,11 @@ module ApplicationHelper
   end
 
   def tos_path
-    return "#{Discourse::base_uri}/tos"
+    SiteSetting.tos_url.blank? ? "#{Discourse::base_uri}/tos" : SiteSetting.tos_url
   end
 
   def privacy_path
-    return "#{Discourse::base_uri}/privacy"
+    SiteSetting.privacy_policy_url.blank? ? "#{Discourse::base_uri}/privacy" : SiteSetting.privacy_policy_url
   end
 
   def login_path

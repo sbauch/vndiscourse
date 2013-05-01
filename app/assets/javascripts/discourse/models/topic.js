@@ -30,16 +30,16 @@ Discourse.Topic = Discourse.Model.extend({
     }
   },
 
-  category: (function() {
+  category: function() {
     if (this.get('categories')) {
       return this.get('categories').findProperty('name', this.get('categoryName'));
     }
-  }).property('categoryName', 'categories'),
+  }.property('categoryName', 'categories'),
 
   shareUrl: function(){
     var user = Discourse.get('currentUser');
-    return '/st/' + this.get('id') + (user ? '/' + user.get('id') : '');
-  }.property('id'),
+    return this.get('url') + (user ? '?u=' + user.get('username_lower') : '');
+  }.property('url'),
 
   url: function() {
     var slug = this.get('slug');
@@ -407,7 +407,16 @@ Discourse.Topic = Discourse.Model.extend({
     // If the post directly below's reply_to_post_number is our post number, it's
     // considered directly below.
     return (postBelow ? postBelow.get('reply_to_post_number') : void 0) === post.get('post_number');
-  }
+  },
+
+  hasExcerpt: function() {
+    return this.get('excerpt') && this.get('excerpt').length > 0;
+  }.property('excerpt'),
+
+  excerptTruncated: function() {
+    var e = this.get('excerpt');
+    return( e && e.substr(e.length - 8,8) === '&hellip;' );
+  }.property('excerpt')
 });
 
 Discourse.Topic.reopenClass({

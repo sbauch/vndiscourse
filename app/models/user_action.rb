@@ -11,7 +11,7 @@ class UserAction < ActiveRecord::Base
   WAS_LIKED = 2
   BOOKMARK = 3
   NEW_TOPIC = 4
-  POST = 5
+  REPLY = 5
   RESPONSE= 6
   MENTION = 7
   QUOTE = 9
@@ -25,7 +25,7 @@ class UserAction < ActiveRecord::Base
     GOT_PRIVATE_MESSAGE,
     BOOKMARK,
     NEW_TOPIC,
-    POST,
+    REPLY,
     RESPONSE,
     LIKE,
     WAS_LIKED,
@@ -35,31 +35,29 @@ class UserAction < ActiveRecord::Base
     EDIT
   ].each_with_index.to_a.flatten]
 
+
   def self.stats(user_id, guardian)
-    results = UserAction.select("action_type, COUNT(*) count, '' AS description")
-      .joins(:target_topic)
-      .where(user_id: user_id)
-      .group('action_type')
 
-    # We apply similar filters in stream, might consider trying to consolidate somehow
-    unless guardian.can_see_private_messages?(user_id)
-      results = results.where('topics.archetype <> ?', Archetype::private_message)
-    end
+    # Sam: I tried this in AR and it got complex
+    builder = UserAction.sql_builder <<SQL
 
-    unless guardian.user && guardian.user.id == user_id
-      results = results.where("action_type <> ?", BOOKMARK)
-    end
+    SELECT action_type, COUNT(*) count
+    FROM user_actions a
+    JOIN topics t ON t.id = a.target_topic_id
+    LEFT JOIN posts p on p.id = a.target_post_id
+    JOIN posts p2 on p2.topic_id = a.target_topic_id and p2.post_number = 1
+    LEFT JOIN categories c ON c.id = t.category_id
+    /*where*/
+    GROUP BY action_type
+SQL
 
-    unless guardian.can_see_deleted_posts?
-      results = results.where('topics.deleted_at IS NULL')
-    end
 
-    results = results.to_a
+    builder.where('a.user_id = :user_id', user_id: user_id)
 
+    apply_common_filters(builder, user_id, guardian)
+
+    results = builder.exec.to_a
     results.sort! { |a,b| ORDER[a.action_type] <=> ORDER[b.action_type] }
-    results.each do |row|
-      row.description = self.description(row.action_type, detailed: true)
-    end
 
     results
   end
@@ -83,6 +81,7 @@ class UserAction < ActiveRecord::Base
     builder = SqlBuilder.new("
 SELECT
   t.title, a.action_type, a.created_at, t.id topic_id,
+  a.user_id AS target_user_id, au.name AS target_name, au.username AS target_username,
   coalesce(p.post_number, 1) post_number,
   p.reply_to_post_number,
   pu.email ,pu.username, pu.name, pu.id user_id,
@@ -94,23 +93,15 @@ LEFT JOIN posts p on p.id = a.target_post_id
 JOIN posts p2 on p2.topic_id = a.target_topic_id and p2.post_number = 1
 JOIN users u on u.id = a.acting_user_id
 JOIN users pu on pu.id = COALESCE(p.user_id, t.user_id)
+JOIN users au on au.id = a.user_id
+LEFT JOIN categories c on c.id = t.category_id
 /*where*/
 /*order_by*/
 /*offset*/
 /*limit*/
 ")
 
-    unless guardian.can_see_deleted_posts?
-      builder.where("p.deleted_at is null and p2.deleted_at is null and t.deleted_at is null")
-    end
-
-    unless guardian.user && guardian.user.id == user_id
-      builder.where("a.action_type not in (#{BOOKMARK})")
-    end
-
-    if !guardian.can_see_private_messages?(user_id) || ignore_private_messages
-      builder.where("t.archetype != :archetype", archetype: Archetype::private_message)
-    end
+    apply_common_filters(builder, user_id, guardian, ignore_private_messages)
 
     if action_id
       builder.where("a.id = :id", id: action_id.to_i)
@@ -126,7 +117,6 @@ JOIN users pu on pu.id = COALESCE(p.user_id, t.user_id)
 
     data.each do |row|
       row["action_type"] = row["action_type"].to_i
-      row["description"] = self.description(row["action_type"])
       row["created_at"] = DateTime.parse(row["created_at"])
       # we should probably cache the excerpts in the db at some point
       row["excerpt"] = PrettyText.excerpt(row["cooked"],300) if row["cooked"]
@@ -139,60 +129,6 @@ JOIN users pu on pu.id = COALESCE(p.user_id, t.user_id)
     end
 
     data
-  end
-
-  def self.description(row, opts = {})
-    t = I18n.t('user_action_descriptions')
-    if opts[:detailed]
-      # will localize as soon as we stablize the names here
-      desc = case row.to_i
-      when BOOKMARK
-        t[:bookmarks]
-      when NEW_TOPIC
-        t[:topics]
-      when WAS_LIKED
-        t[:likes_received]
-      when LIKE
-        t[:likes_given]
-      when RESPONSE
-        t[:responses]
-      when POST
-        t[:posts]
-      when MENTION
-        t[:mentions]
-      when QUOTE
-        t[:quotes]
-      when EDIT
-        t[:edits]
-      when STAR
-        t[:favorites]
-      when NEW_PRIVATE_MESSAGE
-        t[:sent_items]
-      when GOT_PRIVATE_MESSAGE
-        t[:inbox]
-      end
-    else
-      desc =
-      case row.to_i
-      when NEW_TOPIC
-        then t[:posted]
-      when LIKE,WAS_LIKED
-        then t[:liked]
-      when RESPONSE,POST
-        then t[:responded_to]
-      when BOOKMARK
-        then t[:bookmarked]
-      when MENTION
-        then t[:mentioned]
-      when QUOTE
-        then t[:quoted]
-      when STAR
-        then t[:favorited]
-      when EDIT
-        then t[:edited]
-      end
-    end
-    desc
   end
 
   def self.log_action!(hash)
@@ -238,6 +174,34 @@ JOIN users pu on pu.id = COALESCE(p.user_id, t.user_id)
   end
 
   protected
+
+  def self.apply_common_filters(builder,user_id,guardian,ignore_private_messages=false)
+
+
+    unless guardian.can_see_deleted_posts?
+      builder.where("p.deleted_at is null and p2.deleted_at is null and t.deleted_at is null")
+    end
+
+    unless guardian.user && guardian.user.id == user_id
+      builder.where("a.action_type not in (#{BOOKMARK})")
+    end
+
+    if !guardian.can_see_private_messages?(user_id) || ignore_private_messages
+      builder.where("t.archetype != :archetype", archetype: Archetype::private_message)
+    end
+
+    unless guardian.is_moderator?
+      allowed = guardian.secure_category_ids
+      if allowed.present?
+        builder.where("( c.secure IS NULL OR
+                         c.secure = 'f' OR
+                        (c.secure = 't' and c.id in (:cats)) )", cats: guardian.secure_category_ids )
+      else
+        builder.where("(c.secure IS NULL OR c.secure = 'f')")
+      end
+    end
+  end
+
   def self.require_parameters(data, *params)
     params.each do |p|
       raise Discourse::InvalidParameters.new(p) if data[p].nil?

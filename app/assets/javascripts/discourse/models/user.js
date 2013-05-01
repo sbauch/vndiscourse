@@ -169,7 +169,7 @@ Discourse.User = Discourse.Model.extend({
     return Discourse.ajax(Discourse.getURL("/session/forgot_password"), {
       dataType: 'json',
       data: {
-        username: this.get('username')
+        login: this.get('username')
       },
       type: 'POST'
     });
@@ -373,6 +373,7 @@ Discourse.User = Discourse.Model.extend({
         var stat = Em.Object.create(s);
         stat.set('isPM', stat.get('action_type') === Discourse.UserAction.NEW_PRIVATE_MESSAGE ||
                          stat.get('action_type') === Discourse.UserAction.GOT_PRIVATE_MESSAGE);
+        stat.set('description', Em.String.i18n('user_action_groups.' + stat.get('action_type')));
         return stat;
       }));
 
@@ -432,7 +433,7 @@ Discourse.User.reopenClass({
           found = true;
           if (!g[k]) {
             g[k] = Em.Object.create({
-              description: Em.String.i18n("user_action_descriptions." + k),
+              description: Em.String.i18n("user_action_groups." + k),
               count: 0,
               action_type: parseInt(k, 10)
             });

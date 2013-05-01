@@ -38,7 +38,6 @@ class ApplicationController < ActionController::Base
 
   # Some exceptions
   class RenderEmpty < Exception; end
-  class NotLoggedIn < Exception; end
 
   # Render nothing unless we are an xhr request
   rescue_from RenderEmpty do
@@ -68,6 +67,8 @@ class ApplicationController < ActionController::Base
   rescue_from Discourse::NotFound do
     if !request.format || request.format.html?
       # for now do a simple remap, we may look at cleaner ways of doing the render
+      #
+      # Sam: I am confused about this, we need a comment that explains why this is conditional
       raise ActiveRecord::RecordNotFound
     else
       render file: 'public/404', formats: [:html], layout: false, status: 404
@@ -243,17 +244,13 @@ class ApplicationController < ActionController::Base
     alias :requires_parameter :requires_parameters
 
     def store_incoming_links
-      IncomingLink.add(request)
+      IncomingLink.add(request,current_user) unless request.xhr?
     end
 
     def check_xhr
       unless (controller_name == 'forums' || controller_name == 'user_open_ids')
         # bypass xhr check on PUT / POST / DELETE provided api key is there, otherwise calling api is annoying
-        if !request.get? && request["api_key"]
-          puts 'passed xhr'
-          return
-        end
-
+        return if !request.get? && request["api_key"] && SiteSetting.api_key_valid?(request["api_key"])
         raise RenderEmpty.new unless ((request.format && request.format.json?) || request.xhr?)
       end
     end
