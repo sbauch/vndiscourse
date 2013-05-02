@@ -21,6 +21,8 @@ class UserSerializer < BasicUserSerializer
              :teams,
              :position,
              :events_attended
+             :moderator,
+             :admin
 
 
   def self.private_attributes(*attrs)
