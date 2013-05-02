@@ -104,6 +104,15 @@ class PostCreator
 
       # Extract links
       TopicLink.extract_from(post)
+      
+      #Create hashtags
+      @opts[:raw].scan(/(#[A-Za-z0-9][A-Za-z0-9_]{2,20})/).flatten.each do |match|
+        term = match.gsub('#', '')
+        tag = Tag.find_or_create_by_term(term)
+        tag.count += 1
+        tag.save
+      end
+            
 
       # Store unique post key
       if SiteSetting.unique_posts_mins > 0

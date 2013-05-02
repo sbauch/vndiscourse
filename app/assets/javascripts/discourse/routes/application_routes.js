@@ -6,8 +6,7 @@
 **/
 Discourse.Route.buildRoutes(function() {
   var router = this;
-
-  // Topic routes
+	  // Topic routes
   this.resource('topic', { path: '/t/:slug/:id' }, function() {
     this.route('fromParams', { path: '/' });
     this.route('fromParams', { path: '/:nearPost' });

@@ -17,6 +17,7 @@ var debouncedSearch = Discourse.debouncePromise(function(term, topicId) {
       topic_id: topicId
     }
   }).then(function (r) {
+		console.log(r);
     cache[term] = r;
     cacheTime = new Date();
     return r;

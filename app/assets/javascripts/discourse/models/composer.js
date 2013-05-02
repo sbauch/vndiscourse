@@ -225,7 +225,6 @@ Discourse.Composer = Discourse.Model.extend({
     this.set('action', opts.action);
     this.set('topic', opts.topic);
     this.set('targetUsernames', opts.usernames);
-		console.log(this.get('targetUsernames'));
     if (opts.post) {
       this.set('post', opts.post);
       if (!this.get('topic')) {

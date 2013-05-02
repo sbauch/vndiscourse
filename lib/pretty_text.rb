@@ -60,6 +60,12 @@ module PrettyText
       username = username.downcase
       return User.exec_sql('select 1 from users where username_lower = ?', username).values.length == 1
     end
+    
+     def is_hashtag_valid(hashtag)
+      return false unless hashtag
+      return true
+    end
+    
   end
 
   @mutex = Mutex.new
@@ -125,10 +131,10 @@ module PrettyText
       v8['opts'] = opts || {}
       v8['raw'] = text
       v8.eval('opts["mentionLookup"] = function(u){return helpers.is_username_valid(u);}')
+      v8.eval('opts["hashtagLookup"] = function(u){return helpers.is_hashtag_valid(u);}')
       v8.eval('opts["lookupAvatar"] = function(p){return Discourse.Utilities.avatarImg({username: p, size: "tiny", avatarTemplate: helpers.avatar_template(p)});}')
       baked = v8.eval('Discourse.Markdown.markdownConverter(opts).makeHtml(raw)')
     end
-
     # we need some minimal server side stuff, apply CDN and TODO filter disallowed markup
     baked = apply_cdn(baked, Rails.configuration.action_controller.asset_host)
     baked

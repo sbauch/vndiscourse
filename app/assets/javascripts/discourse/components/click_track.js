@@ -16,6 +16,7 @@ Discourse.ClickTrack = {
   trackClick: function(e) {
     var $link = $(e.currentTarget);
     if ($link.hasClass('lightbox')) return true;
+		if ($link.hasClass('hashtag')) return true;
 
     e.preventDefault();
 

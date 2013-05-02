@@ -98,7 +98,7 @@ Discourse.Markdown = {
 
     var converter = new Markdown.Converter();
     var mentionLookup = opts.mentionLookup || Discourse.Mention.lookupCache;
-
+		var hashtagLookup = opts.hashtagLookup || Discourse.Hashtag.lookup;
     var quoteTemplate = null;
 
     // Before cooking callbacks
@@ -155,6 +155,14 @@ Discourse.Markdown = {
           return pre + "<span class='mention'>" + name + "</span>";
         }
       });
+
+			// add #hashtags
+      text = text.replace(/(\W)(#[A-Za-z0-9][A-Za-z0-9_]{2,14})(?=\W)/g, function(x, pre, name) {
+				if (hashtagLookup(name)) {
+          return pre + "<a href='" + Discourse.getURL("/tags/") + (name) + "' class='mention hashtag'>" + name + "</a>";
+   			}
+				 else{ return pre + "<span class=''>" + name + "</span>"}
+ 				});
 
       // a primitive attempt at oneboxing, this regex gives me much eye sores
       text = text.replace(/(<li>)?((<p>|<br>)[\s\n\r]*)(<a href=["]([^"]+)[^>]*)>([^<]+<\/a>[\s\n\r]*(?=<\/p>|<br>))/gi, function() {

@@ -155,6 +155,9 @@ Discourse.ComposerView = Discourse.View.extend({
     $('span.mention', $wmdPreview).each(function(i, e) {
       Discourse.Mention.load(e, refresh);
     });
+		$('span.hashtag', $wmdPreview).each(function(i, e) {
+      Discourse.Hashtag.load(e, refresh);
+    });
   }, 100),
 
   initEditor: function() {
@@ -168,6 +171,7 @@ Discourse.ComposerView = Discourse.View.extend({
     $LAB.script(assetPath('defer/html-sanitizer-bundle'));
     Discourse.ComposerView.trigger("initWmdEditor");
     template = Discourse.UserSelector.templateFunction();
+		var hashtag_template = Discourse.HashtagSelector.templateFunction();
 
     transformTemplate = Handlebars.compile("{{avatar this imageSize=\"tiny\"}} {{this.username}}");
     $wmdInput.data('init', true);
@@ -181,6 +185,17 @@ Discourse.ComposerView = Discourse.View.extend({
       },
       key: "@",
       transformComplete: function(v) { return v.username; }
+    });
+
+		$wmdInput.autocomplete({
+      template: hashtag_template,
+      dataSource: function(term) {
+        return Discourse.HashtagSearch.search({
+          term: term
+        });
+      },
+      key: "#",
+      transformComplete: function(v) { return v.term; }
     });
 
     topic = this.get('topic');
