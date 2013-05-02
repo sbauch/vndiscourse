@@ -135,7 +135,7 @@
 {{render share}}
 {{render quoteButton}}
 
-{{#if Discourse.currentUser.admin}}
+{{#if Discourse.currentUser.moderator}}
   {{render topicAdminMenu content}}
 {{/if}}
 {{#if event_menu}}
