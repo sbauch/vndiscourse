@@ -43,7 +43,19 @@ Discourse.TopicFooterButtonsView = Ember.ContainerView.extend({
 						textKey: (function() {
 	          	return 'topic.rsvp.' + this.get('controller.content.user_rsvp_status') + '.text';
 	        	}).property('controller.content.user_rsvp_status'),
-						
+      if (!topic.get('isPrivateMessage')) {
+
+        // We hide some controls from private messages
+        if (this.get('topic.can_invite_to')) {
+          this.addObject(Discourse.ButtonView.createWithMixins({
+            textKey: 'topic.invite_reply.title',
+            helpKey: 'topic.invite_reply.help',
+            attributeBindings: ['disabled'],
+
+            disabled: function(){
+              return this.get('controller.content.archived') || this.get('controller.content.closed');
+            }.property('controller.content.archived', 'controller.content.closed'),
+
             renderIcon: function(buffer) {
 							// return = (function() {
 							switch (this.get('controller.content.user_rsvp_status')) {
