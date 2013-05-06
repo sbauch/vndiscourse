@@ -8,6 +8,11 @@
 **/
 Discourse.Category = Discourse.Model.extend({
 
+  init: function() {
+    this._super();
+    if (!this.get('id') && this.get('name')) this.set('is_uncategorized', true);
+  },
+
   url: function() {
     return Discourse.getURL("/category/") + (this.get('slug'));
   }.property('name'),

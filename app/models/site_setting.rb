@@ -26,6 +26,7 @@ class SiteSetting < ActiveRecord::Base
   client_setting(:track_external_right_clicks, false)
   client_setting(:must_approve_users, false)
   client_setting(:ga_tracking_code, "")
+  client_setting(:ga_domain_name, "")
   client_setting(:new_topics_rollup, 1)
   client_setting(:enable_long_polling, true)
   client_setting(:polling_interval, 3000)
@@ -86,6 +87,8 @@ class SiteSetting < ActiveRecord::Base
   setting(:newuser_max_mentions_per_post, 2)
 
   setting(:uncategorized_name, 'uncategorized')
+  setting(:uncategorized_color, 'AB9364');
+  setting(:uncategorized_text_color, 'FFFFFF');
 
   setting(:unique_posts_mins, Rails.env.test? ? 0 : 5)
 

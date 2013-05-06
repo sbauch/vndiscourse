@@ -461,7 +461,8 @@ fr:
     traditional_markdown_linebreaks: "Utiliser le retour à la ligne traditionnel dans markdown, le wrapping est implicite sauf si suivi de 2 espaces"
     post_undo_action_window_mins: "La fenêtre dans laquelle chacun peut annuler une action sur un message (comme signaler)"
     must_approve_users: "Les propriétaires du forum doivent approuver les utilisateurs avant qu'il y aient accès."
-    ga_tracking_code: "Code de suivi de Google Analytics, voir: http://google.com/analytics"
+    ga_tracking_code: "Code de suivi de Google Analytics, par exemple : UA-12345678-9, voir: http://google.com/analytics"
+    ga_domain_name: "Domaine de suivi de Google Analytics, par exemple : monsite.com, voir: http://google.com/analytics"
     top_menu: "L'ordre des éléments dans le menu du haut. Exemple populaire|lus|favoris|non lus|nouveaux|posté|categories"
     post_menu: "L'ordre des éléments dans le menu de rédaction"
     share_links: "Liste ordonnée des boutons de partage. Exemple : twitter|facebook|google+"
@@ -506,6 +507,9 @@ fr:
     previous_visit_timeout_hours: "Combien de temps dure une visite avant de la considérer comme la visite 'précédente', en heures."
 
     uncategorized_name: "Nom pour les discussions sans catégorie dans la liste des catégories"
+    uncategorized_color: "La couleur du badge de la catégorie des discussions qui ne sont dans aucune catégorie"
+    uncategorized_text_color: "La couleur du text du badge de la catégorie des discussions qui ne sont dans aucune catégorie"
+
     newuser_max_links: "Nombre maximum de liens qu'un visiteur peut ajouter à un message"
     newuser_max_images: "Nombre maximum d'images qu'un visiteur peut ajouter à un message"
     newuser_max_mentions_per_post: "Nombre maximum de référence à un @utilisateur qu'un visiteur peut ajouter à un message"

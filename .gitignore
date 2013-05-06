@@ -88,3 +88,6 @@ config/version.rb
 # ignore the Ruby Version manager (rvm)
 >>>>>>> f980b4d16e786ac3909b11d5f1926fdd735464ef
 .rvmrc
+.ruby-version
+.ruby-gemset
+.rbenv
