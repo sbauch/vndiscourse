@@ -20,7 +20,7 @@ class UserSerializer < BasicUserSerializer
              :fact_three,
              :teams,
              :position,
-             :events_attended
+             :events_attended,
              :moderator,
              :admin
 
