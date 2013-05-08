@@ -72,7 +72,7 @@ gem 'diffy'
 
 # Gem that enables support for plugins. It is required.
 gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
-gem 'dicsourse_hashtags', path: 'vendor/gems/discourse_hashtags'
+#gem 'dicsourse_hashtags', path: 'vendor/gems/discourse_hashtags'
 
 # Discourse Plugins (optional)
 # Polls and Tasks have been disabled for launch, we need think all sorts of stuff through before adding them back in
