@@ -25,11 +25,12 @@ class Group < ActiveRecord::Base
     id = AUTO_GROUPS[name]
 
     unless group = self[name]
-      group = Group.new(name: name.to_s, automatic: true)
+      group = Group.new(name: "", automatic: true)
       group.id = id
       group.save!
     end
 
+    group.name = I18n.t("groups.default_names.#{name}")
 
     real_ids = case name
                when :admins
@@ -55,9 +56,15 @@ class Group < ActiveRecord::Base
     end
 
     group.save!
+
+    # we want to ensure consistency
+    Group.reset_counters(group.id, :group_users)
   end
 
   def self.refresh_automatic_groups!(*args)
+    if args.length == 0
+      args = AUTO_GROUPS.map{|k,v| k}
+    end
     args.each do |group|
       refresh_automatic_group!(group)
     end
@@ -76,8 +83,8 @@ class Group < ActiveRecord::Base
     GroupUser.where(group_id: trust_group_ids, user_id: user_id).delete_all
 
     if group = Group[name]
-      group_users.build(user_id: user_id)
-      group_users.save!
+      group.group_users.build(user_id: user_id)
+      group.save!
     else
       refresh_automatic_group!(name)
     end

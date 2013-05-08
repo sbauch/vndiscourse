@@ -132,7 +132,7 @@ class PostsController < ApplicationController
   def recover
     post = find_post_from_params
     guardian.ensure_can_recover_post!(post)
-    post.recover
+    post.recover!
     render nothing: true
   end
 
@@ -190,8 +190,8 @@ class PostsController < ApplicationController
     def find_post_from_params
       finder = Post.where(id: params[:id] || params[:post_id])
 
-      # Include deleted posts if the user is a moderator
-      finder = finder.with_deleted if current_user.try(:moderator?)
+      # Include deleted posts if the user is staff
+      finder = finder.with_deleted if current_user.try(:staff?)
 
       post = finder.first
       guardian.ensure_can_see!(post)

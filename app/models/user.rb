@@ -515,11 +515,11 @@ class User < ActiveRecord::Base
 
     posts.order("post_number desc").each do |p|
       if p.post_number == 1
-        p.topic.destroy
+        p.topic.trash!
         # TODO: But the post is not destroyed. Why?
       else
         # TODO: This should be using the PostDestroyer!
-        p.destroy
+        p.trash!
       end
     end
   end
@@ -562,6 +562,21 @@ class User < ActiveRecord::Base
 
   def email_confirmed?
     email_tokens.where(email: email, confirmed: true).present? || email_tokens.empty?
+  end
+
+  def activate
+    email_token = self.email_tokens.active.first
+    if email_token
+      EmailToken.confirm(email_token.token)
+    else
+      self.active = true
+      save
+    end
+  end
+
+  def deactivate
+    self.active = false
+    save
   end
 
   def treat_as_new_topic_start_date
