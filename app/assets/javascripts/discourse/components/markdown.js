@@ -157,7 +157,7 @@ Discourse.Markdown = {
       });
 
 			// add #hashtags
-      text = text.replace(/(\W)(#[A-Za-z0-9][A-Za-z0-9_]{2,14})(?=\W)/g, function(x, pre, name) {
+      text = text.replace(/(\W)(#[A-Za-z0-9][A-Za-z0-9_])(?=\W)/g, function(x, pre, name) {
 				if (hashtagLookup(name)) {
           return pre + "<a href='" + Discourse.getURL("/tags/") + (name) + "' class='mention hashtag'>" + name + "</a>";
    			}
