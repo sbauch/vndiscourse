@@ -50,6 +50,12 @@ en:
     saving: "Saving..."
     saved: "Saved!"
 
+    choose_topic:
+      none_found: "No topics found."
+      title:
+        search: "Search for a Topic:"
+        placeholder: "type the topic title here"
+
     user_action:
       user_posted_topic: "<a href='{{userUrl}}'>{{user}}</a> posted <a href='{{topicUrl}}'>the topic</a>"
       you_posted_topic: "<a href='{{userUrl}}'>You</a> posted <a href='{{topicUrl}}'>the topic</a>"
@@ -591,11 +597,23 @@ en:
 
       move_selected:
         title: "Move Selected Posts"
-        topic_name: "New Topic Name:"
         error: "Sorry, there was an error moving those posts."
         instructions:
-          one: "You are about to create a new topic and populate it with the post you've selected."
-          other: "You are about to create a new topic and populate it with the <b>{{count}}</b> posts you've selected."
+          one: "How would you like to move this post?"
+          other: "How would you like to move the <b>{{count}}</b> posts you've created?"
+
+        new_topic:
+          title: "Move Selected Posts to a New Topic"
+          topic_name: "New Topic Name:"
+          instructions:
+            one: "You are about to create a new topic and populate it with the post you've selected."
+            other: "You are about to create a new topic and populate it with the <b>{{count}}</b> posts you've selected."
+
+        existing_topic:
+          title: "Move Selected Posts to an Existing Topic"
+          instructions:
+            one: "Please choose the topic you'd like to move that post to."
+            other: "Please choose the topic you'd like to move those <b>{{count}}</b> posts to."
 
       multi_select:
         select: 'select'
@@ -776,6 +794,11 @@ en:
       change_in_category_topic: "Edit Description"
       hotness: "Hotness"
       already_used: 'This color has been used by another category'
+      is_secure: "Secure category?"
+      add_group: "Add Group"
+      security: "Security"
+      allowed_groups: "Allowed Groups:"
+
 
     flagging:
       title: 'Why are you flagging this post?'
@@ -922,11 +945,13 @@ en:
         delete_title: "delete post (if its the first post delete topic)"
         flagged_by: "Flagged by"
         error: "Something went wrong"
+        view_message: "view message"
 
       groups:
         title: "Groups"
         edit: "Edit Groups"
         selector_placeholder: "add users"
+        name_placeholder: "Group name, no spaces, same as username rule"
 
       api:
         title: "API"
