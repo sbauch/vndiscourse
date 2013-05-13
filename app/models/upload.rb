@@ -49,7 +49,7 @@ class Upload < ActiveRecord::Base
 
     remote_filename = "#{sha1[2..-1]}.#{image_info.type}"
     path = "/uploads/#{sha1[0]}/#{sha1[1]}"
-    location = "#{SiteSetting.s3_upload_bucket}#{path}"
+    location = "#{SiteSetting.s3_upload_bucket}"
     directory = fog.directories.create(key: location)
 
     file = directory.files.create(key: remote_filename,
@@ -58,7 +58,7 @@ class Upload < ActiveRecord::Base
                                   content_type: file.content_type)
     upload.width, upload.height = ImageSizer.resize(*image_info.size)
 
-    upload.url = "//s3.amazonaws.com/vaynermedia-vaynernet-gifs-development" #{path}/#{remote_filename}"
+    upload.url = "//s3.amazonaws.com/vaynermedia-vaynernet-gifs-development#{path}/#{remote_filename}"
     # upload.url = "//#{SiteSetting.s3_upload_bucket}.s3.amazonaws.com#{path}/#{remote_filename}" # THEIRS. Had trouble with this.
 
     upload.save
