@@ -151,8 +151,10 @@ class Users::OmniauthCallbacksController < ApplicationController
 
     # If the auth supplies a name / username, use those. Otherwise start with email.
     name = data[:name] || data[:email]
-    username = data[:nickname] || data[:email]
-
+    username = (data[:nickname] || data[:email]).gsub(/(\W|\d)/,'')
+    
+    
+    
     resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{email.downcase}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
     user_open_id = UserOpenId.find_by_url(identity_url)
 
