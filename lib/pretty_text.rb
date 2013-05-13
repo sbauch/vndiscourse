@@ -7,7 +7,7 @@ module PrettyText
     {
       elements: %w[
         a abbr aside b bdo blockquote br caption cite code col colgroup dd div del dfn dl
-        dt em hr figcaption figure h1 h2 h3 h4 h5 h6 hgroup i img ins kbd li mark
+        dt em hr figcaption figure h1 h2 h3 h4 h5 h6 hgroup i iframe img ins kbd li mark
         ol p pre q rp rt ruby s samp small span strike strong sub sup table tbody td
         tfoot th thead time tr u ul var wbr
       ],
@@ -71,7 +71,7 @@ module PrettyText
   @mutex = Mutex.new
 
   def self.mention_matcher
-    Regexp.new("(\@[a-zA-Z0-9_]{#{User.username_length.begin},#{User.username_length.end}})")
+    Regexp.new("(\@[a-zA-Z0-9_])")
   end
 
   def self.app_root
