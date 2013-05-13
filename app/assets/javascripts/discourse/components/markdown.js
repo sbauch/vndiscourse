@@ -148,7 +148,7 @@ Discourse.Markdown = {
       });
 
       // add @username mentions, if valid; must be bounded on left and right by non-word characters
-      text = text.replace(/(\W)(@[A-Za-z0-9][A-Za-z0-9_])(?=\W)/g, function(x, pre, name) {
+      text = text.replace(/(\W)(@[A-Za-z0-9][A-Za-z0-9_]{2,30})(?=\W)/g, function(x, pre, name) {
         if (mentionLookup(name.substr(1))) {
           return pre + "<a href='" + Discourse.getURL("/users/") + (name.substr(1).toLowerCase()) + "' class='mention'>" + name + "</a>";
         } else {
@@ -157,7 +157,7 @@ Discourse.Markdown = {
       });
 
 			// add #hashtags
-      text = text.replace(/(\W)(#[A-Za-z0-9][A-Za-z0-9_])(?=\W)/g, function(x, pre, name) {
+      text = text.replace(/(\W)(#[A-Za-z0-9][A-Za-z0-9_]{2,30})(?=\W)/g, function(x, pre, name) {
 				if (hashtagLookup(name)) {
           return pre + "<a href='" + Discourse.getURL("/tags/") + (name) + "' class='mention hashtag'>" + name + "</a>";
    			}
