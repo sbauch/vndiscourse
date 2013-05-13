@@ -40,7 +40,7 @@ class Upload < ActiveRecord::Base
                         filesize: File.size(tempfile),
                         original_filename: file.original_filename)
 
-    image_info = FastImage.new(tempfile, raise_on_failure: true)
+    image_info = FastImage.new(tempfile)
     blob = file.read
     sha1 = Digest::SHA1.hexdigest(blob)
 
