@@ -164,8 +164,19 @@ class UsersController < ApplicationController
       }
       return render(json: honey_pot_response)
     end
-
+    
     user = User.new_from_params(params)
+    
+    resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{user.email.downcase}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
+        
+    user.update_attributes(:teams => resp['teams'], 
+                               :position => resp['function'],
+                               :short_position => VmUserService.short_position(resp['function']))
+    if user.fact_one.nil?                        
+       user.update_attributes(:fact_one => resp['fact_one'], 
+                               :fact_two => resp['fact_two'],
+                               :fact_three => resp['fact_three'])
+    end
 
     auth = session[:authentication]
     puts 'auth' + auth.to_s

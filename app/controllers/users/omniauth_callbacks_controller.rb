@@ -154,7 +154,6 @@ class Users::OmniauthCallbacksController < ApplicationController
     username = data[:nickname] || data[:email]
 
     resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{email.downcase}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
-
     user_open_id = UserOpenId.find_by_url(identity_url)
 
     if user_open_id.blank? && user = User.find_by_email(email)
@@ -170,15 +169,6 @@ class Users::OmniauthCallbacksController < ApplicationController
       # If we have to approve users
       if Guardian.new(user).can_access_forum?
         log_on_user(user)
-        
-        user.update_attributes(:teams => resp['teams'], 
-                               :position => resp['function'],
-                               :short_position => VmUserService.short_position(resp['function']))
-        if user.fact_one.nil?                        
-          user.update_attributes(:fact_one => resp['fact_one'], 
-                                 :fact_two => resp['fact_two'],
-                                 :fact_three => resp['fact_three'])
-        end
         
         @data = {authenticated: true}
       else
