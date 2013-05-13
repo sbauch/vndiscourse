@@ -179,7 +179,7 @@ class Users::OmniauthCallbacksController < ApplicationController
       @data = {
         email: email,
         name: resp['full_name'],
-        username: resp['full_name'].gsub(' ',''),
+        username: resp['full_name'].gsub(/(\W|\d)/,''),
         email_valid: true ,
         auth_provider: data[:provider] || params[:provider].try(:capitalize),
         teams: resp['teams'], 
