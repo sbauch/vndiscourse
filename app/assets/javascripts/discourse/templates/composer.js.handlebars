@@ -24,19 +24,24 @@
     {{#if content.viewOpen}}
       <div class='control-row reply-area'>
         <div class='reply-to'>{{{content.actionTitle}}}:</div>
-          {{#if content.editTitle}}
-            <div class='form-element clearfix'>
-                {{#if content.creatingPrivateMessage}}
-                  {{view Discourse.UserSelector topicIdBinding="controller.controllers.topic.content.id" excludeCurrentUser="true" id="private-message-users" class="span8" placeholderKey="composer.users_placeholder" tabindex="1" usernamesBinding="content.targetUsernames"}}
-                {{/if}}
-                {{view Discourse.TextField valueBinding="content.title" tabindex="2" id="reply-title" maxlength="255" class="span8" placeholderKey="composer.title_placeholder"}}
-                {{#unless content.creatingPrivateMessage}}
-                  {{view Discourse.ComboboxViewCategory valueAttribute="name" contentBinding="Discourse.site.composerCategories" valueBinding="content.categoryName"}}
-                  {{#if content.archetype.hasOptions}}
-                    <button class='btn' {{action showOptions target="controller"}}>{{i18n topic.options}}</button>
-                  {{/if}}
-                {{/unless}}
-            </div>
+
+        {{#if content.editTitle}}
+          <div class='form-element clearfix'>
+            {{#if content.creatingPrivateMessage}}
+              {{view Discourse.UserSelector topicIdBinding="controller.controllers.topic.content.id" excludeCurrentUser="true" id="private-message-users" class="span8" placeholderKey="composer.users_placeholder" tabindex="1" usernamesBinding="content.targetUsernames"}}
+            {{/if}}
+            {{view Discourse.TextField valueBinding="content.title" tabindex="2" id="reply-title" maxlength="255" class="span8" placeholderKey="composer.title_placeholder"}}
+            {{#unless content.creatingPrivateMessage}}
+              {{view Discourse.ComboboxViewCategory valueAttribute="name" contentBinding="Discourse.site.categories" valueBinding="content.categoryName"}}
+              {{#if content.archetype.hasOptions}}
+                <button class='btn' {{action showOptions target="controller"}}>{{i18n topic.options}}</button>
+              {{/if}}
+              {{#if content.showAdminOptions}}
+                <button {{action toggleAdminOptions target="view"}} class="btn no-text" title='{{i18n composer.admin_options_title}}'><i class="icon icon-wrench"></i></button>
+              {{/if}}
+            {{/unless}}
+          </div>
+
           <div class="admin-options-form">
             <div class="auto-close-fields">
               <i class="icon icon-time"></i>
@@ -88,7 +93,9 @@
             {{i18n composer.saved_draft}}
           </div>
         </div>
+
       </div>
     {{/if}}
+
   </div>
 </div>
