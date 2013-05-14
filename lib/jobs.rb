@@ -100,6 +100,36 @@ module Jobs
   def self.enqueue_in(secs, job_name, opts={})
     enqueue(job_name, opts.merge!(delay_for: secs))
   end
+
+
+  def self.enqueue_at(datetime, job_name, opts={})
+    enqueue_in( [(datetime - Time.zone.now).to_i, 0].max, job_name, opts )
+  end
+
+  # TODO: should take job_name like enqueue methods
+  def self.cancel_scheduled_job(job_name, params={})
+    job_class = "Jobs::#{job_name.to_s.camelcase}"
+    matched = true
+    Sidekiq::ScheduledSet.new.each do |scheduled_job|
+      if scheduled_job.klass == 'Sidekiq::Extensions::DelayedClass'
+        job_args = YAML.load(scheduled_job.args[0])
+        if job_args[0] == job_class
+          next unless job_args[2] and job_args[2][0]
+          matched = true
+          params.each do |key, value|
+            unless job_args[2][0][key] == value
+              matched = false
+              break
+            end
+          end
+          next unless matched
+        end
+        scheduled_job.delete
+        break
+      end
+    end
+    matched
+  end
 end
 # Require all jobs
 Dir["#{Rails.root}/lib/jobs/*"].each {|file| require_dependency file }

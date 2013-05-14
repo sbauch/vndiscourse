@@ -68,7 +68,7 @@ gem 'slim'  # required for sidekiq-web
 gem 'therubyracer', require: 'v8'
 gem 'thin'
 gem 'httparty'
-gem 'diffy'
+gem 'diffy', require: false
 
 # Gem that enables support for plugins. It is required.
 gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
@@ -94,27 +94,29 @@ group :assets do
 end
 
 group :test do
-  gem 'fakeweb', '~> 1.3.0'
-  gem 'minitest'
+  gem 'fakeweb', '~> 1.3.0', require: false
+  gem 'minitest', require: false
 end
 
 group :test, :development do
   gem 'jshint_on_rails'
-  gem 'guard-jshint-on-rails'
-  gem 'certified'
-  gem 'fabrication'
-  gem 'guard-jasmine'
-  gem 'guard-rspec'
-  gem 'guard-spork'
+  gem 'listen', require: false
+  gem 'guard-jshint-on-rails', require: false
+  gem 'certified', require: false
+  gem 'fabrication', require: false
+  gem 'guard-jasmine', require: false
+  gem 'guard-rspec', require: false
+  gem 'guard-spork', require: false
   gem 'jasminerice'
   gem 'mocha', require: false
-  gem 'rb-fsevent'
-  gem 'rb-inotify', '~> 0.9', require: RUBY_PLATFORM.include?('linux') && 'rb-inotify'
-  gem 'rspec-rails'
-  gem 'shoulda'
+  gem 'rb-fsevent', require: RUBY_PLATFORM =~ /darwin/i ? 'rb-fsevent' : false
+  gem 'rb-inotify', '~> 0.9', require: RUBY_PLATFORM =~ /linux/i ? 'rb-inotify' : false
+  gem 'rspec-rails', require: false
+  gem 'shoulda', require: false
   gem 'simplecov', require: false
-  gem 'terminal-notifier-guard', require: RUBY_PLATFORM.include?('darwin') && 'terminal-notifier-guard'
   gem 'railroady'
+  gem 'terminal-notifier-guard', require: false
+  gem 'timecop'
 end
 
 group :development do

@@ -19,7 +19,9 @@ class TopicViewSerializer < ApplicationSerializer
      :has_best_of,
      :archetype,
      :slug,
-     :location]
+     :location,
+     :auto_close_at]
+
   end
 
   def self.guardian_attributes

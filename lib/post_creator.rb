@@ -11,6 +11,9 @@ class PostCreator
   #   raw                     - raw text of post
   #   image_sizes             - We can pass a list of the sizes of images in the post as a shortcut.
   #   invalidate_oneboxes     - Whether to force invalidation of oneboxes in this post
+  #   acting_user             - The user performing the action might be different than the user
+  #                             who is the post "author." For example when copying posts to a new
+  #                             topic.
   #
   #   When replying to a topic:
   #     topic_id              - topic we're replying to
@@ -53,6 +56,11 @@ class PostCreator
 
         topic = Topic.new(topic_params)
 
+        if @opts[:auto_close_days]
+          guardian.ensure_can_moderate!(topic)
+          topic.auto_close_days = @opts[:auto_close_days]
+        end
+
         if @opts[:archetype] == Archetype.private_message
 
           topic.subtype = TopicSubtype.user_to_user unless topic.subtype
@@ -92,6 +100,7 @@ class PostCreator
       post.post_type = @opts[:post_type] if @opts[:post_type].present?
       post.no_bump = @opts[:no_bump] if @opts[:no_bump].present?
       post.extract_quoted_post_numbers
+      post.acting_user = @opts[:acting_user] if @opts[:acting_user].present?
 
       post.image_sizes = @opts[:image_sizes] if @opts[:image_sizes].present?
       post.invalidate_oneboxes = @opts[:invalidate_oneboxes] if @opts[:invalidate_oneboxes].present?
@@ -122,6 +131,8 @@ class PostCreator
         topic.allowed_users.where(["users.email_private_messages = true and users.id != ?", @user.id]).each do |u|
           Jobs.enqueue_in(SiteSetting.email_time_window_mins.minutes, :user_email, type: :private_message, user_id: u.id, post_id: post.id)
         end
+
+        clear_possible_flags(topic) if post.post_number > 1 && topic.user_id != post.user_id
       end
 
       # Track the topic
@@ -164,6 +175,25 @@ class PostCreator
   end
 
   protected
+
+  def clear_possible_flags(topic)
+    # at this point we know the topic is a PM and has been replied to ... check if we need to clear any flags
+    #
+    first_post = Post.select(:id).where(topic_id: topic.id).where('post_number = 1').first
+    post_action = nil
+
+    if first_post
+      post_action = PostAction.where(
+        related_post_id: first_post.id,
+        deleted_at: nil,
+        post_action_type_id: PostActionType.types[:notify_moderators]
+      ).first
+    end
+
+    if post_action
+      post_action.remove_act!(@user)
+    end
+  end
 
   def add_users(topic, usernames)
     return unless usernames

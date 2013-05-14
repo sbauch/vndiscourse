@@ -4,6 +4,10 @@ require 'topic_subtype'
 
 describe PostCreator do
 
+  before do
+    ActiveRecord::Base.observers.enable :all
+  end
+
   let(:user) { Fabricate(:user) }
 
   it 'raises an error without a raw value' do
@@ -98,6 +102,14 @@ describe PostCreator do
       end
     end
 
+    context 'when auto-close param is given' do
+      it 'ensures the user can auto-close the topic' do
+        Guardian.any_instance.stubs(:can_moderate?).returns(false)
+        expect {
+          PostCreator.new(user, basic_topic_params.merge(auto_close_days: 2)).create
+        }.to raise_error(Discourse::InvalidAccess)
+      end
+    end
   end
 
   context 'uniqueness' do

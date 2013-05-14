@@ -73,6 +73,9 @@
           {{else}}
             {{#if view.fullyLoaded}}
               <div style='margin-left: 103px;'>{{gcal}}</div>
+
+              {{view Discourse.TopicClosingView topicBinding="controller.content"}}
+
               {{view Discourse.TopicFooterButtonsView topicBinding="controller.content"}}
 
               {{#if controller.content.suggested_topics.length}}
