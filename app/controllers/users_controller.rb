@@ -167,6 +167,8 @@ class UsersController < ApplicationController
     
     user = User.new_from_params(params)
     
+    user.username = params[:username].gsub(/(\W|\d)/,'')
+    
     resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{user.email.downcase}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
         
     user.update_attributes(:teams => resp['teams'], 
