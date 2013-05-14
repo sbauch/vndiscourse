@@ -9,6 +9,7 @@ require_dependency 'trashable'
 class Topic < ActiveRecord::Base
   include ActionView::Helpers
   include RateLimiter::OnCreateRecord
+  include ActiveModel::Dirty
   include Trashable
 
   def self.max_sort_order
