@@ -66,7 +66,7 @@ en:
     choose_topic:
       none_found: "No topics found."
       title:
-        search: "Search for a Topic:"
+        search: "Search for a Topic by name, url or id:"
         placeholder: "type the topic title here"
 
     user_action:
@@ -548,7 +548,7 @@ en:
         invisible: "Make Invisible"
         visible: "Make Visible"
         reset_read: "Reset Read Data"
-        multi_select: "Toggle Multi-Select"
+        multi_select: "Select Posts to Merge/Split"
         convert_to_topic: "Convert to Regular Topic"
 
       reply:
@@ -624,7 +624,7 @@ en:
         error: "Sorry, there was an error moving those posts."
         instructions:
           one: "How would you like to move this post?"
-          other: "How would you like to move the <b>{{count}}</b> posts you've created?"
+          other: "How would you like to move the <b>{{count}}</b> posts you've selected?"
 
         new_topic:
           title: "Move Selected Posts to a New Topic"
@@ -1088,10 +1088,10 @@ en:
 
       site_content:
         none: "Choose a type of content to begin editing."
-        title: 'Site Content'
+        title: 'Content'
         edit: "Edit Site Content"
 
       site_settings:
         show_overriden: 'Only show overridden'
-        title: 'Site Settings'
+        title: 'Settings'
         reset: 'reset to default'

@@ -90,7 +90,7 @@ describe Notification do
   describe 'message bus' do
 
     it 'updates the notification count on create' do
-      MessageBusObserver.any_instance.expects(:refresh_notification_count).with(instance_of(Notification))
+      Notification.any_instance.expects(:refresh_notification_count).returns(nil)
       Fabricate(:notification)
     end
 
@@ -99,7 +99,7 @@ describe Notification do
       let!(:notification) { Fabricate(:notification) }
 
       it 'updates the notification count on destroy' do
-        MessageBusObserver.any_instance.expects(:refresh_notification_count).with(instance_of(Notification))
+        Notification.any_instance.expects(:refresh_notification_count).returns(nil)
         notification.destroy
       end
 
@@ -161,6 +161,33 @@ describe Notification do
     end
   end
 
+  describe 'saw_regular_notification_id' do
+    it 'correctly updates the read state' do
+      user = Fabricate(:user)
+
+      pm = Notification.create!(read: false,
+                           user_id: user.id,
+                           topic_id: 2,
+                           post_number: 1,
+                           data: '[]',
+                           notification_type: Notification.types[:private_message])
+
+      other = Notification.create!(read: false,
+                           user_id: user.id,
+                           topic_id: 2,
+                           post_number: 1,
+                           data: '[]',
+                           notification_type: Notification.types[:mentioned])
+
+
+      user.saw_notification_id(other.id)
+      user.reload
+
+      user.unread_notifications.should == 0
+      user.unread_private_messages.should == 1
+    end
+  end
+
   describe 'mark_posts_read' do
     it "marks multiple posts as read if needed" do
       user = Fabricate(:user)
@@ -171,6 +198,29 @@ describe Notification do
       Notification.create!(read: true, user_id: user.id, topic_id: 2, post_number: 4, data: '[]', notification_type: 1)
 
       Notification.mark_posts_read(user,2,[1,2,3,4]).should == 3
+    end
+  end
+
+  describe 'ensure consistency' do
+    it 'deletes notifications if post is missing or deleted' do
+
+      ActiveRecord::Base.observers.disable :all
+      p = Fabricate(:post)
+      p2 = Fabricate(:post)
+
+      Notification.create!(read: false, user_id: p.user_id, topic_id: p.topic_id, post_number: p.post_number, data: '[]',
+                           notification_type: Notification.types[:private_message])
+      Notification.create!(read: false, user_id: p2.user_id, topic_id: p2.topic_id, post_number: p2.post_number, data: '[]',
+                           notification_type: Notification.types[:private_message])
+
+      Notification.create!(read: false, user_id: p2.user_id, topic_id: p2.topic_id, post_number: p2.post_number, data: '[]',
+                           notification_type: Notification.types[:liked])
+      p2.trash!
+
+      # we may want to make notification "trashable" but for now we nuke pm notifications from deleted topics/posts
+      Notification.ensure_consistency!
+
+      Notification.count.should == 2
     end
   end
 
