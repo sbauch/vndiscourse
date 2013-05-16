@@ -52,50 +52,6 @@ class PostCreator
 
     Post.transaction do
       if @opts[:topic_id].blank?
-        topic_params = {title: @opts[:title], user_id: @user.id, last_post_user_id: @user.id}
-        topic_params[:archetype] = @opts[:archetype] if @opts[:archetype].present?
-        topic_params[:subtype] = @opts[:subtype] if @opts[:subtype].present?
-
-        guardian.ensure_can_create!(Topic)
-
-        category = Category.where(name: @opts[:category]).first
-        topic_params[:category_id] = category.id if category.present?
-        topic_params[:meta_data] = @opts[:meta_data] if @opts[:meta_data].present?
-
-        topic = Topic.new(topic_params)
-
-        if @opts[:auto_close_days]
-          guardian.ensure_can_moderate!(topic)
-          topic.auto_close_days = @opts[:auto_close_days]
-        end
-
-        if @opts[:archetype] == Archetype.private_message
-
-          topic.subtype = TopicSubtype.user_to_user unless topic.subtype
-
-          unless @opts[:target_usernames].present? || @opts[:target_group_names].present?
-            topic.errors.add(:archetype, :cant_send_pm)
-            @errors = topic.errors
-            raise ActiveRecord::Rollback.new
-          end
-
-          add_users(topic,@opts[:target_usernames])
-          add_groups(topic,@opts[:target_group_names])
-          topic.topic_allowed_users.build(user_id: @user.id)
-        end
-        
-        if @opts[:archetype] == Archetype.event
-          topic.attendee_limit = @opts[:attendee_limit].to_i
-          topic.attendee_count = 0
-          topic.starts_at = @opts[:starts_at]
-          topic.ends_at = @opts[:ends_at]
-          topic.location = @opts[:location]
-        end
-        
-        unless topic.save
-          @errors = topic.errors
-          raise ActiveRecord::Rollback.new
-        end
         topic = create_topic
         new_topic = true
       else
@@ -139,7 +95,6 @@ class PostCreator
         tag.count += 1
         tag.save
       end
-            
 
       # Store unique post key
       if SiteSetting.unique_posts_mins > 0
