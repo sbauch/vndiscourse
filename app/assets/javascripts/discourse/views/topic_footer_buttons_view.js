@@ -32,7 +32,7 @@ Discourse.TopicFooterButtonsView = Ember.ContainerView.extend({
 								var starts = topic.get('starts_at');
 								var ends = topic.get('ends_at');
 								var location = topic.get('location');
-								var title = topic.get('title');
+								var title = topic.get('title').replace(/(?!\w)[\x00-\xC0]/g, '');
 								
 								var url = "http://www.google.com/calendar/event?action=TEMPLATE&text=" + title + '&dates=' + starts + '/' + ends + '&location=' + location + '&trp=true&sprop=net.vaynermedia.com&sprop=name:Vaynernet';
 								var prints = "You're registered! <a href='" + url + "' target='_blank'>Add to your Google Calendar</a>"
