@@ -43,8 +43,11 @@ class PostsController < ApplicationController
                                    location: params[:location],
                                    auto_close_days: params[:auto_close_days])
     post = post_creator.create
-
     if post_creator.errors.present?
+
+      # If the post was spam, flag all the user's posts as spam
+      current_user.flag_linked_posts_as_spam if post_creator.spam?
+
       render_json_error(post_creator)
     else
       post_serializer = PostSerializer.new(post, scope: guardian, root: false)
