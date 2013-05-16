@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby "1.9.3"
 
-gem "active_scaffold", git: "git://github.com/activescaffold/active_scaffold.git", :tag => ">= v3.3.0.rc3"
+gem "active_scaffold", git: "git://github.com/activescaffold/active_scaffold.git"#, :tag => ">= v3.3.0.rc3"
 gem 'active_model_serializers', git: 'git://github.com/rails-api/active_model_serializers.git'
 
 # we had issues with latest, stick to the rev till we figure this out
