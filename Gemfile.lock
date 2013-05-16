@@ -1,9 +1,8 @@
 GIT
   remote: git://github.com/activescaffold/active_scaffold.git
-  revision: 
-  tag: >= v3.3.0.rc3
+  revision: e4d72067d0c6bcfb88a255729616871ef837cb5a
   specs:
-    active_scaffold (3.3.0.rc3)
+    active_scaffold (3.3.0)
       rails (~> 3.2.0)
 
 GIT
