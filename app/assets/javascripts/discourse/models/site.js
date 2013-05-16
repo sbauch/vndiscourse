@@ -10,7 +10,6 @@ Discourse.Site = Discourse.Model.extend({
 	
 	composerCategories: (function(){
 		var eventsIndex;
-		console.log(this.categories);	
 		this.categories.reject(function(item, index, enumerable){ 
 			if (item.name == 'Events'){ 
 				eventsIndex = index;
