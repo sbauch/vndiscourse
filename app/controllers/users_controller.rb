@@ -98,10 +98,7 @@ class UsersController < ApplicationController
   def check_username
     requires_parameter(:username)
     
-    # Hit VM API to get correct username
-    resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{params[:email]}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
-    
-    username = resp['full_name'].gsub(' ','')
+    username = params[:username]
     
     validator = UsernameValidator.new(username)
 

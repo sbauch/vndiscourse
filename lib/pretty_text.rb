@@ -61,7 +61,7 @@ module PrettyText
       return User.exec_sql('select 1 from users where username_lower = ?', username).values.length == 1
     end
     
-     def is_hashtag_valid(hashtag)
+    def is_hashtag_valid(hashtag)
       return false unless hashtag
       return true
     end

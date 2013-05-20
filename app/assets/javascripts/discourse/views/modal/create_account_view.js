@@ -179,6 +179,7 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
               }));
             }
           } else if (result.errors) {
+						console.log(result);
             return _this.set('uniqueUsernameValidation', Discourse.InputValidation.create({
               failed: true,
               reason: result.errors.join(' ')
@@ -201,9 +202,9 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
     basicValidation = this.get('basicUsernameValidation');
     uniqueUsername = this.get('uniqueUsernameValidation');
     if (uniqueUsername) {
-      return uniqueUsername;
-    }
-    return basicValidation;
+          return uniqueUsername;
+        }
+    // return basicValidation;
   }).property('uniqueUsernameValidation', 'basicUsernameValidation'),
 
   usernameNeedsToBeValidatedWithEmail: function() {
