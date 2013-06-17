@@ -6,7 +6,11 @@ class SearchObserver < ActiveRecord::Observer
   end
 
   def self.update_index(table, id, search_data)
+<<<<<<< HEAD
     table_name = "#{table}_search_data" #trying fix @SB thanks Marley
+=======
+    table_name = "#{table}_search_data"
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     foreign_key = "#{table}_id"
 
     # Would be nice to use AR here but not sure how to execut Postgres functions

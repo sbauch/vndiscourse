@@ -48,4 +48,8 @@ Discourse.TopicStatusView = Discourse.View.extend({
 });
 
 
+<<<<<<< HEAD
 Discourse.View.registerHelper('topicStatus', Discourse.TopicStatusView);
+=======
+Discourse.View.registerHelper('topicStatus', Discourse.TopicStatusView);
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef

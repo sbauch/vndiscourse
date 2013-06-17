@@ -310,6 +310,7 @@ Discourse.Topic = Discourse.Model.extend({
         topic.get('posts').pushObject(post);
         lastPost = post;
       });
+
       topic.set('loaded', true);
     }
 
@@ -516,6 +517,24 @@ Discourse.Topic.reopenClass({
 
   create: function(obj, topicView) {
     var result = this._super(obj);
+<<<<<<< HEAD
+=======
+
+    if (result.participants) {
+      result.participants = _.map(result.participants,function(u) {
+        return Discourse.User.create(u);
+      });
+      result.fewParticipants = Em.A();
+      _.each(result.participants,function(p) {
+        // TODO should not be hardcoded
+        if (result.fewParticipants.length >= 8) return false;
+        result.fewParticipants.pushObject(p);
+      });
+    }
+
+    return result;
+  }
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
 
     if (result.participants) {
       result.participants = _.map(result.participants,function(u) {

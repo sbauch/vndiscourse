@@ -719,6 +719,7 @@ en:
         action: "split topic"
         topic_name: "New Topic Name:"
         error: "There was an error splitting that topic."
+<<<<<<< HEAD
         instructions:
           one: "You are about to create a new topic and populate it with the post you've selected."
           other: "You are about to create a new topic and populate it with the <b>{{count}}</b> posts you've selected."
@@ -728,6 +729,17 @@ en:
         action: "merge topic"
         error: "There was an error merging that topic."
         instructions:
+=======
+        instructions:
+          one: "You are about to create a new topic and populate it with the post you've selected."
+          other: "You are about to create a new topic and populate it with the <b>{{count}}</b> posts you've selected."
+
+      merge_topic:
+        title: "Merge Topic"
+        action: "merge topic"
+        error: "There was an error merging that topic."
+        instructions:
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
           one: "Please choose the topic you'd like to move that post to."
           other: "Please choose the topic you'd like to move those <b>{{count}}</b> posts to."
 

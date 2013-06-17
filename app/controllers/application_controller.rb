@@ -22,6 +22,7 @@ class ApplicationController < ActionController::Base
   before_filter :preload_json
   before_filter :check_xhr
   before_filter :set_locale
+  before_filter :redirect_to_login_if_required
 
   before_filter :redirect_to_login_if_required
 

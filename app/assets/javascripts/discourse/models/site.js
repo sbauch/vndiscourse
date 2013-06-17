@@ -43,6 +43,33 @@ Discourse.Site.reopenClass({
   create: function(obj) {
     var _this = this;
     var result = this._super(obj);
+<<<<<<< HEAD
+=======
+
+    if (result.categories) {
+      result.categories = _.map(result.categories, function(c) {
+        return Discourse.Category.create(c);
+      });
+    }
+    if (result.post_action_types) {
+      result.postActionByIdLookup = Em.Object.create();
+      result.post_action_types = _.map(result.post_action_types,function(p) {
+        var actionType;
+        actionType = Discourse.PostActionType.create(p);
+        result.postActionByIdLookup.set("action" + p.id, actionType);
+        return actionType;
+      });
+    }
+    if (result.archetypes) {
+      result.archetypes = _.map(result.archetypes,function(a) {
+        return Discourse.Archetype.create(a);
+      });
+    }
+
+    return result;
+  }
+});
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
 
     if (result.categories) {
       result.categories = _.map(result.categories, function(c) {

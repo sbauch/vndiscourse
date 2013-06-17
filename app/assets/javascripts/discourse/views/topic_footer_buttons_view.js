@@ -12,13 +12,18 @@ Discourse.TopicFooterButtonsView = Discourse.ContainerView.extend({
 	
   init: function() {
     this._super();
+<<<<<<< HEAD
 
     this.createButtons();
 
+=======
+    this.createButtons();
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
   },
 
   // Add the buttons below a topic
   createButtons: function() {
+<<<<<<< HEAD
 		var topic = this.get('topic');
 		
     if (Discourse.User.current()) {
@@ -125,6 +130,19 @@ Discourse.TopicFooterButtonsView = Discourse.ContainerView.extend({
           }
         }));
 
+=======
+    var topic = this.get('topic');
+    if (Discourse.User.current()) {
+      if (!topic.get('isPrivateMessage')) {
+
+        // We hide some controls from private messages
+        if (this.get('topic.can_invite_to')) {
+          this.attachViewClass(Discourse.InviteReplyButton);
+        }
+        this.attachViewClass(Discourse.FavoriteButton);
+        this.attachViewWithArgs({topic: topic}, Discourse.ShareButton);
+        this.attachViewClass(Discourse.ClearPinButton);
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
       }
       this.attachViewClass(Discourse.ReplyButton);
 

@@ -6,9 +6,14 @@
       <tr>
           <td style="width:80px"><label for='new-account-name'>{{i18n user.name.title}}</label></td>
           <td style="width:496px">
+<<<<<<< HEAD
           {{view Discourse.TextField disabled="disabled" valueBinding="view.accountName" elementId="new-account-name" autofocus="autofocus"}}
           &nbsp;{{view Discourse.InputTipView validationBinding="view.nameValidation"}}
 
+=======
+          {{textField value=accountName id="new-account-name" autofocus="autofocus"}}
+          &nbsp;{{inputTip validation=nameValidation}}
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
           </td>
       </tr>
       <tr>
@@ -19,9 +24,14 @@
       <tr>
             <td><label for='new-account-email'>{{i18n user.email.title}}</label></td>
             <td>
+<<<<<<< HEAD
             {{view Ember.TextField disabled="disabled" valueBinding="view.accountEmail" id="new-account-email"}}
             &nbsp;{{view Discourse.InputTipView validationBinding="view.emailValidation"}}
 
+=======
+            {{input value=accountEmail id="new-account-email"}}
+            &nbsp;{{inputTip validation=emailValidation}}
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
             </td>
       </tr>
       <tr>
@@ -32,9 +42,14 @@
       <tr>
             <td><label for='new-account-username'>{{i18n user.username.title}}</label></td>
             <td>
+<<<<<<< HEAD
             {{view Ember.TextField disabled="disabled" valueBinding="view.accountUsername" id="new-account-username" maxlength="25"}}
             &nbsp;{{view Discourse.InputTipView validationBinding="view.usernameValidation"}}
 
+=======
+            {{input value=accountUsername id="new-account-username" maxlength="15"}}
+            &nbsp;{{inputTip validation=usernameValidation}}
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
             </td>
       </tr>
       <tr>

@@ -72,7 +72,11 @@ class Post < ActiveRecord::Base
 
   def raw_hash
     return if raw.blank?
+<<<<<<< HEAD
     Digest::SHA1.hexdigest(raw.gsub(/\s+/, "").downcase)
+=======
+    Digest::SHA1.hexdigest(raw.gsub(/\s+/, ""))
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
   end
 
   def reset_cooked

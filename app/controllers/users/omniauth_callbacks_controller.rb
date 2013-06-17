@@ -236,8 +236,13 @@ class Users::OmniauthCallbacksController < ApplicationController
     else
       @data = {
         email: email,
+<<<<<<< HEAD
         name: resp['full_name'],
         username: resp['full_name'].gsub(/(\W|\d)/,''),
+=======
+        name: User.suggest_name(name),
+        username: UserNameSuggester.suggest(username),
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
         email_valid: true ,
         auth_provider: data[:provider] || params[:provider].try(:capitalize),
         teams: resp['teams'], 

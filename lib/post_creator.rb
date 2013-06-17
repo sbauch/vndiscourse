@@ -1,4 +1,3 @@
-
 # Responsible for creating posts and topics
 #
 require_dependency 'rate_limiter'
@@ -56,18 +55,12 @@ class PostCreator
     @new_topic = false
 
     Post.transaction do
-
       setup_topic
       setup_post
       rollback_if_host_spam_detected
       save_post
       extract_links
-      @opts[:raw].scan(/(#[A-Za-z0-9][A-Za-z0-9_]{2,20})/).flatten.each do |match|
-        term = match.gsub('#', '')
-        tag = Tag.find_or_create_by_term(term)
-        tag.count += 1
-        tag.save
-      end
+      extract_hashtags
       store_unique_post_key
       send_notifications_for_private_message
       track_topic
@@ -134,13 +127,7 @@ class PostCreator
 
     # Don't publish invisible topics
     return unless @topic.visible?
-    if @opts[:archetype] == Archetype.event
-      topic.attendee_limit = @opts[:attendee_limit].to_i
-      topic.attendee_count = 0
-      topic.starts_at = @opts[:starts_at]
-      topic.ends_at = @opts[:ends_at]
-      topic.location = @opts[:location]
-    end
+
     return if @topic.private_message?
 
     @topic.posters = @topic.posters_summary
@@ -271,6 +258,15 @@ class PostCreator
 
   def extract_links
     TopicLink.extract_from(@post)
+  end
+  
+  def extract_hashtags
+     @opts[:raw].scan(/(#[A-Za-z0-9][A-Za-z0-9_]{2,20})/).flatten.each do |match|
+        term = match.gsub('#', '')
+        tag = Tag.find_or_create_by_term(term)
+        tag.count += 1
+        tag.save
+      end
   end
 
   def track_topic

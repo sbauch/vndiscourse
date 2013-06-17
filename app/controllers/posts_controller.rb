@@ -199,11 +199,15 @@ class PostsController < ApplicationController
           :target_usernames, 
           :reply_to_post_number, 
           :image_sizes, 
+<<<<<<< HEAD
           :auto_close_days,
           :attendee_limit,
           :starts_at,
           :ends_at,
           :location
+=======
+          :auto_close_days
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
         ).tap do |whitelisted|
           whitelisted[:meta_data] = params[:meta_data]
       end

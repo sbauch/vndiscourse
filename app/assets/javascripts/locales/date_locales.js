@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 //encoding: utf-8
+=======
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
 // // create CS locale, because it's not supported by Sugar at all
 // Date.addLocale('cs', {
 //   'plural': true,
@@ -96,4 +99,8 @@
 // Date.getLocale('zh-TW').short_no_year = '{yyyy}年{M}月';
 // 
 // // set the current date locale, replace underscore with dash to make zh_CN work
+<<<<<<< HEAD
 // Date.setLocale(I18n.locale.replace("_","-"));
+=======
+// Date.setLocale(I18n.locale.replace("_","-"));
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef

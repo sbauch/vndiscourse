@@ -561,8 +561,11 @@ en:
 
     enable_s3_uploads: "Place uploads on Amazon S3"
     s3_upload_bucket: "The Amazon S3 bucket name that files will be uploaded into"
+<<<<<<< HEAD
     
     custom_avatars: "Allow users to upload custom avatars. WRANING: will disable Gravatar and requires S3 uploads to be configured"
+=======
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     s3_access_key_id: "The Amazon S3 access key id that will be used to upload images"
     s3_secret_access_key: "The Amazon S3 secret access key that will be used to upload images"
     s3_region: "The Amazon S3 region name that will be used to upload images"
@@ -807,6 +810,7 @@ en:
 
         To search, visit your user page, or otherwise navigate, click on the icons at the upper right.
 
+<<<<<<< HEAD
         While reading a topic, you can move to the top by clicking its title at the top of the page. To reach the bottom, click the down arrow on the topic progress indicator at the bottom of the page, or click the last post field on the topic summary under the first post.
         
         ### That's it!
@@ -830,6 +834,8 @@ en:
         Enjoy your stay!
 
 
+=======
+>>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     welcome_user:
       subject_template: Welcome to VaynerNet 2.0!
       text_body_template: |
