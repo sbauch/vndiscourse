@@ -18,6 +18,7 @@ $.fn.autocomplete = function(options) {
     alert("only supporting one matcher at the moment");
   }
 
+  var disabled = options && options.disabled;
   var wrap = null;
   var autocompleteOptions = null;
   var selectedOption = null;
@@ -87,12 +88,12 @@ $.fn.autocomplete = function(options) {
   if (isInput) {
     var width = this.width();
     var height = this.height();
-    wrap = this.wrap("<div class='ac-wrap clearfix'/>").parent();
+    wrap = this.wrap("<div class='ac-wrap clearfix" + (disabled ? " disabled": "") +  "'/>").parent();
     wrap.width(width);
     this.width(150);
     this.attr('name', this.attr('name') + "-renamed");
     var vals = this.val().split(",");
-    vals.each(function(x) {
+    _.each(vals,function(x) {
       if (x !== "") {
         if (options.reverseTransform) {
           x = options.reverseTransform(x);
@@ -115,17 +116,14 @@ $.fn.autocomplete = function(options) {
   };
 
   var renderAutocomplete = function() {
-    var borderTop, mePos, pos, ul;
     if (div) {
       div.hide().remove();
     }
-    if (autocompleteOptions.length === 0) {
-      return;
-    }
-    div = $(options.template({
-      options: autocompleteOptions
-    }));
-    ul = div.find('ul');
+    if (autocompleteOptions.length === 0) return;
+
+    div = $(options.template({ options: autocompleteOptions }));
+
+    var ul = div.find('ul');
     selectedOption = 0;
     markSelected();
     ul.find('li').click(function() {
@@ -133,28 +131,39 @@ $.fn.autocomplete = function(options) {
       completeTerm(autocompleteOptions[selectedOption]);
       return false;
     });
-    pos = null;
+    var pos = null;
+    var vOffset = 0;
+    var hOffset = 0;
     if (isInput) {
       pos = {
         left: 0,
         top: 0
       };
+      vOffset = -32;
+      hOffset = 0;
     } else {
       pos = me.caretPosition({
         pos: completeStart,
         key: options.key
       });
+      hOffset = 27;
     }
     div.css({
       left: "-1000px"
     });
+
     me.parent().append(div);
-    mePos = me.position();
-    borderTop = parseInt(me.css('border-top-width'), 10) || 0;
-    return div.css({
+
+    if(!isInput){
+      vOffset = div.height();
+    }
+
+    var mePos = me.position();
+    var borderTop = parseInt(me.css('border-top-width'), 10) || 0;
+    div.css({
       position: 'absolute',
-      top: (mePos.top + pos.top - div.height() + borderTop) + 'px',
-      left: (mePos.left + pos.left + 27) + 'px'
+      top: (mePos.top + pos.top - vOffset + borderTop) + 'px',
+      left: (mePos.left + pos.left + hOffset) + 'px'
     });
   };
 
@@ -163,9 +172,9 @@ $.fn.autocomplete = function(options) {
 
     autocompleteOptions = r;
     if (!r || r.length === 0) {
-      return closeAutocomplete();
+      closeAutocomplete();
     } else {
-      return renderAutocomplete();
+      renderAutocomplete();
     }
   };
 

@@ -158,8 +158,8 @@ Discourse.Markdown = {
 
 			// add #hashtags
       text = text.replace(/(\W)(#[A-Za-z0-9][A-Za-z0-9_]{2,30})(?=\W)/g, function(x, pre, name) {
-				if (hashtagLookup(name)) {
-          return pre + "<a href='" + Discourse.getURL("/tags/") + (name) + "' class='mention hashtag'>" + name + "</a>";
+				if (hashtagLookup(name.substr(1))) {
+          return pre + "<a href='" + Discourse.getURL("/tags/") + (name.substr(1)) + "' class='mention hashtag'>" + name + "</a>";
    			}
 				 else{ return pre + "<span class=''>" + name + "</span>"}
  				});
@@ -174,7 +174,7 @@ Discourse.Markdown = {
         if (Discourse && Discourse.Onebox) {
           onebox = Discourse.Onebox.lookupCache(url);
         }
-        if (onebox && !onebox.isBlank()) {
+        if (onebox && onebox.trim().length > 0) {
           return arguments[2] + onebox;
         } else {
           return arguments[2] + arguments[4] + " class=\"onebox\" target=\"_blank\">" + arguments[6];

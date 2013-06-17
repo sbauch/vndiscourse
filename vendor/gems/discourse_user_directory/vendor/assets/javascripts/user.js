@@ -1,17 +1,25 @@
-(function() {
-  window.Discourse.User.reopenClass({
-  findAll: function(query, filter) {
-    var result = Em.A();
-    Discourse.ajax({
-      url: Discourse.getURL("/directory.json"),
-      data: { filter: filter }
-    }).then(function(users) {
-      users.each(function(u) {
-        result.pushObject(Discourse.User.create(u));
-      });
-			result.set('loaded', true)
-    });
-    return result;
-  }
-  });
-}).call(this);
+Discourse.User.reopenClass({
+  	findAll: function(query, filter) {
+    	return Discourse.ajax("/directory.json", { 
+      	data: { filter: filter }
+    	}).then(function(users) {
+				return users.map(function(u) {
+					// console.log(Discourse.User.create(u));
+        	return Discourse.User.create(u);
+      	});
+    	});
+  	}
+	});
+
+
+// findAll: function(query, filter) {
+//     return Discourse.ajax("/admin/users/list/" + query + ".json", {
+//       data: { filter: filter }
+//     }).then(function(users) {
+//       return users.map(function(u) {
+//         return Discourse.AdminUser.create(u);
+//       });
+//     });
+//   }
+// });
+

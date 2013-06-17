@@ -107,7 +107,6 @@
   }
 
   .gutter {
-    @include unselectable;
     .reply-new{
       .discourse-no-touch & {
         opacity: 0;
@@ -259,7 +258,6 @@
     @include box-shadow(inset 0 -4px 4px -4px rgba($black, 0.14));
     nav.post-controls {
       @include unselectable;
-      float: right;
       padding: 0px;
       button {
         border: none;
@@ -280,6 +278,9 @@
         }
         &.hidden {
           display: none;
+        }
+        &.like, &.edit, &.flag, &.delete, &.share, &.bookmark, &.create {
+          float: right;
         }
       }
       button.create {
@@ -347,7 +348,7 @@
         line-height: 18px;
       }
 
-      h3.moderator a {
+      .staff a {
         background-color: #ffe;
         border: 1px solid #ffd;
       }

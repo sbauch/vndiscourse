@@ -1,4 +1,5 @@
 require_dependency 'discourse_hub'
+require_dependency 'user_name_suggester'
 
 class UsersController < ApplicationController
 
@@ -8,10 +9,11 @@ class UsersController < ApplicationController
 
   before_filter :ensure_logged_in, only: [:username, :update, :change_email, :user_preferences_redirect]
 
-  # we need to allow account creation with bad CSRF tokens, if people are caching, the CSRF token on the 
+  # we need to allow account creation with bad CSRF tokens, if people are caching, the CSRF token on the
   #  page is going to be empty, this means that server will see an invalid CSRF and blow the session
   #  once that happens you can't log in with social
   skip_before_filter :verify_authenticity_token, only: [:create]
+  skip_before_filter :redirect_to_login_if_required, only: [:check_username,:create,:get_honeypot_value,:activate_account,:send_activation_email,:authorize_email]
 
   def show
     @user = fetch_user_from_params
@@ -68,7 +70,7 @@ class UsersController < ApplicationController
   end
 
   def username
-    requires_parameter(:new_username)
+    params.require(:new_username)
 
     user = fetch_user_from_params
     guardian.ensure_can_edit!(user)
@@ -89,18 +91,14 @@ class UsersController < ApplicationController
   end
 
   def is_local_username
-    requires_parameter(:username)
+    params.require(:username)
     u = params[:username].downcase
     r = User.exec_sql('select 1 from users where username_lower = ?', u).values
     render json: {valid: r.length == 1}
   end
 
   def check_username
-    requires_parameter(:username)
-    
-    username = params[:username]
-    
-    validator = UsernameValidator.new(username)
+    params.require(:username)
 
     if !validator.valid_format?
       render json: {errors: validator.errors}
@@ -108,7 +106,7 @@ class UsersController < ApplicationController
       if User.username_available?(username)
         render json: {available: true}
       else
-        render json: {available: false, suggestion: User.suggest_username(params[:username])}
+        render json: {available: false, suggestion: UserNameSuggester.suggest(params[:username])}
       end
     else
 
@@ -139,7 +137,7 @@ class UsersController < ApplicationController
         end
       elsif available_globally && !available_locally
         # Already registered on this site with the matching nickname and email address. Why are you signing up again?
-        render json: {available: false, suggestion: User.suggest_username(params[:username])}
+        render json: {available: false, suggestion: UserNameSuggester.suggest(params[:username])}
       else
         # Not available anywhere.
         render json: {available: false, suggestion: suggestion_from_discourse_hub}
@@ -151,17 +149,8 @@ class UsersController < ApplicationController
   end
 
   def create
+    return fake_success_reponse if suspicious? params
 
-    if honeypot_or_challenge_fails?(params)
-      # Don't give any indication that we caught you in the honeypot
-      honey_pot_response = {
-        success: true,
-        active: false,
-        message: I18n.t("login.activate_email", email: params[:email])
-      }
-      return render(json: honey_pot_response)
-    end
-    
     user = User.new_from_params(params)
     
     user.username = params[:username].gsub(/(\W|\d)/,'')
@@ -190,35 +179,27 @@ class UsersController < ApplicationController
     end
 
     if user.save
-      msg = nil
-      active_user = user.active?
-
-      if active_user
-        # If the user is active (remote authorized email)
-        if SiteSetting.must_approve_users?
-          msg = I18n.t("login.wait_approval")
-          active_user = false
-        else
-          log_on_user(user)
-          user.enqueue_welcome_message('welcome_user')
-          msg = I18n.t("login.active")
-        end
-      else
-        msg = I18n.t("login.activate_email", email: user.email)
-        Jobs.enqueue(
-          :user_email, type: :signup, user_id: user.id,
+      if SiteSetting.must_approve_users?
+        message = I18n.t("login.wait_approval")
+      elsif !user.active?
+        message = I18n.t("login.activate_email", email: user.email)
+        Jobs.enqueue(:user_email,
+          type: :signup,
+          user_id: user.id,
           email_token: user.email_tokens.first.token
         )
+      else
+        message = I18n.t("login.active")
+        log_on_user(user)
+        user.enqueue_welcome_message('welcome_user')
       end
 
-      # Create 3rd party auth records (Twitter, Facebook, GitHub)
       create_third_party_auth_records(user, auth) if auth.present?
 
       # Clear authentication session.
       session[:authentication] = nil
 
-      # JSON result
-      render json: { success: true, active: active_user, message: msg }
+      render json: { success: true, active: user.active?, message: message }
     else
       render json: {
         success: false,
@@ -232,7 +213,7 @@ class UsersController < ApplicationController
       message: I18n.t(
         "login.errors",
         errors:I18n.t(
-          "login.not_available", suggestion: User.suggest_username(params[:username])
+          "login.not_available", suggestion: UserNameSuggester.suggest(params[:username])
         )
       )
     }
@@ -297,7 +278,7 @@ class UsersController < ApplicationController
   end
 
   def change_email
-    requires_parameter(:email)
+    params.require(:email)
     user = fetch_user_from_params
     guardian.ensure_can_edit!(user)
     lower_email = Email.downcase(params[:email]).strip
@@ -378,15 +359,18 @@ class UsersController < ApplicationController
       '3019774c067cc2b'
     end
 
-    def fetch_user_from_params
-      username_lower = params[:username].downcase
-      username_lower.gsub!(/\.json$/, '')
+    def suspicious?(params)
+      honeypot_or_challenge_fails?(params) || SiteSetting.invite_only?
+    end
 
-      user = User.where(username_lower: username_lower).first
-      raise Discourse::NotFound.new if user.blank?
-
-      guardian.ensure_can_see!(user)
-      user
+    def fake_success_reponse
+      render(
+        json: {
+          success: true,
+          active: false,
+          message: I18n.t("login.activate_email", email: params[:email])
+        }
+      )
     end
 
     def honeypot_or_challenge_fails?(params)

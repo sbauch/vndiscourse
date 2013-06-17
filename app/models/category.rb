@@ -27,18 +27,22 @@ class Category < ActiveRecord::Base
   after_destroy :invalidate_site_cache
   after_destroy :publish_categories_list
 
+  has_one :category_search_data
+
   scope :latest, ->{ order('topic_count desc') }
 
   scope :secured, ->(guardian = nil) {
     ids = guardian.secure_category_ids if guardian
     if ids.present?
-      where("categories.secure ='f' or categories.id in (:cats)", cats: ids)
+      where("NOT categories.secure or categories.id in (:cats)", cats: ids)
     else
-      where("categories.secure ='f'")
+      where("NOT categories.secure")
     end
   }
 
   delegate :post_template, to: 'self.class'
+
+  attr_accessor :displayable_topics
 
   # Internal: Update category stats: # of topics in past year, month, week for
   # all categories.
@@ -81,6 +85,8 @@ class Category < ActiveRecord::Base
     if name.present?
       self.slug = Slug.for(name)
 
+      return if self.slug.blank?
+
       # If a category with that slug already exists, set the slug to nil so the category can be found
       # another way.
       category = Category.where(slug: self.slug)
@@ -104,14 +110,10 @@ class Category < ActiveRecord::Base
     errors.add(:slug, I18n.t(:is_reserved)) if slug == SiteSetting.uncategorized_name
   end
 
-  def secure?
-    self.secure
-  end
-
   def group_names=(names)
     # this line bothers me, destroying in AR can not seem to be queued, thinking of extending it
     category_groups.destroy_all unless new_record?
-    ids = Group.where(name: names.split(",")).select(:id).map(&:id)
+    ids = Group.where(name: names.split(",")).pluck(:id)
     ids.each do |id|
       category_groups.build(group_id: id)
     end
@@ -133,4 +135,39 @@ class Category < ActiveRecord::Base
     end
   end
 
+  def secure_group_ids
+    if self.secure
+      groups.pluck("groups.id")
+    end
+  end
+
 end
+
+# == Schema Information
+#
+# Table name: categories
+#
+#  id              :integer          not null, primary key
+#  name            :string(50)       not null
+#  color           :string(6)        default("AB9364"), not null
+#  topic_id        :integer
+#  topic_count     :integer          default(0), not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  user_id         :integer          not null
+#  topics_year     :integer
+#  topics_month    :integer
+#  topics_week     :integer
+#  slug            :string(255)      not null
+#  description     :text
+#  text_color      :string(6)        default("FFFFFF"), not null
+#  hotness         :float            default(5.0), not null
+#  secure          :boolean          default(FALSE), not null
+#  auto_close_days :float
+#
+# Indexes
+#
+#  index_categories_on_forum_thread_count  (topic_count)
+#  index_categories_on_name                (name) UNIQUE
+#
+

@@ -2,24 +2,26 @@
   This view is used for rendering the buttons at the footer of the topic
 
   @class TopicFooterButtonsView
-  @extends Ember.ContainerView
+  @extends Discourse.ContainerView
   @namespace Discourse
   @module Discourse
 **/
-Discourse.TopicFooterButtonsView = Ember.ContainerView.extend({
+Discourse.TopicFooterButtonsView = Discourse.ContainerView.extend({
   elementId: 'topic-footer-buttons',
   topicBinding: 'controller.content',
 	
   init: function() {
     this._super();
-		return this.createButtons();
+
+    this.createButtons();
+
   },
 
   // Add the buttons below a topic
   createButtons: function() {
 		var topic = this.get('topic');
 		
-    if (Discourse.get('currentUser')) {
+    if (Discourse.User.current()) {
 			if (topic.get('archetype') == 'event'){
           this.addObject(Discourse.ButtonView.createWithMixins({
             helpKey: 'topic.rsvp.' + this.get('controller.content.user_rsvp_status') + '.help',
@@ -124,82 +126,15 @@ Discourse.TopicFooterButtonsView = Ember.ContainerView.extend({
         }));
 
       }
-
-      this.addObject(Discourse.ButtonView.createWithMixins({
-        classNames: ['btn', 'btn-primary', 'create'],
-        attributeBindings: ['disabled'],
-        helpKey: 'topic.reply.help',
-        disabled: !this.get('controller.content.can_create_post'),
-
-        text: function() {
-          var archetype, customTitle;
-          archetype = this.get('controller.content.archetype');
-          if (customTitle = this.get("parentView.replyButtonText" + (archetype.capitalize()))) {
-            return customTitle;
-          }
-          return Em.String.i18n("topic.reply.title");
-        }.property(),
-
-        renderIcon: function(buffer) {
-          buffer.push("<i class='icon icon-plus'></i>");
-        },
-
-        click: function() {
-          this.get('controller').reply();
-        }
-      }));
+      this.attachViewClass(Discourse.ReplyButton);
 
       if (!topic.get('isPrivateMessage')) {
-        this.addObject(Discourse.DropdownButtonView.createWithMixins({
-          topic: topic,
-          title: Em.String.i18n('topic.notifications.title'),
-          longDescriptionBinding: 'topic.notificationReasonText',
-          dropDownContent: [
-            [Discourse.Topic.NotificationLevel.WATCHING, 'topic.notifications.watching'],
-            [Discourse.Topic.NotificationLevel.TRACKING, 'topic.notifications.tracking'],
-            [Discourse.Topic.NotificationLevel.REGULAR, 'topic.notifications.regular'],
-            [Discourse.Topic.NotificationLevel.MUTE, 'topic.notifications.muted']
-          ],
-
-          text: function() {
-            var key = (function() {
-              switch (this.get('topic.notification_level')) {
-                case Discourse.Topic.NotificationLevel.WATCHING: return 'watching';
-                case Discourse.Topic.NotificationLevel.TRACKING: return 'tracking';
-                case Discourse.Topic.NotificationLevel.REGULAR: return 'regular';
-                case Discourse.Topic.NotificationLevel.MUTE: return 'muted';
-              }
-            }).call(this);
-
-            var icon = (function() {
-              switch (key) {
-                case 'watching': return '<i class="icon-circle heatmap-high"></i>&nbsp;';
-                case 'tracking': return '<i class="icon-circle heatmap-low"></i>&nbsp;';
-                case 'regular': return '';
-                case 'muted': return '<i class="icon-remove-sign"></i>&nbsp;';
-              }
-            })();
-            return icon + (Ember.String.i18n("topic.notifications." + key + ".title")) + "<span class='caret'></span>";
-          }.property('topic.notification_level'),
-
-          clicked: function(id) {
-            return this.get('topic').updateNotifications(id);
-          }
-
-        }));
+        this.attachViewWithArgs({topic: topic}, Discourse.NotificationsButton);
       }
-      return this.trigger('additionalButtons', this);
-
+      this.trigger('additionalButtons', this);
     } else {
       // If not logged in give them a login control
-      return this.addObject(Discourse.ButtonView.create({
-        textKey: 'topic.login_reply',
-        classNames: ['btn', 'btn-primary', 'create'],
-        click: function() {
-          var _ref;
-          return (_ref = this.get('controller.controllers.modal')) ? _ref.show(Discourse.LoginView.create()) : void 0;
-        }
-      }));
+      this.attachViewClass(Discourse.LoginReplyButton);
     }
   }
 });

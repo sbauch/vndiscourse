@@ -1,10 +1,16 @@
-window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.Presence,
+Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.Presence,
 
   username: null
   query: null
   selectAll: false
   content: null
   filterMode: 'directory'
+  
+  seeAll: (->
+    @set('content', null)
+    @set('username', 'show-me-all')
+    @refreshUsers()
+  ),
   
   filterUsers: Discourse.debounce(->
     @refreshUsers() 
@@ -15,8 +21,11 @@ window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.P
   ).observes('query')
 
   refreshUsers: ->
-    @set 'content', Discourse.User.findAll(@get('query'), @get('username'))
-    console.log(@get 'content')
+    controller = this
+    Discourse.User.findAll(@get('query'), @get('username')).then((result) ->
+      controller.set('content', result)
+    )
+
     
   show: (term) ->
     if @get('query') == term
@@ -26,7 +35,7 @@ window.Discourse.DirectoryController =  Ember.ArrayController.extend Discourse.P
   
   availableNavItems: (->
     summary = @get('filterSummary')
-    loggedOn = !!Discourse.get('currentUser')
+    loggedOn = Discourse.User.current()
 
     Discourse.SiteSettings.top_menu.split("|").map((i)->
       Discourse.NavItem.fromText i,

@@ -2,11 +2,6 @@ require 'spec_helper'
 require_dependency 'post_destroyer'
 
 describe Post do
-
-  before do
-    ImageSorcery.any_instance.stubs(:convert).returns(false)
-  end
-
   # Help us build a post with a raw body
   def post_with_body(body, user=nil)
     args = post_args.merge(raw: body)
@@ -25,6 +20,9 @@ describe Post do
 
   it { should have_many :post_replies }
   it { should have_many :replies }
+
+  it { should have_many :post_uploads }
+  it { should have_many :uploads }
 
   it { should rate_limit }
 
@@ -54,25 +52,43 @@ describe Post do
   end
 
   describe "versions and deleting/recovery" do
-    let(:post) { Fabricate(:post, post_args) }
 
-    before do
-      post.trash!
-      post.reload
-    end
+    context 'a post without links' do
+      let(:post) { Fabricate(:post, post_args) }
 
-    it "doesn't create a new version when deleted" do
-      post.versions.count.should == 0
-    end
-
-    describe "recovery" do
       before do
-        post.recover!
+        post.trash!
         post.reload
       end
 
-      it "doesn't create a new version when recovered" do
+      it "doesn't create a new version when deleted" do
         post.versions.count.should == 0
+      end
+
+      describe "recovery" do
+        before do
+          post.recover!
+          post.reload
+        end
+
+        it "doesn't create a new version when recovered" do
+          post.versions.count.should == 0
+        end
+      end
+    end
+
+    context 'a post with links' do
+      let(:post) { Fabricate(:post_with_external_links) }
+      before do
+        post.trash!
+        post.reload
+      end
+
+      describe 'recovery' do
+        it 'recreates the topic_link records' do
+          TopicLink.expects(:extract_from).with(post)
+          post.recover!
+        end
       end
     end
 
@@ -201,7 +217,7 @@ describe Post do
       end
 
       it "it counts properly with more than one link on the same host" do
-        three_links.linked_hosts.should == {"discourse.org" => 2, "www.imdb.com" => 1}
+        three_links.linked_hosts.should == {"discourse.org" => 1, "www.imdb.com" => 1}
       end
     end
 
@@ -365,8 +381,14 @@ describe Post do
 
   end
 
-  it 'validates' do
-    Fabricate.build(:post, post_args).should be_valid
+  context 'validation' do
+    it 'validates our default post' do
+      Fabricate.build(:post, post_args).should be_valid
+    end
+
+    it 'treate blank posts as invalid' do
+      Fabricate.build(:post, raw: "").should_not be_valid
+    end
   end
 
   context "raw_hash" do

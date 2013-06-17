@@ -1,3 +1,2 @@
 Discourse.DirectoryView = window.Discourse.View.extend
-  templateName: 'directory',
-  
+  templateName: 'directory'

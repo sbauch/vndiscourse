@@ -2,7 +2,7 @@ class TopicListSerializer < ApplicationSerializer
 
   attributes :can_create_topic,
              :more_topics_url,
-             :filter_summary,
+             # :filter_summary,
              :draft,
              :draft_key,
              :draft_sequence,
@@ -24,7 +24,7 @@ class TopicListSerializer < ApplicationSerializer
     elsif object.category_private
       return false
     else    
-      scope.can_create?(Topic, nil, object.category_private)
+      scope.can_create?(Topic, object.category_private)
     end
   end
 

@@ -54,14 +54,20 @@ Discourse::Application.routes.draw do
       post 'refresh_browsers', constraints: AdminConstraint.new
       put 'activate'
       put 'deactivate'
+      put 'block'
+      put 'unblock'
     end
 
     resources :impersonate, constraints: AdminConstraint.new
-    resources :email_logs do
+
+    resources :email do
       collection do
         post 'test'
+        get 'logs'
+        get 'preview-digest' => 'email#preview_digest'
       end
     end
+
     get 'customize' => 'site_customizations#index', constraints: AdminConstraint.new
     get 'flags' => 'flags#index'
     get 'flags/:filter' => 'flags#index'
@@ -106,6 +112,7 @@ Discourse::Application.routes.draw do
   
   resources :static
   post 'login' => 'static#enter'
+  get 'login' => 'static#show', id: 'login'
   get 'faq' => 'static#show', id: 'faq'
   get 'tos' => 'static#show', id: 'tos'
   get 'privacy' => 'static#show', id: 'privacy'
@@ -223,6 +230,7 @@ Discourse::Application.routes.draw do
   post 't/:topic_id/timings' => 'topics#timings', constraints: {topic_id: /\d+/}
   post 't/:topic_id/invite' => 'topics#invite', constraints: {topic_id: /\d+/}
   post 't/:topic_id/move-posts' => 'topics#move_posts', constraints: {topic_id: /\d+/}
+  post 't/:topic_id/merge-topic' => 'topics#merge_topic', constraints: {topic_id: /\d+/}
   delete 't/:topic_id/timings' => 'topics#destroy_timings', constraints: {topic_id: /\d+/}
 
   post 't/:topic_id/notifications' => 'topics#set_notifications' , constraints: {topic_id: /\d+/}

@@ -5,6 +5,9 @@
 # Pour toute question contactez
 # <Maxime QUANDALLE> "maxime@quandalle.com"
 #
+# To validate this YAML file after you change it, please paste it into
+# http://yamllint.com/
+
 
 fr:
   js:
@@ -317,6 +320,9 @@ fr:
       facebook:
         title: "via Facebook"
         message: "Authentification via Facebook (assurez-vous que les popups ne soient pas bloquées)"
+      cas:
+        title: "via CAS"
+        message: "Authentification via CAS (assurez-vous que les popups ne soient pas bloquées)"
       yahoo:
         title: "via Yahoo"
         message: "Authentification via Yahoo (assurez-vous que les popups ne soient pas bloquées)"
@@ -338,6 +344,14 @@ fr:
       min_length:
         need_more_for_title: "{{n}} caractères restant pour le titre"
         need_more_for_reply: "{{n}} caractères restant pour le message"
+
+      error:
+        title_missing: "Le titre est obligatoire."
+        title_too_short: "Le titre doit avoir au moins {{min}} caractères."
+        title_too_long: "Le titre ne doit pas dépasser les {{max}} caractères."
+        post_missing: "Le message ne peut être vide."
+        post_length: "Le mesasge doit avoir au moins {{min}} caractères."
+        category_missing: "Vous devez choisir une catégorie."
 
       save_edit: "Sauvegarder la modification"
       reply_original: "Répondre à la discussion initiale"
@@ -424,6 +438,10 @@ fr:
       placeholder: "saisir votre requête ici"
       no_results: "Aucun résultat."
       searching: "Recherche en cours ..."
+
+      prefer:
+        user: "La recherche priorisera les résultats de @{{username}}"
+        category: "La recherche priorisera les résultats de la catégorie : {{category}}"
 
     site_map: "voir une autre liste des discussions ou une catégorie"
     go_back: 'retour'
@@ -604,32 +622,28 @@ fr:
           other: "les plus populaires"
         cancel: "Ré-afficher l'ensemble des messages de cette discussion."
 
-      move_selected:
-        title: "Déplacer les messages sélectionnés"
-        error: "Désolés, une erreur s'est produite lors du déplacement des messages."
+      split_topic:
+        title: "Scinder la discussion"
+        action: "scinder la discussion"
+        topic_name: "Nom de la nouvelle discussion :"
+        error: "Il y a eu une erreur lors du scindage de la discussion."
         instructions:
-          one: "Comment souhaitez-vous déplacer le message que vous avez sélectionné ?"
-          other: "Comment souhaitez-vous déplacer les <b>{{count}}</b> messages que vous avez sélectionné ?"
+          one: "Vous êtes sur le point de créer une nouvelle discussion avec le message que vous avez sélectionné."
+          other: "Vous êtes sur le point de créer une nouvelle discussion avec les <b>{{count}}</b> messages que vous avez sélectionné."
 
-        new_topic:
-          title: "Déplacer les messages sélectionnés dans une nouvelle discussion"
-          topic_name: "Nom de la nouvelle discussion :"
-          instructions:
-            one: "Vous êtes sur le point de créer une nouvelle discussion avec le message que vous avez sélectionné."
-            other: "Vous êtes sur le point de créer une nouvelle discussion avec les <b>{{count}}</b> messages que vous avez sélectionné."
-
-        existing_topic:
-          title: "Déplacer les messages sélectionnés dans une discussion existante"
-          instructions:
-            one: "Merci de sélectionner la discussion dans laquelle vous souhaitez déplacer le message que vous avez sélectionné."
-            other: "Merci de sélectionner la discussion dans laquelle vous souhaitez déplacer ces <b>{{count}}</b> messages que vous avez sélectionné."
+      merge_topic:
+        title: "Fusionner la discussion"
+        action: "fusionner la discussion"
+        error: "Il y a eu une erreur lors de la fusion."
+        instructions:
+          one: "Merci de sélectionner la discussion dans laquelle vous souhaitez déplacer le message que vous avez sélectionné."
+          other: "Merci de sélectionner la discussion dans laquelle vous souhaitez déplacer les <b>{{count}}</b> messages que vous avez sélectionné."
 
       multi_select:
         select: 'sélectioner'
         selected: '({{count}}) sélectionés'
         delete: "supprimer la sélection"
         cancel: "annuler la sélection"
-        move: "déplacer la sélection"
         description:
           one: "vous avez sélectionné <b>1</b> message."
           other: "Vous avez sélectionné <b>{{count}}</b> messages."
@@ -782,6 +796,8 @@ fr:
       edit_long: "Editer la catégorie"
       edit_uncategorized: "Editer les non catégoriser"
       view: 'Voir les discussions dans cette catégorie'
+      general: 'Général'
+      settings: 'Paramètres'
       delete: 'Supprimer la catégorie'
       create: 'Créer la catégorie'
       save: 'Enregistrer la catégorie'
@@ -807,7 +823,7 @@ fr:
       add_group: "Ajouter un groupe"
       security: "Sécurité"
       allowed_groups: "Groupes permis :"
-      
+      auto_close_label: "Fermer automatiquement après :"
 
     flagging:
       title: 'Pourquoi voulez-vous signaler ce message ?'
@@ -978,7 +994,7 @@ fr:
         delete_confirm: "Supprimer cette personnalisation"
         about: "Vous pouvez modifier les feuillets de styles et en-têtes de votre site. Choisissez ou ajouter un style pour commencer l'édition."
 
-      email_logs:
+      email:
         title: "Historique des mails"
         sent_at: "Envoyer à"
         email_type: "Type d'email"

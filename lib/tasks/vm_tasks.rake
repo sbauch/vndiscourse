@@ -21,9 +21,13 @@ end
 
 desc 'update user info nightly'
 task "vm:users:update" => :environment do
-  User.all.each do |u|
+  User.where(:active => true).each do |u|
+    begin
     resp = HTTParty.get("https://vaynerpeople.herokuapp.com/api/users/find?email=#{u.email}&token=cqOR1F80vsKOGndLWS7ekg").parsed_response['user']
     u.update_attributes(:teams => resp['teams'], :position => resp['function'], :start_date => resp['start_date'], :short_position => VmUserService.short_position(resp['function']) )
+    rescue
+      puts u
+    end  
   end
 end
 
@@ -41,7 +45,7 @@ end
     end
   
     unless @anniversaries.empty?
-      usernames = @anniversaries.collect{|u| u.username }
+      usernames = @anniversaries.select{|u| u.active == true }.collect{|u| u.username }
     
       sam = User.find_by_email('sam@vaynermedia.com')
   

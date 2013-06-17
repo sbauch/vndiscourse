@@ -18,15 +18,14 @@ Discourse.Presence = Em.Mixin.create({
     @return {Boolean}
   */
   blank: function(name) {
-    var prop;
-    prop = this[name] || this.get(name);
+    var prop = this[name] || this.get(name);
     if (!prop) return true;
 
     switch (typeof prop) {
-      case "string":
-        return prop.trim().isBlank();
-      case "object":
-        return Object.isEmpty(prop);
+    case "string":
+      return prop.trim().length === 0;
+    case "object":
+      return $.isEmptyObject(prop);
     }
     return false;
   },

@@ -1,14 +1,17 @@
 <div id='list-controls' class='list-controls'>
   <div class="container">
     <ul class="nav nav-pills" id='category-filter'>
-      {{#each controller.availableNavItems}}
-        <li>{{view Discourse.NavItemView contentBinding="this"}}</li>
-      {{/each}}
-  </ul>
+      {{each availableNavItems itemViewClass="Discourse.NavItemView"}}
+    </ul>
+
   
   <section class="category-column first">
     {{view Discourse.TextField valueBinding="controller.username"  styleKey='width:300px;' placeholder="Search for a Vayniac by name, position, or team..."}}
   </section>
+    
+  <section class="category-column second">
+    <button class='btn' {{action seeAll}}>Don't know who you're looking for? See all employees<i class="icon icon-group"></i></button>
+  </section>   
 
 {{#if content}}  
 

@@ -9,12 +9,6 @@
 Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
   templateName: 'modal/create_account',
   title: Em.String.i18n('create_account.title'),
-  uniqueUsernameValidation: null,
-  globalNicknameExists: false,
-  complete: false,
-  accountPasswordConfirm: 0,
-  accountChallenge: 0,
-  formSubmitted: false,
 
   submitDisabled: (function() {
     if (this.get('formSubmitted')) return true;
@@ -241,49 +235,17 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
     });
   }).property('accountPassword'),
 
-  fetchConfirmationValue: function() {
-    var createAccountView = this;
-    return Discourse.ajax('/users/hp.json').then(function (json) {
-      createAccountView.set('accountPasswordConfirm', json.value);
-      createAccountView.set('accountChallenge', json.challenge.split("").reverse().join(""));
-    });
-  },
-
-  createAccount: function() {
-    var challenge, email, name, password, passwordConfirm, username,
-      _this = this;
-    this.set('formSubmitted', true);
-    name = this.get('accountName');
-    email = this.get('accountEmail');
-    password = this.get('accountPassword');
-    username = this.get('accountUsername');
-    passwordConfirm = this.get('accountPasswordConfirm');
-    challenge = this.get('accountChallenge');
-    return Discourse.User.createAccount(name, email, password, username, passwordConfirm, challenge).then(function(result) {
-      if (result.success) {
-        _this.flash(result.message);
-        _this.set('complete', true);
-      } else {
-        _this.flash(result.message || Em.String.i18n('create_account.failed'), 'error');
-        _this.set('formSubmitted', false);
-      }
-      if (result.active) {
-        return window.location.reload();
-      }
-    }, function() {
-      _this.set('formSubmitted', false);
-      return _this.flash(Em.String.i18n('create_account.failed'), 'error');
-    });
-  },
-
   didInsertElement: function(e) {
+
+    this._super();
+
     // allows the submission the form when pressing 'ENTER' on *any* text input field
     // but only when the submit button is enabled
-    var _this = this;
-    return Em.run.next(function() {
-      return $("input[type='text'], input[type='password']").keydown(function(e) {
-        if (_this.get('submitDisabled') === false && e.keyCode === 13) {
-          return _this.createAccount();
+    var createAccountController = this.get('controller');
+    Em.run.schedule('afterRender', function() {
+      $("input[type='text'], input[type='password']").keydown(function(e) {
+        if (createAccountController.get('submitDisabled') === false && e.keyCode === 13) {
+          createAccountController.createAccount();
         }
       });
     });

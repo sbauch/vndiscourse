@@ -41,7 +41,6 @@ describe CookedPostProcessor do
       before do
         @topic = Fabricate(:topic)
         @post = Fabricate.build(:post_with_image_url, topic: @topic, user: @topic.user)
-        ImageSorcery.any_instance.stubs(:convert).returns(false)
         @cpp = CookedPostProcessor.new(@post, image_sizes: {'http://www.forumwarz.com/images/header/logo.png' => {'width' => 111, 'height' => 222}})
         @cpp.expects(:get_size).returns([111,222])
       end
@@ -64,8 +63,6 @@ describe CookedPostProcessor do
 
       before do
         FastImage.stubs(:size).returns([123, 456])
-        ImageSorcery.any_instance.stubs(:convert).returns(false)
-        CookedPostProcessor.any_instance.expects(:image_dimensions).returns([123, 456])
         creator = PostCreator.new(user, raw: Fabricate.build(:post_with_images).raw, topic_id: topic.id)
         @post = creator.create
       end
@@ -81,6 +78,22 @@ describe CookedPostProcessor do
       end
 
     end
+
+    context 'with an absolute image path without protocol' do
+      let(:user) { Fabricate(:user) }
+      let(:topic) { Fabricate(:topic, user: user) }
+      let(:post) { Fabricate.build(:post_with_s3_image_url, topic: topic, user: user) }
+      let(:processor) { CookedPostProcessor.new(post) }
+
+      before do
+        processor.post_process_images
+      end
+
+      it "doesn't change the protocol" do
+        processor.html.should =~ /src="\/\/bucket\.s3\.amazonaws\.com\/uploads\/6\/4\/123\.png"/
+      end
+    end
+
   end
 
   context 'link convertor' do
@@ -132,6 +145,19 @@ describe CookedPostProcessor do
         cpp.image_dimensions(@url)
       end
     end
+  end
+
+  context 'get_image_uri' do
+
+    it "returns nil unless the scheme is either http or https" do
+      cpp.get_image_uri("http://domain.com").should   == URI.parse("http://domain.com")
+      cpp.get_image_uri("https://domain.com").should  == URI.parse("https://domain.com")
+      cpp.get_image_uri("ftp://domain.com").should    == nil
+      cpp.get_image_uri("ftps://domain.com").should   == nil
+      cpp.get_image_uri("//domain.com").should        == nil
+      cpp.get_image_uri("/tmp/image.png").should      == nil
+    end
+
   end
 
 end

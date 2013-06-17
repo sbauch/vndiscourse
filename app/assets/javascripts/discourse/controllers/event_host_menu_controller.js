@@ -34,6 +34,7 @@ Discourse.EventHostMenuController = Discourse.ObjectController.extend({
     			});
 
     var modalController = this.get('controllers.modal');
+		console.log(modalController);
     if (modalController) {
       modalController.show(modal);
     }

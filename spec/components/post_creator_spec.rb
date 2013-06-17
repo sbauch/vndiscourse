@@ -10,10 +10,6 @@ describe PostCreator do
 
   let(:user) { Fabricate(:user) }
 
-  it 'raises an error without a raw value' do
-    lambda { PostCreator.new(user, {}) }.should raise_error(Discourse::InvalidParameters)
-  end
-
   context 'new topic' do
     let(:category) { Fabricate(:category, user: user) }
     let(:topic) { Fabricate(:topic, user: user) }
@@ -28,6 +24,18 @@ describe PostCreator do
     it 'ensures the user can create the topic' do
       Guardian.any_instance.expects(:can_create?).with(Topic,nil).returns(false)
       lambda { creator.create }.should raise_error(Discourse::InvalidAccess)
+    end
+
+
+    context "invalid title" do
+
+      let(:creator_invalid_title) { PostCreator.new(user, basic_topic_params.merge(title: 'a')) }
+
+      it "has errors" do
+        creator_invalid_title.create
+        expect(creator_invalid_title.errors).to be_present
+      end
+
     end
 
     context 'success' do
@@ -57,14 +65,16 @@ describe PostCreator do
         topic_id = created_post.topic_id
 
 
-        messages.map{|m| m.channel}.sort.should == [ "/latest",
+        messages.map{|m| m.channel}.sort.should == [ "/new",
                                                      "/users/#{admin.username}",
                                                      "/users/#{admin.username}",
-                                                     "/topic/#{created_post.topic_id}",
-                                                     "/category/#{cat.slug}"
+                                                     "/unread/#{admin.id}",
+                                                     "/unread/#{admin.id}",
+                                                     "/topic/#{created_post.topic_id}"
                                                    ].sort
         admin_ids = [Group[:admins].id]
-        messages.any?{|m| m.group_ids != admin_ids}.should be_false
+
+        messages.any?{|m| m.group_ids != admin_ids && m.user_ids != [admin.id]}.should be_false
       end
 
       it 'generates the correct messages for a normal topic' do
@@ -75,13 +85,16 @@ describe PostCreator do
           topic_id = p.topic_id
         end
 
-        latest = messages.find{|m| m.channel == "/latest"}
+        latest = messages.find{|m| m.channel == "/new"}
         latest.should_not be_nil
+
+        read = messages.find{|m| m.channel == "/unread/#{p.user_id}"}
+        read.should_not be_nil
 
         user_action = messages.find{|m| m.channel == "/users/#{p.user.username}"}
         user_action.should_not be_nil
 
-        messages.length.should == 2
+        messages.length.should == 3
       end
 
       it 'extracts links from the post' do
@@ -203,9 +216,17 @@ describe PostCreator do
     end
 
     it "does not create the post" do
+      GroupMessage.stubs(:create)
       creator.create
       creator.errors.should be_present
       creator.spam?.should be_true
+    end
+
+    it "sends a message to moderators" do
+      GroupMessage.expects(:create).with do |group_name, msg_type, params|
+        group_name == Group[:moderators].name and msg_type == :spam_post_blocked and params[:user].id == user.id
+      end
+      creator.create
     end
 
   end
@@ -282,6 +303,28 @@ describe PostCreator do
       post.topic.subtype.should == TopicSubtype.user_to_user
       target_user1.notifications.count.should == 1
       target_user2.notifications.count.should == 1
+    end
+  end
+
+  context 'setting created_at' do
+    created_at = 1.week.ago
+    let(:topic) do
+      PostCreator.create(user,
+                         raw: 'This is very interesting test post content',
+                         title: 'This is a very interesting test post title',
+                         created_at: created_at)
+    end
+
+    let(:post) do
+      PostCreator.create(user,
+                         raw: 'This is very interesting test post content',
+                         topic_id: Topic.last,
+                         created_at: created_at)
+    end
+
+    it 'acts correctly' do
+      topic.created_at.should be_within(10.seconds).of(created_at)
+      post.created_at.should be_within(10.seconds).of(created_at)
     end
   end
 end

@@ -10,3 +10,23 @@ task "images:compress" => :environment do
   end
 end
 
+desc "updates reverse index of image uploads"
+task "images:reindex" => :environment do
+	RailsMultisite::ConnectionManagement.each_connection do |db|
+		puts "Reindexing #{db}"
+    Post.select([:id, :cooked]).find_each do |p|
+			doc = Nokogiri::HTML::fragment(p.cooked)
+			doc.search("img").each do |img|
+				src = img['src']
+				if src.present? && Upload.has_been_uploaded?(src) && m = Upload.uploaded_regex.match(src)
+          begin
+            PostUpload.create({ post_id: p.id, upload_id: m[:upload_id] })
+          rescue ActiveRecord::RecordNotUnique
+          end
+				end
+			end
+      putc "."
+		end
+  end
+  puts "\ndone."
+end
