@@ -3,15 +3,10 @@
   <div class="control-group">
     <label class="control-label">{{i18n user.username.title}}</label>
     <div class="controls">
-<<<<<<< HEAD
-      <span class='static'>{{content.username}}</span>
+      <span class='static'>{{username}}</span>
       {{#if Discourse.currentUser.admin}}
         {{#linkTo "preferences.username" class="btn pad-left"}}{{i18n user.change_username.action}}{{/linkTo}}
       {{/if}}
-=======
-      <span class='static'>{{username}}</span>
-      {{#linkTo "preferences.username" class="btn pad-left"}}{{i18n user.change_username.action}}{{/linkTo}}
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     </div>
     <div class='instructions'>
       {{{i18n user.username.short_instructions username="username"}}}
@@ -74,7 +69,6 @@
   <!-- <div class="control-group">
     <label class="control-label">{{i18n user.bio}}</label>
     <div class="controls">
-<<<<<<< HEAD
       {{view Discourse.PagedownEditor valueBinding="content.bio_raw"}}
     </div>
   </div> -->
@@ -84,19 +78,12 @@
     <label class="control-label">Fact One</label>
     <div class="controls">
       {{view Ember.TextField valueBinding="content.fact_one" classNames="input-xxlarge"}}
-=======
-      {{avatar model imageSize="large"}}
-    </div>
-    <div class='instructions'>
-      {{{i18n user.avatar.instructions}}} {{email}}
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     </div>
   </div>
 
   <div class="control-group">
     <label class="control-label">Fact Two</label>
     <div class="controls">
-<<<<<<< HEAD
       {{view Ember.TextField valueBinding="content.fact_two" classNames="input-xxlarge"}}
     </div>
   </div>
@@ -105,9 +92,6 @@
     <label class="control-label">Fact Three</label>
     <div class="controls">
       {{view Ember.TextField valueBinding="content.fact_three" classNames="input-xxlarge"}}
-=======
-      {{pagedown value=bio_raw}}
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     </div>
   </div>
 <!-- end VM custom   -->

@@ -174,10 +174,7 @@ Discourse.ComposerView = Discourse.View.extend({
     $LAB.script(assetPath('defer/html-sanitizer-bundle'));
     Discourse.ComposerView.trigger("initWmdEditor");
     var template = Discourse.UserSelector.templateFunction();
-<<<<<<< HEAD
 		var hashtag_template = Discourse.HashtagSelector.templateFunction();
-=======
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
 
     $wmdInput.data('init', true);
     $wmdInput.autocomplete({
@@ -192,7 +189,6 @@ Discourse.ComposerView = Discourse.View.extend({
       transformComplete: function(v) { return v.username; }
     });
 
-<<<<<<< HEAD
 		$wmdInput.autocomplete({
       template: hashtag_template,
       dataSource: function(term) {
@@ -206,9 +202,6 @@ Discourse.ComposerView = Discourse.View.extend({
 
     topic = this.get('topic');
 
-
-=======
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     this.editor = editor = Discourse.Markdown.createEditor({
       lookupAvatar: function(username) {
         return Discourse.Utilities.avatarImg({ username: username, size: 'tiny' });

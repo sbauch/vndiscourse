@@ -32,10 +32,7 @@ module Discourse
     end
 
     # Custom directories with classes and modules you want to be autoloadable.
-<<<<<<< HEAD
-    config.autoload_paths += %W(#{config.root}/app/serializers #{config.root}/lib/services)
-=======
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
+    config.autoload_paths += Dir["#{config.root}/lib/services"]
     config.autoload_paths += Dir["#{config.root}/app/serializers"]
     config.autoload_paths += Dir["#{config.root}/lib/validators/"]
 

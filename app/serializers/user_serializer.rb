@@ -56,10 +56,6 @@ class UserSerializer < BasicUserSerializer
                      :new_topic_duration_minutes,
                      :external_links_in_new_tab,
                      :enable_quoting
-<<<<<<< HEAD
-=======
-
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
 
   def auto_track_topics_after_msecs
     object.auto_track_topics_after_msecs || SiteSetting.auto_track_topics_after

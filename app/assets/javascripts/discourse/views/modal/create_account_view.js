@@ -10,7 +10,6 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
   templateName: 'modal/create_account',
   title: Em.String.i18n('create_account.title'),
 
-<<<<<<< HEAD
   submitDisabled: (function() {
     if (this.get('formSubmitted')) return true;
     if (this.get('nameValidation.failed')) return true;
@@ -240,12 +239,6 @@ Discourse.CreateAccountView = Discourse.ModalBodyView.extend({
 
     this._super();
 
-=======
-  didInsertElement: function(e) {
-
-    this._super();
-
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     // allows the submission the form when pressing 'ENTER' on *any* text input field
     // but only when the submit button is enabled
     var createAccountController = this.get('controller');

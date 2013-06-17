@@ -160,7 +160,6 @@ Discourse.TopicView = Discourse.View.extend(Discourse.Scrolling, {
 
   // Triggered whenever any posts are rendered, debounced to save over calling
   postsRendered: Discourse.debounce(function() {
-<<<<<<< HEAD
 		$(".hashtag").click(function() {
 			var enter = $.Event('keyup', { keyCode: 13 });
 			var searchterm = $(this)[0].innerText;
@@ -171,8 +170,6 @@ Discourse.TopicView = Discourse.View.extend(Discourse.Scrolling, {
 			return false;		
  			})
     this.set('renderedPosts', $('.topic-post'));
-=======
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     this.updatePosition(false);
   }, 50),
 

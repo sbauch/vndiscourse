@@ -383,9 +383,4 @@ class Guardian
     method_name = :"can_#{action}_#{obj.class.name.underscore}?"
     return method_name if respond_to?(method_name)
   end
-
-<<<<<<< HEAD
 end
-=======
-end
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef

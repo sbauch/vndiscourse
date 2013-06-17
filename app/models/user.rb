@@ -9,11 +9,6 @@ require_dependency 'user_name_suggester'
 require_dependency 'roleable'
 
 class User < ActiveRecord::Base
-<<<<<<< HEAD
-=======
-  include Roleable
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
-
   include Roleable
 
   attr_accessible :name, :username, :password, :email, :bio_raw, :website, :teams, :position, :short_position,
@@ -79,7 +74,6 @@ class User < ActiveRecord::Base
   end
 
   def self.username_length
-<<<<<<< HEAD
     3..25
   end
   
@@ -129,9 +123,6 @@ class User < ActiveRecord::Base
         end  
       end
     end        
-=======
-    3..15
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
   end
 
   def self.username_available?(username)

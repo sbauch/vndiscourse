@@ -291,10 +291,6 @@ Discourse.Post.reopenClass({
   },
 
   create: function(obj, topic) {
-<<<<<<< HEAD
-
-=======
->>>>>>> 4de0c58b834664c3220deb58202d1ccd14053fef
     var result = this._super(obj);
     this.createActionSummary(result);
     // if (obj.reply_to_user) {
