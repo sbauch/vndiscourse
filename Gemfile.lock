@@ -91,11 +91,6 @@ PATH
     discourse_plugin (0.0.1)
 
 PATH
-  remote: vendor/gems/discourse_task
-  specs:
-    discourse_task (0.0.1)
-
-PATH
   remote: vendor/gems/discourse_user_directory
   specs:
     discourse_user_directory (0.0.6)
@@ -528,7 +523,6 @@ DEPENDENCIES
   discourse_emoji!
   discourse_pervasive_banner!
   discourse_plugin!
-  discourse_task!
   discourse_user_directory!
   em-redis
   email_reply_parser
