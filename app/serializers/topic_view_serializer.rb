@@ -49,7 +49,7 @@ class TopicViewSerializer < ApplicationSerializer
              :highest_post_number,
              :pinned,
              :filtered_posts_count,
-             #:user_rsvp_status,
+             :user_rsvp_status,
              :post_creator,
              :event_menu,
              :starts_at,
