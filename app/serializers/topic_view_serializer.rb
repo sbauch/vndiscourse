@@ -19,6 +19,7 @@ class TopicViewSerializer < ApplicationSerializer
      :has_best_of,
      :archetype,
      :slug,
+     :location,
      :auto_close_at]
 
   end
@@ -52,10 +53,7 @@ class TopicViewSerializer < ApplicationSerializer
              :post_creator,
              :event_menu,
              :starts_at,
-             :ends_at,
-             :attendee_limit,
-             :location
-
+             :ends_at
 
   has_one :created_by, serializer: BasicUserSerializer, embed: :objects
   has_one :last_poster, serializer: BasicUserSerializer, embed: :objects
