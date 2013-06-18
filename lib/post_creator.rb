@@ -183,6 +183,13 @@ class PostCreator
     post = @topic.posts.new(raw: @opts[:raw],
                            user: @user,
                            reply_to_post_number: @opts[:reply_to_post_number])
+                           
+    if @opts[:archetype] == 'event'
+      post.starts_at = @opts[:starts_at]
+      post.ends_at = @opts[:ends_at]
+      post.attendee_limit = @opts[:attendee_limit]
+      post.location = @opts[:location]
+    end                        
 
     post.post_type = @opts[:post_type] if @opts[:post_type].present?
     post.no_bump = @opts[:no_bump] if @opts[:no_bump].present?
