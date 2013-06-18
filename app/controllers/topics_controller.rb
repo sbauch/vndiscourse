@@ -284,6 +284,7 @@ class TopicsController < ApplicationController
       end
 
       format.json do
+        puts 'we got this far'
         render_json_dump(topic_view_serializer)
       end
     end
