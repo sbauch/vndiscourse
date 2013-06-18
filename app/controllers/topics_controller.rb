@@ -40,8 +40,8 @@ class TopicsController < ApplicationController
     raise Discourse::NotFound if @topic_view.posts.blank? && !(opts[:best].to_i > 0)
 
     anonymous_etag(@topic_view.topic) do
-      puts 'slugs dont match?:' + slugs_do_not_match.to_s
       redirect_to_correct_topic && return if slugs_do_not_match
+      puts 'slugs do match'
       View.create_for(@topic_view.topic, request.remote_ip, current_user)
       track_visit_to_topic
       perform_show_response
