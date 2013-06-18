@@ -56,6 +56,7 @@ class PostCreator
 
     Post.transaction do
       setup_topic
+      eventify_topic
       setup_post
       rollback_if_host_spam_detected
       save_post
@@ -182,14 +183,7 @@ class PostCreator
   def setup_post
     post = @topic.posts.new(raw: @opts[:raw],
                            user: @user,
-                           reply_to_post_number: @opts[:reply_to_post_number])
-                           
-    if @opts[:archetype] == 'event'
-      post.starts_at = @opts[:starts_at]
-      post.ends_at = @opts[:ends_at]
-      post.attendee_limit = @opts[:attendee_limit]
-      post.location = @opts[:location]
-    end                        
+                           reply_to_post_number: @opts[:reply_to_post_number])               
 
     post.post_type = @opts[:post_type] if @opts[:post_type].present?
     post.no_bump = @opts[:no_bump] if @opts[:no_bump].present?
@@ -291,4 +285,15 @@ class PostCreator
       after_topic_create if @new_topic
     end
   end
+  
+  def evenitfy_topic
+    if @opts[:archetype] == 'event'
+      @topic.starts_at = @opts[:starts_at]
+      @topic.ends_at = @opts[:ends_at]
+      @topic.attendee_limit = @opts[:attendee_limit]
+      @topic.location = @opts[:location]
+      @topic.save
+    end         
+  end
+  
 end

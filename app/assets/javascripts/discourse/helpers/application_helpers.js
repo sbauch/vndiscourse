@@ -36,7 +36,7 @@ Handlebars.registerHelper('longUser', function(property, options) {
 
   // if (prop.length <= 15) return prop;
 	
-	result = prop.split(/(?=[A-Z]2+)/);
+	result = prop.split(/(?=[A-Z])/);
 	return result.join(' ');
 });
 
