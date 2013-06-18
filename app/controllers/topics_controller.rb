@@ -43,7 +43,7 @@ class TopicsController < ApplicationController
       redirect_to_correct_topic && return if slugs_do_not_match
       puts 'slugs do match'
       view = View.create_for(@topic_view.topic, request.remote_ip, current_user)
-      puts view.errors
+      puts view
       track_visit_to_topic
       perform_show_response
     end
