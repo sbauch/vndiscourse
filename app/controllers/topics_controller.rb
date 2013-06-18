@@ -27,14 +27,14 @@ class TopicsController < ApplicationController
 
   def show
     opts = params.slice(:username_filters, :best_of, :page, :post_number, :posts_before, :posts_after, :best)
-    begin
+    # begin
       @topic_view = TopicView.new(params[:id] || params[:topic_id], current_user, opts)
-    rescue Discourse::NotFound
-      topic = Topic.where(slug: params[:id]).first if params[:id]
-      raise Discourse::NotFound unless topic
-      return redirect_to(topic.relative_url)
-    end
-
+    # rescue Discourse::NotFound
+    #       topic = Topic.where(slug: params[:id]).first if params[:id]
+    #       raise Discourse::NotFound unless topic
+    #       return redirect_to(topic.relative_url)
+    #     end
+    
     raise Discourse::NotFound if @topic_view.posts.blank? && !(opts[:best].to_i > 0)
 
     anonymous_etag(@topic_view.topic) do
