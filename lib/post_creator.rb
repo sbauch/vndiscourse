@@ -286,7 +286,7 @@ class PostCreator
     end
   end
   
-  def evenitfy_topic
+  def eventify_topic
     if @opts[:archetype] == 'event'
       @topic.starts_at = @opts[:starts_at]
       @topic.ends_at = @opts[:ends_at]
