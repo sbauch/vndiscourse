@@ -1,39 +1,45 @@
-<div id='user-info'> 
+{{#with user}}
+  <div id='user-info'>
+    <nav class='buttons'>
+      {{#if can_edit}}
+        {{#linkTo "preferences" class="btn"}}{{i18n user.edit}}{{/linkTo}}
+      {{/if}}
+      <br/>
+      {{#if can_send_private_message_to_user}}
+        <button class='btn create' {{action composePrivateMessage}}>
+          <i class='icon icon-envelope-alt'></i>
+          {{i18n user.private_message}}
+        </button>
+      {{/if}}
+    </nav>
+    <div class='clearfix'></div>
+
+    <ul class='action-list nav-stacked side-nav'>
+      {{activityFilter count=statsCountNonPM}}
+      {{#each statsExcludingPms}}
+        {{activityFilter content=this}}
+      {{/each}}
+    </ul>
     <div class='show'>
-    <dl>
-    <dt>{{i18n user.email.title}}:</dt><dd {{bindAttr title="content.email"}}>{{content.email}}</dd>
-    <dt>Position:</dt><dd {{bindAttr title="content.position"}}>{{content.position}}</dd>
-    <dt>Teams:</dt><dd {{bindAttr title="content.teams"}}>{{content.teams}}</dd>
-    <dt>Flash Lessons:</dt><dd>{{content.events_attended}}</dd>  
+      <dl>
+      <dt>Position:</dt><dd>{{position}}</dd>
+      <dt>Teams:</dt><dd>{{teams}}</dd>
+      <dt>Flash Lessons:</dt><dd>{{events_attended}}</dd>    
+      {{#if created_at}}
+        <dt>{{i18n user.created}}:</dt><dd>{{date created_at}}</dd>
+      {{/if}}
+      {{#if last_posted_at}}
+        <dt>{{i18n user.last_posted}}:</dt><dd>{{date last_posted_at}}</dd>
+      {{/if}}
+      {{#if last_seen_at}}
+        <dt>{{i18n user.last_seen}}:</dt><dd>{{date last_seen_at}}</dd>
+      {{/if}}
+      {{#if email}}
+        <dt>{{i18n user.email.title}}:</dt><dd {{bindAttr title="email"}}>{{email}}</dd>
+      {{/if}}
+      </dl>
+    </div>
 
-    {{#if content.last_posted_at}}
-      <dt>{{i18n user.last_posted}}:</dt><dd>{{date content.last_posted_at}}</dd>
-    {{/if}}
-    {{#if content.last_seen_at}}
-      <dt>{{i18n user.last_seen}}:</dt><dd>{{date content.last_seen_at}}</dd>
-    {{/if}}
-    </dl>
-  </div>
-  <nav class='buttons'>
-    {{#if content.can_edit}}
-      {{#linkTo "preferences" class="btn"}}{{i18n user.edit}}{{/linkTo}}
-    {{/if}}
-    <br/>
-    {{#if content.can_send_private_message_to_user}}
-      <button class='btn create' {{action composePrivateMessage}}>
-        <i class='icon icon-envelope-alt'></i>
-        {{i18n user.private_message}}
-      </button>
-    {{/if}}
-  </nav>
-  <div class='clearfix'></div>
-
-  <ul class='action-list nav-stacked side-nav'>
-    {{view Discourse.ActivityFilterView countBinding="statsCountNonPM"}}
-    {{#each statsExcludingPms}}
-      {{view Discourse.ActivityFilterView contentBinding="this"}}
-    {{/each}}
-  </ul>
     {{#if can_edit}}
       <div style='margin-top: 10px'>
         <button class='btn' data-not-implemented='true' disabled title="{{i18n not_implemented}}">{{i18n user.download_archive}}</button>
@@ -41,4 +47,6 @@
     {{/if}}
 
   </div>
+{{/with}}
+
 {{userStream stream=model}}
