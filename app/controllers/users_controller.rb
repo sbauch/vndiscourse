@@ -55,7 +55,7 @@ class UsersController < ApplicationController
       
       
       [:email_digests, :email_direct, :email_private_messages,
-       :external_links_in_new_tab, :enable_quoting].each do |i|
+       :external_links_in_new_tab, :enable_quoting, :dynamic_favicon].each do |i|
         if params[i].present?
           u.send("#{i.to_s}=", params[i] == 'true')
         end

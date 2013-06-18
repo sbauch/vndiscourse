@@ -482,5 +482,9 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
     if (onPostRendered) {
       onPostRendered(post);
     }
+  },
+
+  removeAllowedUser: function(username) {
+    this.get('model').removeAllowedUser(username);
   }
 });

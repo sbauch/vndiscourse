@@ -172,6 +172,8 @@ en:
       bio: "About me"
       invited_by: "Invited By"
       trust_level: "Trust Level"
+      notifications: "Notifications"
+      dynamic_favicon: "Show incoming message notifications on favicon"
       external_links_in_new_tab: "Open all external links in a new tab"
       enable_quoting: "Enable quote reply for highlighted text"
       moderator: "{{user}} is a moderator"
@@ -554,7 +556,7 @@ en:
         one: "you have 1 unread old post in this topic"
         other: "you have {{count}} unread old posts in this topic"
       new_posts:
-        one: "there is 1 new posts in this topic since you last read it"
+        one: "there is 1 new post in this topic since you last read it"
         other: "there are {{count}} new posts in this topic since you last read it"
 
       likes:
