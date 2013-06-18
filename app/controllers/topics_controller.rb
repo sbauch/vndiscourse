@@ -42,7 +42,8 @@ class TopicsController < ApplicationController
     anonymous_etag(@topic_view.topic) do
       redirect_to_correct_topic && return if slugs_do_not_match
       puts 'slugs do match'
-      View.create_for(@topic_view.topic, request.remote_ip, current_user)
+      view = View.create_for(@topic_view.topic, request.remote_ip, current_user)
+      puts view.errors
       track_visit_to_topic
       perform_show_response
     end
@@ -272,6 +273,7 @@ class TopicsController < ApplicationController
 
   def perform_show_response
     topic_view_serializer = TopicViewSerializer.new(@topic_view, scope: guardian, root: false)
+    puts topic_view_serializer
     respond_to do |format|
       format.html do
         store_preloaded("topic_#{@topic_view.topic.id}", MultiJson.dump(topic_view_serializer))
