@@ -6,8 +6,8 @@
       <tr>
           <td style="width:80px"><label for='new-account-name'>{{i18n user.name.title}}</label></td>
           <td style="width:496px">
-          {{view Discourse.TextField disabled="disabled" valueBinding="view.accountName" elementId="new-account-name" autofocus="autofocus"}}
-          &nbsp;{{view Discourse.InputTipView validationBinding="view.nameValidation"}}
+          {{textField value=accountName id="new-account-name" disabled="disabled"}}
+          &nbsp;{{inputTip validation=nameValidation}}
           </td>
       </tr>
       <tr>
@@ -18,8 +18,8 @@
       <tr>
             <td><label for='new-account-email'>{{i18n user.email.title}}</label></td>
             <td>
-            {{view Ember.TextField disabled="disabled" valueBinding="view.accountEmail" id="new-account-email"}}
-            &nbsp;{{view Discourse.InputTipView validationBinding="view.emailValidation"}}
+            {{input value=accountEmail id="new-account-email" disabled="disabled"}}
+            &nbsp;{{inputTip validation=emailValidation}}
             </td>
       </tr>
       <tr>
@@ -30,8 +30,8 @@
       <tr>
             <td><label for='new-account-username'>{{i18n user.username.title}}</label></td>
             <td>
-            {{view Ember.TextField disabled="disabled" valueBinding="view.accountUsername" id="new-account-username" maxlength="25"}}
-            &nbsp;{{view Discourse.InputTipView validationBinding="view.usernameValidation"}}
+            {{input value=accountUsername id="new-account-username" maxlength="30" disabled="disabled"}}
+            &nbsp;
             </td>
       </tr>
       <tr>

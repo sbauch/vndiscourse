@@ -253,7 +253,8 @@ class Users::OmniauthCallbacksController < ApplicationController
         openid_url: identity_url
       }
     end
-
+    puts @data
+    @data.to_json
   end
 
   alias_method :create_or_sign_on_user_using_yahoo, :create_or_sign_on_user_using_openid
