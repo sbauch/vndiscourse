@@ -291,6 +291,7 @@ class PostCreator
       @topic.starts_at = @opts[:starts_at]
       @topic.ends_at = @opts[:ends_at]
       @topic.attendee_limit = @opts[:attendee_limit]
+      @topic.attendee_count = 0
       @topic.location = @opts[:location]
       @topic.save
     end         

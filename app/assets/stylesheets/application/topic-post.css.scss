@@ -74,11 +74,6 @@
     .gutter {
       width: 100px;
     }
-    article.boxed {
-      .read-icon {
-        left: 750px !important;
-      }
-    }
   }
 }
 
@@ -202,13 +197,6 @@
     }
   }
   @include hover {
-    .read-icon {
-      i {
-        &:before {
-          font-size: 25px;
-        }
-      }
-    }
     section.post-menu-area {
       display: block;
     }
@@ -281,6 +269,25 @@
         }
         &.like, &.edit, &.flag, &.delete, &.share, &.bookmark, &.create {
           float: right;
+        }
+        .read-icon {
+          &:before {
+            font-family: "FontAwesome";
+            content: "\f02e";
+          }
+          &.unseen {
+            &:before {
+              content: "\f097";
+            }
+          }
+          &.last-read {
+            color: $red;
+          }
+          &.bookmarked {
+            &:before {
+              color: $bookmarkColor;
+            }
+          }
         }
       }
       button.create {
@@ -362,18 +369,6 @@
       }
       .score {
         font-size: 12px;
-      }
-    }
-    .post-info {
-      margin-top: -1px;
-      line-height: 12px;
-      a {
-        color: rgba(#323232, 0.9);
-        font-size: 10px;
-      }
-      .bar {
-        color: $muted-link-color;
-        font-size: 10px;
       }
     }
   }
@@ -484,11 +479,6 @@
     position: relative;
     font-size: 16px;
     line-height: 20px;
-    @include small-width {
-      .read-icon {
-        right: 365px !important;
-      }
-    }
     .post-select {
       @include border-radius-all(4px);
       background-color: $light_gray;
@@ -504,34 +494,22 @@
       padding: 2px 5px;
       z-index: 490;
     }
-    .read-icon {
-      @include transition(opacity 1s);
-      opacity: 0;
-      position: absolute;
-      top: -3px;
-      left: 800px;
-      width: 16px;
-      height: 22px;
+    .topic-meta-data-inside {
+      float: right;
       z-index: 490;
-      font-size: 20px;
-      cursor: pointer;
-      &:before {
-        font-family: "FontAwesome";
-        content: "\f02e";
-      }
-      &.seen {
-        color: $gray;
-        opacity: 1;
-      }
-      &.last-read {
-        color: $red;
-        opacity: 1;
-      }
-      &.bookmarked {
-        &:before {
-          color: $bookmarkColor;
+      margin-left: 20px;
+      .post-info {
+        font-size: 12px;
+        display: inline-block;
+        margin-right: 12px;
+        &.edits {
+          a, a:visited {
+            color: #aaa;
+          }
         }
-        opacity: 1;
+      }
+      .post-date {
+        color: #aaa;
       }
     }
     img {
@@ -541,7 +519,7 @@
       position: relative;
       .contents {
         .cooked {
-          padding: 12px 10px 0;
+          padding: 10px 10px 0;
         }
         position: relative;
         border: 1px solid #b9b9b9;
@@ -567,7 +545,14 @@
         @include box-shadow(0 1px 2px rgba($black, 0.07));
       }
       .contents.avoid-tab {
+        .topic-meta-data-inside {
+          position: relative;
+          top: -30px;
+        }
         padding-top: 30px;
+        .cooked {
+          padding-top: 10px;
+        }
       }
       .post-actions {
         padding: 3px 0 0px 15px;
