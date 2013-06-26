@@ -17,10 +17,10 @@ Discourse.CreateAccountController = Discourse.Controller.extend(Discourse.ModalF
 
   submitDisabled: function() {
     if (this.get('formSubmitted')) return true;
-    if (this.get('nameValidation.failed')) return true;
+    // if (this.get('nameValidation.failed')) return true;
     if (this.get('emailValidation.failed')) return true;
-    if (this.get('usernameValidation.failed')) return true;
-    if (this.get('passwordValidation.failed')) return true;
+    //if (this.get('usernameValidation.failed')) return true;
+    //if (this.get('passwordValidation.failed')) return true;
     return false;
   }.property('nameValidation.failed', 'emailValidation.failed', 'usernameValidation.failed', 'passwordValidation.failed', 'formSubmitted'),
 
