@@ -19,6 +19,7 @@ class TopicViewSerializer < ApplicationSerializer
      :has_best_of,
      :archetype,
      :slug,
+     :category_id,
      :location,
      :auto_close_at,
      :category_id,
