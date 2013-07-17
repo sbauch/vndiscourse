@@ -351,12 +351,9 @@ Discourse.Post.reopenClass({
     if (obj && obj.reply_to_user) {
       result.set('reply_to_user', Discourse.User.create(obj.reply_to_user));
     }
-<<<<<<< HEAD
-    result.set('topic', topic);
+    //result.set('topic', topic);
 				console.log('result');
 
-=======
->>>>>>> 81616a46ba2fd8a393a38e4f989e1b2ca4525387
     return result;
   },
 

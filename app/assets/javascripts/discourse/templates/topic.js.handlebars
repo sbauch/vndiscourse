@@ -57,44 +57,7 @@
           {{#unless postStream.loadingFilter}}
             {{collection itemViewClass="Discourse.PostView" contentBinding="postStream.posts" topicViewBinding="view"}}
           {{/unless}}
-
-<<<<<<< HEAD
-          {{#if loading}}
-            {{#unless loadingBelow}}
-              <div class='spinner small'>{{i18n loading}}</div>
-            {{/unless}}
-          {{else}}
-            {{#if view.fullyLoaded}}
-              <div style='margin-left: 103px;'>{{gcal}}</div>
-
-              {{view Discourse.TopicClosingView topicBinding="model"}}
-
-              {{view Discourse.TopicFooterButtonsView topicBinding="model"}}
-
-              {{#if suggested_topics.length}}
-                <div id='suggested-topics'>
-
-                  <h3>{{i18n suggested_topics.title}}</h3>
-
-                  <div class='topics'>
-                    <table id="topic-list">
-                      <tr>
-                        <th>
-                          {{i18n topic.title}}
-                        </th>
-                        <th>{{i18n category_title}}</th>
-                        <th class='num'>{{i18n posts}}</th>
-                        <th class='num'>{{i18n likes}}</th>
-                        <th class='num'>{{i18n views}}</th>
-                        <th class='num activity' colspan='2'>{{i18n activity}}</th>
-                      </tr>
-
-                    {{each suggested_topics itemTagName="tr" itemViewClass="Discourse.SuggestedTopicView"}}
-                    </table>
-                  </div>
-                  <br/>
-                  <h3>{{{view.browseMoreMessage}}}</h3>
-=======
+          
           {{#if postStream.loadingBelow}}
             <div class='spinner'>{{i18n loading}}</div>
           {{/if}}
@@ -129,7 +92,6 @@
 
                   {{each details.suggested_topics itemTagName="tr" itemViewClass="Discourse.SuggestedTopicView"}}
                   </table>
->>>>>>> 81616a46ba2fd8a393a38e4f989e1b2ca4525387
                 </div>
                 <br/>
                 <h3>{{{view.browseMoreMessage}}}</h3>
@@ -180,5 +142,3 @@
 {{#if event_menu}}
   {{render eventHostMenu content}}
 {{/if}}
-
-
