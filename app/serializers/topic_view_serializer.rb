@@ -19,7 +19,6 @@ class TopicViewSerializer < ApplicationSerializer
      :has_best_of,
      :archetype,
      :slug,
-     :category_id,
      :location,
      :auto_close_at,
      :category_id,
@@ -32,9 +31,7 @@ class TopicViewSerializer < ApplicationSerializer
              :starred,
              :posted,
              :pinned,
-             :filtered_posts_count,
              :user_rsvp_status,
-             :post_creator,
              :event_menu,
              :starts_at,
              :ends_at,
@@ -43,14 +40,14 @@ class TopicViewSerializer < ApplicationSerializer
              :last_read_post_number,
              :deleted_by
 
-  has_one :created_by, serializer: BasicUserSerializer, embed: :objects
-  has_one :last_poster, serializer: BasicUserSerializer, embed: :objects
-  has_many :allowed_users, serializer: BasicUserSerializer, embed: :objects
-  has_many :allowed_groups, serializer: BasicGroupSerializer, embed: :objects
-
-  has_many :links, serializer: TopicLinkSerializer, embed: :objects
-  has_many :participants, serializer: TopicPostCountSerializer, embed: :objects
-  has_many :suggested_topics, serializer: SuggestedTopicSerializer, embed: :objects
+  # has_one :created_by, serializer: BasicUserSerializer, embed: :objects
+  # has_one :last_poster, serializer: BasicUserSerializer, embed: :objects
+  # has_many :allowed_users, serializer: BasicUserSerializer, embed: :objects
+  # has_many :allowed_groups, serializer: BasicGroupSerializer, embed: :objects
+  # 
+  # has_many :links, serializer: TopicLinkSerializer, embed: :objects
+  # has_many :participants, serializer: TopicPostCountSerializer, embed: :objects
+  # has_many :suggested_topics, serializer: SuggestedTopicSerializer, embed: :objects
 
 
   # Define a delegator for each attribute of the topic we want
