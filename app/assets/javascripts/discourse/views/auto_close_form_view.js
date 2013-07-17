@@ -10,12 +10,12 @@ Discourse.AutoCloseFormView = Ember.View.extend({
   templateName: 'auto_close_form',
 
   label: function() {
-    return Em.String.i18n( this.get('labelKey') || 'composer.auto_close_label' );
+    return I18n.t( this.get('labelKey') || 'composer.auto_close_label' );
   }.property('labelKey'),
 
   autoCloseChanged: function() {
     if( this.get('autoCloseDays') && this.get('autoCloseDays').length > 0 ) {
-      this.set('autoCloseDays', this.get('autoCloseDays').replace(/[^\d]/g, '') )
+      this.set('autoCloseDays', this.get('autoCloseDays').replace(/[^\d]/g, '') );
     }
   }.observes('autoCloseDays')
 });

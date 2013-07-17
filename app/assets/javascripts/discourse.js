@@ -22,6 +22,9 @@ Discourse = Ember.Application.createWithMixins({
   // The highest seen post number by topic
   highestSeenByTopic: {},
 
+  // Helps with integration tests
+  URL_FIXTURES: {},
+
   getURL: function(url) {
 
     // If it's a non relative URL, return it.
@@ -104,12 +107,6 @@ Discourse = Ember.Application.createWithMixins({
     this.set('notifyCount', count);
   },
 
-  openComposer: function(opts) {
-    // TODO, remove container link
-    var composer = Discourse.__container__.lookup('controller:composer');
-    if (composer) composer.open(opts);
-  },
-
   /**
     Establishes global DOM events and bindings via jQuery.
 
@@ -140,26 +137,26 @@ Discourse = Ember.Application.createWithMixins({
 
     $('#main').on('click.discourse', '[data-not-implemented=true]', function(e) {
       e.preventDefault();
-      alert(Em.String.i18n('not_implemented'));
+      alert(I18n.t('not_implemented'));
       return false;
     });
 
     $('#main').on('click.discourse', 'a', function(e) {
-      if (e.isDefaultPrevented() || e.shiftKey || e.metaKey || e.ctrlKey) return;
+      if (e.isDefaultPrevented() || e.shiftKey || e.metaKey || e.ctrlKey) { return; }
 
       var $currentTarget = $(e.currentTarget);
       var href = $currentTarget.attr('href');
-      if (!href) return;
-      if (href === '#') return;
-      if ($currentTarget.attr('target')) return;
-      if ($currentTarget.data('auto-route')) return;
+      if (!href) { return; }
+      if (href === '#') { return; }
+      if ($currentTarget.attr('target')) { return; }
+      if ($currentTarget.data('auto-route')) { return; }
 
       // If it's an ember #linkTo skip it
-      if ($currentTarget.hasClass('ember-view')) return;
+      if ($currentTarget.hasClass('ember-view')) { return; }
 
-      if ($currentTarget.hasClass('lightbox')) return;
-      if (href.indexOf("mailto:") === 0) return;
-      if (href.match(/^http[s]?:\/\//i) && !href.match(new RegExp("^http:\\/\\/" + window.location.hostname, "i"))) return;
+      if ($currentTarget.hasClass('lightbox')) { return; }
+      if (href.indexOf("mailto:") === 0) { return; }
+      if (href.match(/^http[s]?:\/\//i) && !href.match(new RegExp("^http:\\/\\/" + window.location.hostname, "i"))) { return; }
 
       e.preventDefault();
       Discourse.URL.routeTo(href);
@@ -181,6 +178,9 @@ Discourse = Ember.Application.createWithMixins({
       }
     });
 
+    bootbox.animate(false);
+    bootbox.backdrop(true); // clicking outside a bootbox modal closes it
+
     setInterval(function(){
       Discourse.Formatter.updateRelativeAge($('.relative-date'));
     },60 * 1000);
@@ -196,7 +196,7 @@ Discourse = Ember.Application.createWithMixins({
       // Reloading will refresh unbound properties
       Discourse.KeyValueStore.abandonLocal();
       window.location.reload();
-    })
+    });
   },
 
   authenticationComplete: function(options) {
@@ -250,9 +250,7 @@ Discourse = Ember.Application.createWithMixins({
     // If we have URL_FIXTURES, load from there instead (testing)
     var fixture = Discourse.URL_FIXTURES && Discourse.URL_FIXTURES[url];
     if (fixture) {
-      return Ember.Deferred.promise(function(promise) {
-        promise.resolve(fixture);
-      })
+      return Ember.RSVP.resolve(fixture);
     }
 
     return Ember.Deferred.promise(function (promise) {
@@ -260,7 +258,7 @@ Discourse = Ember.Application.createWithMixins({
       args.success = function(xhr) {
         Ember.run(promise, promise.resolve, xhr);
         if (oldSuccess) oldSuccess(xhr);
-      }
+      };
 
       var oldError = args.error;
       args.error = function(xhr) {
@@ -270,7 +268,7 @@ Discourse = Ember.Application.createWithMixins({
 
         promise.reject(xhr);
         if (oldError) oldError(xhr);
-      }
+      };
 
       // We default to JSON on GET. If we don't, sometimes if the server doesn't return the proper header
       // it will not be parsed as an object.
@@ -304,7 +302,7 @@ Discourse = Ember.Application.createWithMixins({
       bus.subscribe("/categories", function(data){
         var site = Discourse.Site.instance();
         _.each(data.categories,function(c){
-          site.updateCategory(c)
+          site.updateCategory(c);
         });
       });
 
@@ -324,10 +322,6 @@ Discourse = Ember.Application.createWithMixins({
     Discourse.MessageBus.alwaysLongPoll = Discourse.Environment === "development";
     Discourse.MessageBus.start();
     Discourse.KeyValueStore.init("discourse_", Discourse.MessageBus);
-
-    // Don't remove site settings for now. It seems on some browsers the route
-    // tries to use it after it has been removed
-    // PreloadStore.remove('siteSettings');
 
     // Developer specific functions
     Discourse.Development.setupProbes();

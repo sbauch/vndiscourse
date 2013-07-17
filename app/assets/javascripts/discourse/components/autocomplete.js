@@ -203,18 +203,8 @@ $.fn.autocomplete = function(options) {
     closeAutocomplete();
   });
 
-  $(this).keypress(function(e) {
 
-    if(options.allowAny){
-      if(inputSelectedItems.length === 0) {
-        inputSelectedItems.push("");
-      }
-      inputSelectedItems.pop();
-      inputSelectedItems.push(me.val());
-      if (options.onChangeItems) {
-        options.onChangeItems(inputSelectedItems);
-      }
-    }
+  $(this).keypress(function(e) {
 
     if (!options.key) return;
 
@@ -232,6 +222,25 @@ $.fn.autocomplete = function(options) {
 
   return $(this).keydown(function(e) {
     var c, caretPosition, i, initial, next, nextIsGood, prev, prevIsGood, stopFound, term, total, userToComplete;
+
+    if(options.allowAny){
+      // saves us wiring up a change event as well, keypress is while its pressed
+      _.delay(function(){
+        if(inputSelectedItems.length === 0) {
+          inputSelectedItems.push("");
+        }
+
+        if(_.isString(inputSelectedItems[0])) {
+          inputSelectedItems.pop();
+          inputSelectedItems.push(me.val());
+          if (options.onChangeItems) {
+            options.onChangeItems(inputSelectedItems);
+          }
+        }
+
+      },50);
+    }
+
     if (!options.key) {
       completeStart = 0;
     }
@@ -333,12 +342,13 @@ $.fn.autocomplete = function(options) {
           } else if (e.which === 187) {
             term += "+";
           } else if (e.which === 189) {
-            term += "-";
+            term += (e.shiftKey) ? "_" : "-";
           } else {
             if (e.which !== 8) {
               term += ",";
             }
           }
+
           options.dataSource(term).then(updateAutoComplete);
           return true;
       }

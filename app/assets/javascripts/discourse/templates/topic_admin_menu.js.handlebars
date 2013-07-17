@@ -1,4 +1,4 @@
-{{#if visible}}
+{{#if menuVisible}}
   <div class="topic-admin-menu">
     <h3>{{i18n admin_title}}</h3>
 
@@ -7,9 +7,15 @@
           <button {{action toggleMultiSelect}} class='btn btn-admin'><i class='icon-tasks'></i> {{i18n topic.actions.multi_select}}</button>
         </li>
 
-      {{#if can_delete}}
+      {{#if details.can_delete}}
         <li>
           <button {{action deleteTopic}} class='btn btn-admin btn-danger'><i class='icon-trash'></i> {{i18n topic.actions.delete}}</button>
+        </li>
+      {{/if}}
+
+      {{#if details.can_recover}}
+        <li>
+          <button {{action recoverTopic}} class='btn btn-admin'><i class='icon-undo'></i> {{i18n topic.actions.recover}}</button>
         </li>
       {{/if}}
 
@@ -46,14 +52,14 @@
         {{/if}}
       </li>
 
-      {{#if view.topic.canConvertToRegular}}
+      {{#if canConvertToRegular}}
       <li>
           <button {{action convertToRegular}} class='btn btn-admin'><i class='icon-minus'></i> {{i18n topic.actions.convert_to_topic}}</button>
       </li>
       {{/if}}
 
       <li>
-        <button class='btn btn-admin' {{action resetRead target="view.parentView"}}><i class='icon-remove'></i> {{i18n topic.actions.reset_read}}</button>
+        <button class='btn btn-admin' {{action resetRead}}><i class='icon-remove'></i> {{i18n topic.actions.reset_read}}</button>
       </li>
       
       <li>

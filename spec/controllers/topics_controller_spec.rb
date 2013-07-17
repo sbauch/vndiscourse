@@ -2,6 +2,44 @@ require 'spec_helper'
 
 describe TopicsController do
 
+
+
+  context 'wordpress' do
+    let!(:user) { log_in(:moderator) }
+    let(:p1) { Fabricate(:post, user: user) }
+    let(:topic) { p1.topic }
+    let!(:p2) { Fabricate(:post, topic: topic, user:user )}
+
+    it "returns the JSON in the format our wordpress plugin needs" do
+      xhr :get, :wordpress, topic_id: topic.id, best: 3
+      response.should be_success
+      json = ::JSON.parse(response.body)
+      json.should be_present
+
+      # The JSON has the data the wordpress plugin needs
+      json['id'].should == topic.id
+      json['posts_count'].should == 2
+      json['filtered_posts_count'].should == 2
+
+      # Posts
+      json['posts'].size.should == 1
+      post = json['posts'][0]
+      post['id'].should == p2.id
+      post['username'].should == user.username
+      post['avatar_template'].should == user.avatar_template
+      post['name'].should == user.name
+      post['created_at'].should be_present
+      post['cooked'].should == p2.cooked
+
+      # Participants
+      json['participants'].size.should == 1
+      participant = json['participants'][0]
+      participant['id'].should == user.id
+      participant['username'].should == user.username
+      participant['avatar_template'].should == user.avatar_template
+    end
+  end
+
   context 'move_posts' do
     it 'needs you to be logged in' do
       lambda { xhr :post, :move_posts, topic_id: 111, title: 'blah', post_ids: [1,2,3] }.should raise_error(Discourse::NotLoggedIn)
@@ -355,6 +393,37 @@ describe TopicsController do
     end
   end
 
+  describe 'recover' do
+    it "won't allow us to recover a topic when we're not logged in" do
+      lambda { xhr :put, :recover, topic_id: 1 }.should raise_error(Discourse::NotLoggedIn)
+    end
+
+    describe 'when logged in' do
+      let(:topic) { Fabricate(:topic, user: log_in, deleted_at: Time.now, deleted_by: log_in) }
+
+      describe 'without access' do
+        it "raises an exception when the user doesn't have permission to delete the topic" do
+          Guardian.any_instance.expects(:can_recover_topic?).with(topic).returns(false)
+          xhr :put, :recover, topic_id: topic.id
+          response.should be_forbidden
+        end
+      end
+
+      context 'with permission' do
+        before do
+          Guardian.any_instance.expects(:can_recover_topic?).with(topic).returns(true)
+        end
+
+        it 'succeeds' do
+          Topic.any_instance.expects(:recover!)
+          xhr :put, :recover, topic_id: topic.id
+          response.should be_success
+        end
+      end
+    end
+
+  end
+
   describe 'delete' do
     it "won't allow us to delete a topic when we're not logged in" do
       lambda { xhr :delete, :destroy, id: 1 }.should raise_error(Discourse::NotLoggedIn)
@@ -460,19 +529,19 @@ describe TopicsController do
 
       it 'grabs first page when no filter is provided' do
         SiteSetting.stubs(:posts_per_page).returns(20)
-        TopicView.any_instance.expects(:filter_posts_in_range).with(0, 20)
+        TopicView.any_instance.expects(:filter_posts_in_range).with(0, 19)
         xhr :get, :show, topic_id: topic.id, slug: topic.slug
       end
 
       it 'grabs first page when first page is provided' do
         SiteSetting.stubs(:posts_per_page).returns(20)
-        TopicView.any_instance.expects(:filter_posts_in_range).with(0, 20)
+        TopicView.any_instance.expects(:filter_posts_in_range).with(0, 19)
         xhr :get, :show, topic_id: topic.id, slug: topic.slug, page: 1
       end
 
       it 'grabs correct range when a page number is provided' do
         SiteSetting.stubs(:posts_per_page).returns(20)
-        TopicView.any_instance.expects(:filter_posts_in_range).with(20, 40)
+        TopicView.any_instance.expects(:filter_posts_in_range).with(20, 39)
         xhr :get, :show, topic_id: topic.id, slug: topic.slug, page: 2
       end
 
@@ -480,17 +549,6 @@ describe TopicsController do
         TopicView.any_instance.expects(:filter_posts_near).with(p2.post_number)
         xhr :get, :show, topic_id: topic.id, slug: topic.slug, post_number: p2.post_number
       end
-
-      it 'delegates a posts_after param to TopicView#filter_posts_after' do
-        TopicView.any_instance.expects(:filter_posts_after).with(p1.post_number)
-        xhr :get, :show, topic_id: topic.id, slug: topic.slug, posts_after: p1.post_number
-      end
-
-      it 'delegates a posts_before param to TopicView#filter_posts_before' do
-        TopicView.any_instance.expects(:filter_posts_before).with(p2.post_number)
-        xhr :get, :show, topic_id: topic.id, slug: topic.slug, posts_before: p2.post_number
-      end
-
     end
 
     context "when 'login required' site setting has been enabled" do

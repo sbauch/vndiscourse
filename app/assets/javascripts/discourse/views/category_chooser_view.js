@@ -9,12 +9,15 @@
 Discourse.CategoryChooserView = Discourse.ComboboxView.extend({
   classNames: ['combobox category-combobox'],
   overrideWidths: true,
-  dataAttributes: ['name', 'color', 'text_color', 'description', 'topic_count'],
+  dataAttributes: ['name', 'color', 'text_color', 'description_text', 'topic_count'],
   valueBinding: Ember.Binding.oneWay('source'),
 
   init: function() {
     this._super();
-    this.set('content', Discourse.Category.list());
+    // TODO perhaps allow passing a param in to select if we need full or not
+    this.set('content', _.filter(Discourse.Category.list(), function(c){
+      return c.permission === Discourse.PermissionType.FULL;
+    }));
   },
 
   none: function() {
@@ -23,11 +26,20 @@ Discourse.CategoryChooserView = Discourse.ComboboxView.extend({
 
   template: function(text, templateData) {
     if (!templateData.color) return text;
+
     var result = "<span class='badge-category' style='background-color: #" + templateData.color + '; color: #' +
         templateData.text_color + ";'>" + templateData.name + "</span>";
+
     result += " <span class='topic-count'>&times; " + templateData.topic_count + "</span>";
-    if (templateData.description && templateData.description !== 'null') {
-      result += '<div class="category-desc">' + templateData.description.substr(0,200) + (templateData.description.length > 200 ? '&hellip;' : '') + '</div>';
+
+    var description = templateData.description_text;
+    // TODO wtf how can this be null?
+    if (description && description !== 'null') {
+
+      result += '<div class="category-desc">' +
+                 description.substr(0,200) +
+                 (description.length > 200 ? '&hellip;' : '') +
+                 '</div>';
     }
     return result;
   }

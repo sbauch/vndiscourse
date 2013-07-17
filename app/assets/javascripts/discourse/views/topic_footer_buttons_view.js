@@ -68,65 +68,16 @@ Discourse.TopicFooterButtonsView = Discourse.ContainerView.extend({
 						}
           }));
 
-        this.addObject(Discourse.ButtonView.createWithMixins({
-          textKey: 'favorite.title',
-          helpKeyBinding: 'controller.content.favoriteTooltipKey',
+        // We hide some controls from private messages
+        if (this.get('topic.details.can_invite_to')) {
+        }
+        this.attachViewClass(Discourse.FavoriteButton);
 
-          favoriteChanged: (function() {
-            this.rerender();
-          }).observes('controller.content.starred'),
-
-          click: function() {
-            this.get('controller').toggleStar();
-          },
-
-          renderIcon: function(buffer) {
-            var extraClass;
-            if (this.get('controller.content.starred')) {
-              extraClass = 'starred';
-            }
-            return buffer.push("<i class='icon-star " + extraClass + "'></i>");
-          }
-        }));
-
-        // this.addObject(Discourse.ButtonView.create({
-        //   textKey: 'topic.share.title',
-        //   helpKey: 'topic.share.help',
-        //   'data-share-url': topic.get('shareUrl'),
-        // 
-        //   renderIcon: function(buffer) {
-        //     buffer.push("<i class='icon icon-share'></i>");
-        //   }
-        // }));
-
-
-        // Add our clear pin button
-        this.addObject(Discourse.ButtonView.createWithMixins({
-          textKey: 'topic.clear_pin.title',
-          helpKey: 'topic.clear_pin.help',
-          classNameBindings: ['unpinned'],
-
-          // Hide the button if it becomes unpinned
-          unpinned: function() {
-            // When not logged in don't show the button
-            if (!Discourse.get('currentUser')) return 'hidden'
-
-            return this.get('controller.pinned') ? null : 'hidden';
-          }.property('controller.pinned'),
-
-          click: function(buffer) {
-            this.get('controller').clearPin();
-          },
-
-          renderIcon: function(buffer) {
-            buffer.push("<i class='icon icon-pushpin'></i>");
-          }
-        }));
       }
       this.attachViewClass(Discourse.ReplyButton);
 
       if (!topic.get('isPrivateMessage')) {
-        this.attachViewWithArgs({topic: topic}, Discourse.NotificationsButton);
+        this.attachViewClass(Discourse.NotificationsButton);
       }
       this.trigger('additionalButtons', this);
     } else {

@@ -3,7 +3,9 @@ class SiteSerializer < ApplicationSerializer
   attributes :default_archetype,
              :notification_types,
              :post_types,
-             :uncategorized_slug
+             :uncategorized_slug,
+             :group_names
+
 
   has_many :categories, serializer: BasicCategorySerializer, embed: :objects
   has_many :post_action_types, embed: :objects

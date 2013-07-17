@@ -4,10 +4,18 @@ class StaticController < ApplicationController
 
   def show
 
+    map = {
+      "faq" => "faq_url",
+      "tos" => "tos_url",
+      "privacy" =>  "privacy_policy_url"
+    }
+
     page = params[:id]
 
-    return redirect_to(SiteSetting.tos_url) if page == 'tos' and !SiteSetting.tos_url.blank?
-    return redirect_to(SiteSetting.privacy_policy_url) if page == 'privacy' and !SiteSetting.privacy_policy_url.blank?
+    if site_setting_key = map[page]
+      url = SiteSetting.send(site_setting_key)
+      return redirect_to(url) unless url.blank?
+    end
 
     # Don't allow paths like ".." or "/" or anything hacky like that
     page.gsub!(/[^a-z0-9\_\-]/, '')
@@ -17,6 +25,10 @@ class StaticController < ApplicationController
     # if we don't have a localized version, try the English one
     if not lookup_context.find_all("#{file}.html").any?
       file = "static/#{page}.en"
+    end
+
+    if not lookup_context.find_all("#{file}.html").any?
+      file = "static/#{page}"
     end
 
     if lookup_context.find_all("#{file}.html").any?
@@ -36,7 +48,7 @@ class StaticController < ApplicationController
 
     redirect_to(
       if params[:redirect].blank? || params[:redirect].match(login_path)
-        root_path
+        "/"
       else
         params[:redirect]
       end

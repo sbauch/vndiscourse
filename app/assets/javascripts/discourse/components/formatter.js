@@ -1,11 +1,36 @@
+/*jshint onecase:true */
+
 Discourse.Formatter = (function(){
 
   var updateRelativeAge, autoUpdatingRelativeAge, relativeAge, relativeAgeTiny,
       relativeAgeMedium, relativeAgeMediumSpan, longDate, toTitleCase,
-      shortDate;
+      shortDate, shortDateNoYear, breakUp;
+
+  breakUp = function(string, maxLength){
+    if(string.length <= maxLength) {
+      return string;
+    }
+
+    var firstPart = string.substr(0, maxLength);
+
+    var betterSplit = firstPart.substr(1).search(/[^a-z]/);
+    if (betterSplit >= 0) {
+      var offset = 1;
+      if(string[betterSplit+1] === "_") {
+        offset = 2;
+      }
+      return string.substr(0, betterSplit + offset) + " " + string.substring(betterSplit + offset);
+    } else {
+      return firstPart + " " + string.substr(maxLength);
+    }
+  };
 
   shortDate = function(date){
     return moment(date).shortDate();
+  };
+
+  shortDateNoYear = function(date) {
+    return moment(date).shortDateNoYear();
   };
 
   // http://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
@@ -15,7 +40,7 @@ Discourse.Formatter = (function(){
     return str.replace(/\w\S*/g, function(txt){
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
-  }
+  };
 
   longDate = function(dt) {
     if (!dt) return;
@@ -41,11 +66,15 @@ Discourse.Formatter = (function(){
     var append = "";
 
     if(format === 'medium') {
-      append = " date' title='" + longDate(date);
+      append = " date";
       if(options.leaveAgo) {
         format = 'medium-with-ago';
       }
       options.wrapInSpan = false;
+    }
+
+    if (options.title) {
+      append += "' title='" + longDate(date);
     }
 
     return "<span class='relative-date" + append + "' data-time='" + date.getTime() + "' data-format='" + format +  "'>" + relativeAge(date, options)  + "</span>";
@@ -59,7 +88,7 @@ Discourse.Formatter = (function(){
 
     var formatted;
     var t = function(key,opts){
-      return Ember.String.i18n("dates." + format + "." + key, opts);
+      return I18n.t("dates." + format + "." + key, opts);
     };
 
     switch(true){
@@ -76,19 +105,22 @@ Discourse.Formatter = (function(){
     case(distanceInMinutes >= 90 && distanceInMinutes <= 1439):
       formatted = t("about_x_hours", {count: Math.round(distanceInMinutes / 60.0)});
       break;
+    case(Discourse.SiteSettings.relative_date_duration === 0 && distanceInMinutes <= 525599):
+      formatted = shortDateNoYear(date);
+      break;
     case(distanceInMinutes >= 1440 && distanceInMinutes <= 2519):
       formatted = t("x_days", {count: 1});
       break;
-    case(distanceInMinutes >= 2520 && distanceInMinutes <= 129599):
+    case(distanceInMinutes >= 2520 && distanceInMinutes <= ((Discourse.SiteSettings.relative_date_duration||14) * 1440)):
       formatted = t("x_days", {count: Math.round(distanceInMinutes / 1440.0)});
       break;
-    case(distanceInMinutes >= 129600 && distanceInMinutes <= 525599):
-      formatted = t("x_months", {count: Math.round(distanceInMinutes / 43200.0)});
+    case(distanceInMinutes >= ((Discourse.SiteSettings.relative_date_duration||14) * 1440) && distanceInMinutes <= 525599):
+      formatted = shortDateNoYear(date);
       break;
     default:
       var months = Math.round(distanceInMinutes / 43200.0);
-      if (months < 24) {
-        formatted = t("x_months", {count: months});
+      if (months < 12) {
+        formatted = shortDateNoYear(date);
       } else {
         formatted = t("over_x_years", {count: Math.round(months / 12.0)});
       }
@@ -104,8 +136,8 @@ Discourse.Formatter = (function(){
     distanceInMinutes = Math.round(distance / 60.0);
 
     var t = function(key, opts){
-      return Ember.String.i18n("dates.medium" + (leaveAgo?"_with_ago":"") + "." + key, opts);
-    }
+      return I18n.t("dates.medium" + (leaveAgo?"_with_ago":"") + "." + key, opts);
+    };
 
     switch(true){
     case(distanceInMinutes >= 1 && distanceInMinutes <= 56):
@@ -144,7 +176,7 @@ Discourse.Formatter = (function(){
     oneMinuteAgo = 60;
 
     if (distance < oneMinuteAgo) {
-      displayDate = Em.String.i18n("now");
+      displayDate = I18n.t("now");
     } else if (distance > fiveDaysAgo) {
       if ((new Date()).getFullYear() !== date.getFullYear()) {
         displayDate = shortDate(date);
@@ -183,6 +215,7 @@ Discourse.Formatter = (function(){
     autoUpdatingRelativeAge: autoUpdatingRelativeAge,
     updateRelativeAge: updateRelativeAge,
     toTitleCase: toTitleCase,
-    shortDate: shortDate
+    shortDate: shortDate,
+    breakUp: breakUp
   };
 })();

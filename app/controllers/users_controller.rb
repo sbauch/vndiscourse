@@ -5,7 +5,6 @@ class UsersController < ApplicationController
 
   skip_before_filter :check_xhr, only: [:show, :password_reset, :update, :activate_account, :avatar, :authorize_email, :user_preferences_redirect]
   skip_before_filter :authorize_mini_profiler, only: [:avatar]
-  skip_before_filter :check_restricted_access, only: [:avatar]
 
   before_filter :ensure_logged_in, only: [:username, :update, :change_email, :user_preferences_redirect]
 
@@ -13,7 +12,13 @@ class UsersController < ApplicationController
   #  page is going to be empty, this means that server will see an invalid CSRF and blow the session
   #  once that happens you can't log in with social
   skip_before_filter :verify_authenticity_token, only: [:create]
-  skip_before_filter :redirect_to_login_if_required, only: [:check_username,:create,:get_honeypot_value,:activate_account,:send_activation_email,:authorize_email]
+  skip_before_filter :redirect_to_login_if_required, only: [:check_username,
+                                                            :create,
+                                                            :get_honeypot_value,
+                                                            :activate_account,
+                                                            :send_activation_email,
+                                                            :authorize_email,
+                                                            :password_reset]
 
   def show
     @user = fetch_user_from_params
@@ -52,8 +57,8 @@ class UsersController < ApplicationController
       u.fact_one = params[:fact_one]
       u.fact_two = params[:fact_two]
       u.fact_three = params[:fact_three]
-      
-      
+      u.title = params[:title] || u.title if guardian.can_grant_title?(u)
+
       [:email_digests, :email_direct, :email_private_messages,
        :external_links_in_new_tab, :enable_quoting, :dynamic_favicon].each do |i|
         if params[i].present?
@@ -100,6 +105,11 @@ class UsersController < ApplicationController
   def check_username
     params.require(:username)
 
+
+    # The special case where someone is changing the case of their own username
+    return render(json: {available: true}) if current_user and params[:username].downcase == current_user.username.downcase
+
+    validator = UsernameValidator.new(params[:username])
     if !validator.valid_format?
       render json: {errors: validator.errors}
     elsif !SiteSetting.call_discourse_hub?
@@ -149,7 +159,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    return fake_success_reponse if suspicious? params
+    return fake_success_response if suspicious? params
 
     user = User.new_from_params(params)
     
@@ -332,7 +342,7 @@ class UsersController < ApplicationController
     @user = fetch_user_from_params
     @email_token = @user.email_tokens.unconfirmed.active.first
     if @user
-      @email_token = @user.email_tokens.create(email: @user.email) if @email_token.nil?
+      @email_token ||= @user.email_tokens.create(email: @user.email)
       Jobs.enqueue(:user_email, type: :signup, user_id: @user.id, email_token: @email_token.token)
     end
     render nothing: true
@@ -363,7 +373,7 @@ class UsersController < ApplicationController
       honeypot_or_challenge_fails?(params) || SiteSetting.invite_only?
     end
 
-    def fake_success_reponse
+    def fake_success_response
       render(
         json: {
           success: true,

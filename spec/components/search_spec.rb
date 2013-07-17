@@ -126,6 +126,18 @@ describe Search do
       end
     end
 
+    context 'searching for a post' do
+      let!(:post) { Fabricate(:post, topic: topic, user: topic.user) }
+      let!(:reply) { Fabricate(:basic_reply, topic: topic, user: topic.user) }
+      let(:result) { first_of_type(Search.new('quote', type_filter: 'topic').execute, 'topic') }
+
+      it 'returns the post' do
+        result.should be_present
+        result[:title].should == topic.title
+        result[:url].should == reply.url
+      end
+    end
+
     context "search for a topic by id" do
       let(:result) { first_of_type(Search.new(topic.id, type_filter: 'topic').execute, 'topic') }
 
@@ -148,6 +160,7 @@ describe Search do
 
     context 'security' do
       let!(:post) { Fabricate(:post, topic: topic, user: topic.user) }
+
       def result(current_user)
         first_of_type(Search.new('hello', guardian: current_user).execute, 'topic')
       end
@@ -158,8 +171,7 @@ describe Search do
         topic.category_id = category.id
         topic.save
 
-        category.deny(:all)
-        category.allow(Group[:staff])
+        category.set_permissions(:staff => :full)
         category.save
 
         result(nil).should_not be_present
@@ -198,7 +210,7 @@ describe Search do
       r[:title].should == category.name
       r[:url].should == "/category/#{category.slug}"
 
-      category.deny(:all)
+      category.set_permissions({})
       category.save
 
       result.should_not be_present

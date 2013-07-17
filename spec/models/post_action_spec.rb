@@ -12,6 +12,21 @@ describe PostAction do
   let(:post) { Fabricate(:post) }
   let(:bookmark) { PostAction.new(user_id: post.user_id, post_action_type_id: PostActionType.types[:bookmark] , post_id: post.id) }
 
+  describe "flagged_posts_report" do
+    it "operates correctly" do
+      PostAction.act(codinghorror, post, PostActionType.types[:spam])
+      mod_message = PostAction.act(Fabricate(:user), post, PostActionType.types[:notify_moderators], message: "this is a 10")
+
+      posts, users = PostAction.flagged_posts_report("")
+      posts.count.should == 1
+      first = posts.first
+
+      users.count.should == 3
+      first[:post_actions].count.should == 2
+      first[:post_actions].first[:permalink].should == mod_message.related_post.topic.url
+    end
+  end
+
   describe "messaging" do
 
     it "notify moderators integration test" do
@@ -82,6 +97,20 @@ describe PostAction do
       PostAction.act(codinghorror, post, PostActionType.types[:off_topic])
       post.topic.trash!
       PostAction.flagged_posts_count.should == 0
+    end
+
+    it "should ignore validated flags" do
+      admin = Fabricate(:admin)
+      PostAction.act(codinghorror, post, PostActionType.types[:off_topic])
+      post.hidden.should be_false
+      PostAction.defer_flags!(post, admin.id)
+      PostAction.flagged_posts_count.should == 0
+      post.reload
+      post.hidden.should be_false
+
+      PostAction.hide_post!(post)
+      post.reload
+      post.hidden.should be_true
     end
 
   end
@@ -220,7 +249,7 @@ describe PostAction do
       u2 = Fabricate(:walter_white)
       admin = Fabricate(:admin) # we need an admin for the messages
 
-      SiteSetting.flags_required_to_hide_post = 2
+      SiteSetting.stubs(:flags_required_to_hide_post).returns(2)
 
       PostAction.act(u1, post, PostActionType.types[:spam])
       PostAction.act(u2, post, PostActionType.types[:spam])

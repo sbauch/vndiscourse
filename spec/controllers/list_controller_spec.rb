@@ -6,19 +6,22 @@ describe ListController do
   before do
     @user = Fabricate(:coding_horror)
     @post = Fabricate(:post, user: @user)
+
+    # forces tests down some code paths
+    SiteSetting.stubs(:top_menu).returns('latest,-video|new|unread|favorited|categories|category/beer')
   end
 
   describe 'indexes' do
 
     [:latest, :hot].each do |filter|
-      context '#{filter}' do
+      context "#{filter}" do
         before { xhr :get, filter }
         it { should respond_with(:success) }
       end
     end
 
     [:favorited, :read, :posted, :unread, :new].each do |filter|
-      context '#{filter}' do
+      context "#{filter}" do
         it { expect { xhr :get, filter }.to raise_error(Discourse::NotLoggedIn) }
       end
     end
@@ -82,6 +85,21 @@ describe ListController do
         response.should be_success
       end
 
+      context 'SiteSetting.uncategorized_name is non standard' do
+        before do
+          SiteSetting.stubs(:uncategorized_name).returns('testing')
+        end
+
+        it "responds with success given SiteSetting.uncategorized_name" do
+          xhr :get, :category, category: SiteSetting.uncategorized_name
+          response.should be_success
+        end
+
+        it 'responds with success given "uncategorized"' do
+          xhr :get, :category, category: 'uncategorized'
+          response.should be_success
+        end
+      end
     end
 
   end

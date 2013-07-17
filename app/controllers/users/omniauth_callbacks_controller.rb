@@ -60,22 +60,7 @@ class Users::OmniauthCallbacksController < ApplicationController
       auth_provider: "Twitter"
     }
 
-    if user_info
-      if user_info.user.active
-        if Guardian.new(user_info.user).can_access_forum?
-          log_on_user(user_info.user)
-          @data[:authenticated] = true
-        else
-          @data[:awaiting_approval] = true
-        end
-      else
-        @data[:awaiting_activation] = true
-        # send another email ?
-      end
-    else
-      @data[:name] = screen_name
-    end
-
+    process_user_info(user_info, screen_name)
   end
 
   def create_or_sign_on_user_using_facebook(auth_token)
@@ -92,7 +77,7 @@ class Users::OmniauthCallbacksController < ApplicationController
 
     session[:authentication] = {
       facebook: {
-        facebook_user_id: fb_uid ,
+        facebook_user_id: fb_uid,
         link: raw_info["link"],
         username: raw_info["username"],
         first_name: raw_info["first_name"],
@@ -116,12 +101,8 @@ class Users::OmniauthCallbacksController < ApplicationController
     }
 
     if user_info
-      user = user_info.user
-      if user
-        unless user.active
-          user.active = true
-          user.save
-        end
+      if user = user_info.user
+        user.toggle(:active).save unless user.active?
 
         # If we have to approve users
         if Guardian.new(user).can_access_forum?
@@ -132,13 +113,9 @@ class Users::OmniauthCallbacksController < ApplicationController
         end
       end
     else
-      user = User.where(email: email).first
-      if user
-        FacebookUserInfo.create!(session[:authentication][:facebook].merge(user_id: user.id))
-        unless user.active
-          user.active = true
-          user.save
-        end
+      if user = User.where(email: email).first
+        user.create_facebook_user_info! session[:authentication][:facebook]
+        user.toggle(:active).save unless user.active?
         log_on_user(user)
         @data[:authenticated] = true
       end
@@ -148,9 +125,22 @@ class Users::OmniauthCallbacksController < ApplicationController
 
   def create_or_sign_on_user_using_cas(auth_token)
     logger.error "authtoken #{auth_token}"
-    email = "#{auth_token[:extra][:user]}@#{SiteSetting.cas_domainname}"
+
+    email = auth_token[:info][:email] if auth_token[:info]
+    email ||= if SiteSetting.cas_domainname.present?
+      "#{auth_token[:extra][:user]}@#{SiteSetting.cas_domainname}"
+    else
+      auth_token[:extra][:user]
+    end
+
     username = auth_token[:extra][:user]
-    name = auth_token["uid"]
+
+    name = if auth_token[:info] && auth_token[:info][:name]
+      auth_token[:info][:name]
+    else
+      auth_token["uid"]
+    end
+
     cas_user_id = auth_token["uid"]
 
     session[:authentication] = {
@@ -173,12 +163,8 @@ class Users::OmniauthCallbacksController < ApplicationController
     }
 
     if user_info
-      user = user_info.user
-      if user
-        unless user.active
-          user.active = true
-          user.save
-        end
+      if user = user_info.user
+        user.toggle(:active).save unless user.active?
         log_on_user(user)
         @data[:authenticated] = true
       end
@@ -186,10 +172,7 @@ class Users::OmniauthCallbacksController < ApplicationController
       user = User.where(email: email).first
       if user
         CasUserInfo.create!(session[:authentication][:cas].merge(user_id: user.id))
-        unless user.active
-          user.active = true
-          user.save
-        end
+        user.toggle(:active).save unless user.active?
         log_on_user(user)
         @data[:authenticated] = true
       end
@@ -278,24 +261,7 @@ class Users::OmniauthCallbacksController < ApplicationController
       auth_provider: "Github"
     }
 
-    if user_info
-      if user_info.user.active
-
-        if Guardian.new(user_info.user).can_access_forum?
-          log_on_user(user_info.user)
-          @data[:authenticated] = true
-        else
-          @data[:awaiting_approval] = true
-        end
-
-      else
-        @data[:awaiting_activation] = true
-        # send another email ?
-      end
-    else
-      @data[:name] = screen_name
-    end
-
+    process_user_info(user_info, screen_name)
   end
 
   def create_or_sign_on_user_using_persona(auth_token)
@@ -331,6 +297,26 @@ class Users::OmniauthCallbacksController < ApplicationController
   end
 
   private
+
+  def process_user_info(user_info, screen_name)
+    if user_info
+      if user_info.user.active?
+
+        if Guardian.new(user_info.user).can_access_forum?
+          log_on_user(user_info.user)
+          @data[:authenticated] = true
+        else
+          @data[:awaiting_approval] = true
+        end
+
+      else
+        @data[:awaiting_activation] = true
+        # send another email ?
+      end
+    else
+      @data[:name] = screen_name
+    end
+  end
 
   def invite_only?
     SiteSetting.invite_only? && !@data[:authenticated]

@@ -16,7 +16,6 @@ class ApplicationController < ActionController::Base
 
   before_filter :inject_preview_style
   before_filter :block_if_maintenance_mode
-  before_filter :check_restricted_access
   before_filter :authorize_mini_profiler
   before_filter :store_incoming_links
   before_filter :preload_json
@@ -64,27 +63,24 @@ class ApplicationController < ActionController::Base
 
   rescue_from Discourse::NotLoggedIn do |e|
     raise e if Rails.env.test?
-    redirect_to root_path
+    redirect_to "/"
   end
 
   rescue_from Discourse::NotFound do
-
-    if request.format && request.format.json?
-      render status: 404, layout: false, text: "[error: 'not found']"
-    else
-      render_not_found_page(404)
-    end
-
+    rescue_discourse_actions("[error: 'not found']", 404)
   end
 
   rescue_from Discourse::InvalidAccess do
-    if request.format && request.format.json?
-      render status: 403, layout: false, text: "[error: 'invalid access']"
-    else
-      render_not_found_page(403)
-    end
+    rescue_discourse_actions("[error: 'invalid access']", 403)
   end
 
+  def rescue_discourse_actions(message, error)
+    if request.format && request.format.json?
+      render status: error, layout: false, text: (error == 404) ? build_not_found_page(error) : message
+    else
+      render text: build_not_found_page(error, 'no_js')
+    end
+  end
 
   def set_locale
     I18n.locale = SiteSetting.default_locale
@@ -108,7 +104,7 @@ class ApplicationController < ActionController::Base
       guardian.current_user.sync_notification_channel_position
     end
 
-    store_preloaded("site", Site.cached_json(current_user))
+    store_preloaded("site", Site.cached_json(guardian))
 
     if current_user.present?
       store_preloaded("currentUser", MultiJson.dump(CurrentUserSerializer.new(current_user, root: false)))
@@ -128,7 +124,6 @@ class ApplicationController < ActionController::Base
   def guardian
     @guardian ||= Guardian.new(current_user)
   end
-
 
   def serialize_data(obj, serializer, opts={})
     # If it's an array, apply the serializer as an each_serializer to the elements
@@ -159,9 +154,6 @@ class ApplicationController < ActionController::Base
 
     # Don't cache logged in users
     return false if current_user.present?
-
-    # Don't cache if there's restricted access
-    return false if SiteSetting.access_password.present?
 
     true
   end
@@ -241,16 +233,6 @@ class ApplicationController < ActionController::Base
       end
     end
 
-    def check_restricted_access
-      # note current_user is defined in the CurrentUser mixin
-      if SiteSetting.access_password.present? && cookies[:_access] != SiteSetting.access_password
-        unless api_key_valid?
-          redirect_to request_access_path(return_path: request.fullpath)
-          return false
-        end
-      end
-    end
-
     def mini_profiler_enabled?
       defined?(Rack::MiniProfiler) && current_user.try(:admin?)
     end
@@ -280,19 +262,27 @@ class ApplicationController < ActionController::Base
       redirect_to :login if SiteSetting.login_required? && !current_user
     end
 
-    def render_not_found_page(status=404)
+    def build_not_found_page(status=404, layout=false)
       @top_viewed = TopicQuery.top_viewed(10)
       @recent = TopicQuery.recent(10)
       @slug =  params[:slug].class == String ? params[:slug] : ''
       @slug =  (params[:id].class == String ? params[:id] : '') if @slug.blank?
       @slug.gsub!('-',' ')
-      render status: status, layout: 'no_js', formats: [:html], template: '/exceptions/not_found'
+      render_to_string status: status, layout: layout, formats: [:html], template: '/exceptions/not_found'
     end
 
-    protected
+  protected
 
     def api_key_valid?
       request["api_key"] && SiteSetting.api_key_valid?(request["api_key"])
+    end
+
+    # returns an array of integers given a param key
+    # returns nil if key is not found
+    def param_to_integer_list(key, delimiter = ',')
+      if params[key]
+        params[key].split(delimiter).map(&:to_i)
+      end
     end
 
 end

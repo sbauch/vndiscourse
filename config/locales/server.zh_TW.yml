@@ -425,7 +425,6 @@ zh_TW:
     company_short_name: "運行本站點的公司短名，用于法律文檔，例如服務條款 /tos"
     company_domain: "運行本站點的公司域名，用于法律文檔，例如服務條款 /tos"
     api_key: "加密的應用開發接口密鑰（API key），用于創建和更新主題。使用 /admin/api 來對它進行設置。"
-    access_password: "當啓用訪問限制時，必須填寫此密碼"
     queue_jobs: "如果失敗隊列在排隊，使用 Sidekiq 消息引擎對不同的工作排隊"
     crawl_images: "允許從第三方獲取圖片來插入寬、高數值"
     ninja_edit_window: "在多少秒鍾之內，對帖子的多次編輯不生成新版本"
@@ -474,7 +473,7 @@ zh_TW:
     posts_per_page: "在主題頁面，返回多少個帖子"
     system_username: "論壇給用戶發送自動私信時使用的用戶名"
     send_welcome_message: "給新用戶發送歡迎私信？"
-    supress_reply_directly_below: "當一個帖子只有一個回複時，不顯示帖子回複數量"
+    suppress_reply_directly_below: "當一個帖子只有一個回複時，不顯示帖子回複數量"
     allow_index_in_robots_txt: "允許搜索引擎索引站點內容（更新 robots.txt）"
     email_domains_blacklist: "將一列豎線分隔的郵箱域名放入黑名單，例如：mailinator.com|trashmail.net"
     email_domains_whitelist: "豎線 | 分隔的電子郵箱域名，用戶只能使用這些郵箱域名注冊。注意：用戶使用不包含在這個列表裏的郵箱域名，將無法成功注冊。"
@@ -547,8 +546,6 @@ zh_TW:
     newuser_max_mentions_per_post: "一個訪問者可以在一個帖子裏使用 @name 提及的最大數量"
     max_mentions_per_post: "你可以在一個帖子裏使用 @name 提及的最大數量"
 
-    auto_link_images_wider_than: "圖片寬度超過此設定像素值的，將被自動附加一個鏈接並且使用燈箱（lightbox）來展示"
-
     email_time_window_mins: "等待多少分鍾才給用戶發送通知電子郵件，好讓他們有機會自己來浏覽"
     flush_timings_secs: "刷新時間數據的頻率，以秒爲單位"
     max_word_length: "在主題的標題中，允許的詞語長度的最大字符數"
@@ -561,7 +558,7 @@ zh_TW:
     min_body_similar_length: "開始檢查相似主題的帖子內容的最小長度"
 
     category_colors: "設置分類顔色的用'|'分隔的十六進制色彩值列表"
-    max_upload_size_kb: "允許用戶上傳的最大文件大小(以kB爲單位) - 確保在nginx(client_max_body_size), apache或代理服務中進行限制文件大小的配置."
+    max_image_size_kb: "允許用戶上傳的最大文件大小(以kB爲單位) - 確保在nginx(client_max_body_size), apache或代理服務中進行限制文件大小的配置."
     max_similar_results: "當用戶撰寫新主題時，顯示多少類似主題給用戶"
 
     title_prettify: "防止常見標題裏的錯別字和錯誤，包括全部大寫，第一個字符小寫，多個！和？，結尾多余的. 等等。"
@@ -693,15 +690,7 @@ zh_TW:
 
       <small>在每封你發送的郵件底部應該都有取消訂閱的鏈接，讓我們模擬一下。這封郵件發送自 中華人民共和國 北京市海澱區中關村南大街3號 海澱資本中心 14層 公司名稱，郵編 100081。如果你不希望將來繼續收到我們的郵件，[點擊此處取消訂閱][5].</small>
 
-  request_access:
-    code: "訪問碼"
-    instructions: "本站點限制訪問，請在下面輸入訪問碼："
-    enter: "進入"
-    incorrect: "訪問碼不正確"
-
   system_messages:
-    site_password: "另外，如果你需要，此站點密碼是 `%{access_password}`。"
-
     post_hidden:
       subject_template: "%{site_name} 提示：由于論壇用戶舉報，系統隱藏了你的帖子"
       text_body_template: |
@@ -927,6 +916,7 @@ zh_TW:
   deleted: '已刪除'
 
   upload:
+    pasted_image_filename: ""
     image:
       fetch_failure: "抱歉，獲取圖片時發生錯誤。"
       unknown_image_type: "抱歉，你上傳的文件似乎不是一張圖片。"

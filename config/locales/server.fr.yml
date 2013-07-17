@@ -5,6 +5,7 @@
 #
 # Pour toute question contactez
 # <Maxime QUANDALLE> "maxime@quandalle.com"
+# <Thomas BENTKOWSKI> "thomasbentkowski@gmail.com"
 #
 # To validate this YAML file after you change it, please paste it into
 # http://yamllint.com/
@@ -302,80 +303,80 @@ fr:
 
   reports:
     visits:
-      title: Visites utilisateur par jour
-      xaxis: Jour
-      yaxis: Nombre de visites
+      title: "Visites utilisateur par jour"
+      xaxis: "Jour"
+      yaxis: "Nombre de visites"
     signups:
-      title: Nouveaux utilisateurs
-      xaxis: Jour
+      title: "Nouveaux utilisateurs"
+      xaxis: "Jour"
       yaxis: "Nombre d'utilisateurs"
     topics:
-      title: Nouvelles discussions
-      xaxis: Jour
-      yaxis: Nombre de discussions
+      title: "Nouvelles discussions"
+      xaxis: "Jour"
+      yaxis: "Nombre de discussions"
     posts:
-      title: Nouveaux messages
-      xaxis: Jour
-      yaxis: Nombre de messages
+      title: "Nouveaux messages"
+      xaxis: "Jour"
+      yaxis: "Nombre de messages"
     likes:
-      title: Nouveau Likes
-      xaxis: Jour
-      yaxis: Nombre de Likes
+      title: "Nouveau Likes"
+      xaxis: "Jour"
+      yaxis: "Nombre de Likes"
     flags:
-      title: Nouveaux Signalements
-      xaxis: Jour
-      yaxis: Nombre de signalements
+      title: "Nouveaux Signalements"
+      xaxis: "Jour"
+      yaxis: "Nombre de signalements"
     bookmarks:
-      title: Signets
-      xaxis: Jour
-      yaxis: Nombre de nouveaux signets
+      title: "Signets"
+      xaxis: "Jour"
+      yaxis: "Nombre de nouveaux signets"
     favorites:
-      title: Favoris
-      xaxis: Jour
-      yaxis: Nombre de nouveaux favoris
+      title: "Favoris"
+      xaxis: "Jour"
+      yaxis: "Nombre de nouveaux favoris"
     users_by_trust_level:
-      title: Utilisateurs par niveau de confiance
-      xaxis: Niveau de confiance
+      title: "Utilisateurs par niveau de confiance"
+      xaxis: "Niveau de confiance"
       yaxis: "Nombre d'utilisateurs"
     emails:
-      title: Emails envoyés
-      xaxis: Jour
+      title: "Emails envoyés"
+      xaxis: "Jour"
       yaxis: "Nombre d'emails"
     user_to_user_private_messages:
-      title: Utilisateur à Utilisateur
-      xaxis: Jour
-      yaxis: Nombre de messages privés
+      title: "Utilisateur à Utilisateur"
+      xaxis: "Jour"
+      yaxis: "Nombre de messages privés"
     system_private_messages:
-      title: Système
-      xaxis: Jour
-      yaxis: Nombre de messages privés
+      title: "Système"
+      xaxis: "Jour"
+      yaxis: "Nombre de messages privés"
     moderator_warning_private_messages:
-      title: Avertissements
-      xaxis: Jour
-      yaxis: Nombre de messages privés
+      title: "Avertissements"
+      xaxis: "Jour"
+      yaxis: "Nombre de messages privés"
     notify_moderators_private_messages:
-      title: Notifications Modérateur
-      xaxis: Jour
-      yaxis: Nombre de messages privés
+      title: "Notifications Modérateur"
+      xaxis: "Jour"
+      yaxis: "Nombre de messages privés"
     notify_user_private_messages:
-      title: Notifications Utilisateur
-      xaxis: Jour
-      yaxis: Nombre de messages privés
+      title: "Notifications Utilisateur"
+      xaxis: "Jour"
+      yaxis: "Nombre de messages privés"
     top_referrers:
-      title: Meilleurs référants
-      xaxis: Utilisateurs
-      num_clicks: Clics
-      num_topics: Discussions
+      title: "Meilleurs référants"
+      xaxis: "Utilisateurs"
+      num_clicks: "Clics"
+      num_topics: "Discussions"
     top_traffic_sources:
-      title: Meilleures sources de traffic
-      xaxis: Domaine
-      num_clicks: Clics
-      num_topics: Discussions
-      num_users: Utilisateurs
+      title: "Meilleures sources de traffic"
+      xaxis: "Domaine"
+      num_clicks: "Clics"
+      num_topics: "Discussions"
+      num_users: "Utilisateurs"
     top_referred_topics:
-      title: Discussions les plus référencées
-      xaxis: Discussion
-      num_clicks: Clics
+      title: "Discussions les plus référencées"
+      xaxis: "Discussion"
+      num_clicks: "Clics"
 
   dashboard:
     rails_env_warning: "Votre serveur fonctionne dans l'environnement de %{env}."
@@ -438,7 +439,6 @@ fr:
     company_short_name: "Le nom de la société qui gère ce site (utilisé dans les documents légaux, tels que /tos)"
     company_domain: "Le nom de domaine de la société qui gère ce site (utilisé dans les documents légaux, tels que /tos)"
     api_key: "La clé API sécurisé à utiliser pour créer et mettre à jour des discussions. Utilisez la section /admin/api pour la configurer."
-    access_password: "Si l'accès restreint est activé, assurez-vous que le mot de passe soit saisi ici."
     queue_jobs: "mettre les différents jobs en attente sur différentes queues, si false les queues sont en file"
     crawl_images: "permettre la récupération des images provenant de sources tierces"
     ninja_edit_window: "temps d'édition avant de sauvegarder une nouvelle version, en secondes."
@@ -487,7 +487,7 @@ fr:
     posts_per_page: "Nombre de messages retournés sur une page de discussion"
     system_username: "Pseudo qui envoie les messages automatiques"
     send_welcome_message: "Les nouveaux utilisateurs reçoivent-ils un message privé de bienvenue ?"
-    supress_reply_directly_below: "Ne pas afficher les boutons de réponse sous un message lorsque la réponse est juste en dessous"
+    suppress_reply_directly_below: "Ne pas afficher les boutons de réponse sous un message lorsque la réponse est juste en dessous"
     allow_index_in_robots_txt: "Le site doit-être indexé par les moteurs de recherche (met à jour le fichier robots.txt)"
     email_domains_blacklist: "Liste des domaines d'email interdits, délimités par un pipe. Exemple: mailinator.com|trashmail.net"
     email_domains_whitelist: "Liste des domaines d'email autorisés, délimités par un pipe. ATTENTION : les utilisateurs ayant un email sur un autre domaine ne pourrons pas s'enregistrer."
@@ -515,6 +515,7 @@ fr:
 
     enable_cas_logins: "Active l'authentification CAS"
     cas_hostname: "Nom d'hôte du serveur CAS"
+    cas_domainname: "Le nom de domaine qui génerera des adresses email pour le serveur CAS"
 
     enable_github_logins: "Active l'authentification GitHub (nécessite github_client_id et github_client_secret)"
     github_client_id: "id client, enregistré sur https://github.com/settings/applications"
@@ -522,7 +523,7 @@ fr:
 
     enable_persona_logins: "Active l'authentification par e-mail avec Mozilla Persona"
 
-    allow_import: "Autoriser l'importation qui remplacera TOUTES les données du site. Laisser sur faux, sauf si vous prévoyez d'importer des données."
+    allow_import: "Autoriser l'importation qui remplacera TOUTES les données du site. Laisser non coché, sauf si vous prévoyez d'importer des données."
 
     active_user_rate_limit_secs: "A quelle fréquence mettre à jour le champ 'dernier_vu_a', en secondes."
     previous_visit_timeout_hours: "Combien de temps dure une visite avant de la considérer comme la visite 'précédente', en heures."
@@ -551,6 +552,8 @@ fr:
 
     enable_s3_uploads: "S'il faut ou non uploader sur s3"
     s3_upload_bucket: "Le bucket dans lequel uploader sur s3"
+    s3_secret_access_key: "La clé secrète Amazon S3 qui va être utilisée pour uploader des images"
+    s3_region: "Le nom de la région Amazon S3 qui va être utilisée pour uploader des images"
 
     default_invitee_trust_level: "Le niveau de confiance par défaut des utilisateurs invités"
     default_trust_level: "Le niveau de confiance par défaut des utilisateurs"
@@ -567,8 +570,6 @@ fr:
     regular_requires_likes_given: "Combien de j'aime un utilisateur doit donner pour être promu au niveau régulier (2)"
     regular_requires_topic_reply_count: "Combien de réponses un utilisateur doit donner pour être promu au niveau régulier (2)"
 
-    auto_link_images_wider_than: ""
-
     email_time_window_mins: "Combien de minutes attendre avant d'envoyer un mail à l'utilisateur, pour lui donner une chance de voir lui-même avant l'envoi."
     flush_timings_secs: "A quelle fréquence requêter les données de timing au serveur, en secondes."
     max_word_length: "Le nombre maximum de mots dans un titre de discussion"
@@ -580,7 +581,8 @@ fr:
     min_body_similar_length: "La taille minimale du message avant que l'on vérifie l'existence de discussions identiques"
 
     category_colors: "Une liste de couleurs autorisées pour les catégories (au format hexadécimal, séparés par un |)"
-    max_upload_size_kb: "La taille maximum des fichiers que les utilisateurs peuvent envoyer en kB - assurez-vous de configurer également cette limite dans nginx (client_max_body_size) / apache ou votre proxy."
+    max_image_size_kb: "La taille maximum des images que les utilisateurs peuvent envoyer en kB - assurez-vous de configurer également cette limite dans nginx (client_max_body_size) / apache ou votre proxy."
+    max_attachment_size_kb: "La taille maximum des fichiers que les utilisateurs peuvent envoyer en kB - assurez-vous de configurer également cette limite dans nginx (client_max_body_size) / apache ou votre proxy."
     max_similar_results: "Nombre de discussions similaires à afficher lorsqu'un utilisateur est en train de créer une nouvelle discussion"
 
     title_prettify: "Corrige les coquilles les plus communes dans les titres (intégralité du titre en majuscule, première lettre en minuscule, de multiples ! et ?, un . inutile à la fin, etc.)"
@@ -594,6 +596,17 @@ fr:
 
     newuser_spam_host_threshold: "Limite du nombre de liens vers un même host qu'un nouvel utilisateur peut insérer dans un message avant d'être considérer comme un SPAM."
     staff_like_weight: "Poids supplémentaire donné aux Likes du staff lors d'une recherche."
+
+    reply_by_email_enabled: "Cocher si le forum doit supporter les réponses par email"
+    reply_by_email_address: "Modèle pour la réponse par adresse email par exemple : %{reply_key}@reply.myforum.com"
+
+    pop3s_polling_enabled: "Cocher si le polling via POP3S doit être activé pour les réponses par email"
+    pop3s_polling_port: "Le port à utiliser pour le polling sur le POPS3"
+    pop3s_polling_host: "L'hôte utilisé pour le polling pour l'email via POP3S"
+    pop3s_polling_username: "Le nom d'utilisateur pour le polling POPS3 par email"
+    pop3s_polling_password: "Le mot de passe pour le polling POPS3 par email"
+
+    minimum_topics_similar: "Combien de topics ont besoin d'exister dans la base de données avant que des topics similaires soit présentés."
 
   notification_types:
     mentioned: "%{display_username} vous a mentionné dans %{link}"
@@ -713,15 +726,7 @@ fr:
 
       <small>Il devrait toujours y avoir un lien de déinscription dans le pied de page d'un mail. Donc en voici-un. Ce mail a été envoyé par Nom de la Société,  55 Main Street, Anytown, USA 12345. Si vous ne voulez plus recevoir nos e-mails, [cliquez ici pour vous désinscrire][5].</small>
 
-  request_access:
-    code: "Code d'accès"
-    instructions: "Ce site possède une zone restreinte, vous devez saisir le code d'accès pour entrer."
-    enter: "Entrer"
-    incorrect: "Le code d''accès est incorrect."
-
   system_messages:
-    site_password: "Si vous en avez besoin, le mot de passe du site est `%{access_password}`."
-
     post_hidden:
       subject_template: "%{site_name} Notice: Message caché suite à un signalement par la communauté"
       text_body_template: |
@@ -840,7 +845,7 @@ fr:
         Merci de visiter ce lien pour voir la discussion: %{base_url}%{url}
 
     user_replied:
-      subject_template: "[%{site_name}] %{username} a répondu à votre message dans '%{topic_title}'"
+      subject_template: "[%{site_name}] nouvelle réponse dans '%{topic_title}'"
       text_body_template: |
         %{username} a répondu à votre message dans '%{topic_title}' sur %{site_name}:
 
@@ -873,7 +878,7 @@ fr:
         Merci de suivre ce lien pour répondre : %{base_url}%{url}
 
     user_posted:
-      subject_template: "[%{site_name}] %{username} à répondu à '%{topic_title}'"
+      subject_template: "[%{site_name}] nouveau message dans '%{topic_title}'"
       text_body_template: |
         %{username} à répondu à '%{topic_title}' sur %{site_name}:
 
@@ -951,6 +956,7 @@ fr:
   deleted: 'supprimmé'
 
   upload:
+    pasted_image_filename: "Image collée"
     image:
       fetch_failure: "Désolé, une erreur s'est produite lorsque nous avons essayé de récupérer l'image."
       unknown_image_type: "Désolé, mais le fichier que vous essayez d'envoyer ne semble pas être une image."

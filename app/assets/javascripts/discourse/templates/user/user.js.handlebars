@@ -34,16 +34,18 @@
       </div>
     </div>
   </div>
-</div>
-<div class="container">
-  <div class='user-info clearfix'>
-    <div class='about-me'>
-      <ol>
-        <li>{{{user.fact_one}}}</li>
-        <li>{{{user.fact_two}}}</li>
-        <li>{{{user.fact_three}}}</li>
-      </ol>    
+  <div class="container">
+    <div class='user-info clearfix'>
+      <div class='about-me'>
+        <ol>
+        <li>{{{fact_one}}}</li>
+        <li>{{{fact_two}}}</li>
+        <li>{{{fact_three}}}</li>
+      </ol>   
+      </div>
     </div>
   </div>
-</div>  
+  <div class="container">
+    {{outlet userOutlet}}
+  </div>
 {{/unless}}

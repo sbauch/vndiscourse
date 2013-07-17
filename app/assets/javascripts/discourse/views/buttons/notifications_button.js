@@ -7,8 +7,10 @@
   @module Discourse
 **/
 Discourse.NotificationsButton = Discourse.DropdownButtonView.extend({
-  title: Em.String.i18n('topic.notifications.title'),
-  longDescriptionBinding: 'topic.notificationReasonText',
+  title: I18n.t('topic.notifications.title'),
+  longDescriptionBinding: 'topic.details.notificationReasonText',
+  topic: Em.computed.alias('controller.model'),
+  hidden: Em.computed.alias('topic.deleted'),
 
   dropDownContent: [
     [Discourse.Topic.NotificationLevel.WATCHING, 'topic.notifications.watching'],
@@ -19,7 +21,7 @@ Discourse.NotificationsButton = Discourse.DropdownButtonView.extend({
 
   text: function() {
     var key = (function() {
-      switch (this.get('topic.notification_level')) {
+      switch (this.get('topic.details.notification_level')) {
         case Discourse.Topic.NotificationLevel.WATCHING: return 'watching';
         case Discourse.Topic.NotificationLevel.TRACKING: return 'tracking';
         case Discourse.Topic.NotificationLevel.REGULAR: return 'regular';
@@ -35,11 +37,11 @@ Discourse.NotificationsButton = Discourse.DropdownButtonView.extend({
         case 'muted': return '<i class="icon-remove-sign"></i>&nbsp;';
       }
     })();
-    return icon + (Ember.String.i18n("topic.notifications." + key + ".title")) + "<span class='caret'></span>";
-  }.property('topic.notification_level'),
+    return icon + (I18n.t("topic.notifications." + key + ".title")) + "<span class='caret'></span>";
+  }.property('topic.details.notification_level'),
 
   clicked: function(id) {
-    return this.get('topic').updateNotifications(id);
+    return this.get('topic.details').updateNotifications(id);
   }
 
 });

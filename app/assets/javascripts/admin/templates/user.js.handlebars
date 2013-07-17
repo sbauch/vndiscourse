@@ -27,6 +27,25 @@
     <div class='value'>{{avatar content imageSize="large"}}</div>
   </div>
 
+  <div class='display-row'>
+    <div class='field'>{{i18n user.title.title}}</div>
+    <div class='value'>
+      {{#if editingTitle}}
+        {{textField value=title autofocus="autofocus"}}
+      {{else}}
+        <span {{action toggleTitleEdit}}>{{title}}&nbsp;</span>
+      {{/if}}
+    </div>
+    <div class='controls'>
+      {{#if editingTitle}}
+        <button class='btn' {{action saveTitle}}>{{i18n admin.user.save_title}}</button>
+        <a href="#" {{action toggleTitleEdit}}>Cancel</a>
+      {{else}}
+        <button class='btn' {{action toggleTitleEdit}}>{{i18n admin.user.edit_title}}</button>
+      {{/if}}
+    </div>
+  </div>
+
   <div class='display-row' style='height: 50px'>
     <div class='field'>{{i18n user.ip_address.title}}</div>
     <div class='value'>{{ip_address}}</div>
@@ -90,7 +109,7 @@
       {{else}}
         {{#if can_send_activation_email}}
           <button class='btn' {{action sendActivationEmail target="content"}}>
-            <i class='icon icon-envelope-alt'></i>
+            <i class='icon icon-envelope'></i>
             {{i18n admin.user.send_activation_email}}
           </button>
         {{/if}}
@@ -142,10 +161,22 @@
     </div>
 
   </div>
+
   <div class='display-row'>
     <div class='field'>{{i18n trust_level}}</div>
-    <div class='value'>{{trustLevel.name}}</div>
+    <div class="value">
+      {{combobox content=trustLevels value=trust_level nameProperty="detailedName"}}
+    </div>
+    <div class="controls">
+    {{#if dirty}}
+      <div>
+      <button class='btn ok' {{action saveTrustLevel target="content"}}><i class='icon-ok'></i></button>
+      <button class='btn cancel' {{action restoreTrustLevel target="content"}}><i class='icon-remove'></i></button>
+      </div>
+    {{/if}}
+    </div>
   </div>
+
   <div class='display-row'>
     <div class='field'>{{i18n admin.user.banned}}</div>
     <div class='value'>{{isBanned}}</div>
@@ -156,15 +187,16 @@
         {{i18n admin.user.unban}}
       </button>
       {{banDuration}}
+      {{i18n admin.user.banned_explanation}}
     {{else}}
       {{#if canBan}}
         <button class='btn btn-danger' {{action ban target="content"}}>
           <i class='icon icon-ban-circle'></i>
           {{i18n admin.user.ban}}
         </button>
+        {{i18n admin.user.banned_explanation}}
       {{/if}}
     {{/if}}
-    {{i18n admin.user.banned_explanation}}
     </div>
   </div>
   <div class='display-row'>
@@ -176,13 +208,8 @@
           <i class='icon icon-thumbs-up'></i>
           {{i18n admin.user.unblock}}
         </button>
-      {{else}}
-        <button class='btn btn-danger' {{action block target="content"}}>
-          <i class='icon icon-ban-circle'></i>
-          {{i18n admin.user.block}}
-        </button>
+        {{i18n admin.user.block_explanation}}
       {{/if}}
-      {{i18n admin.user.block_explanation}}
     </div>
   </div>
 </section>

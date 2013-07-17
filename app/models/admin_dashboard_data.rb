@@ -29,11 +29,16 @@ class AdminDashboardData
       facebook_config_check,
       twitter_config_check,
       github_config_check,
+      s3_config_check,
+      image_magick_check,
       failing_emails_check,
       default_logo_check,
       contact_email_check,
       send_consumer_email_check,
-      title_check ].compact
+      title_check,
+      access_password_removal,
+      system_username_check,
+      notification_email_check ].compact
   end
 
   def self.fetch_all
@@ -49,12 +54,13 @@ class AdminDashboardData
       reports: REPORTS.map { |type| Report.find(type).as_json },
       admins: User.admins.count,
       moderators: User.moderators.count,
+      banned: User.banned.count,
       blocked: User.blocked.count,
       top_referrers: IncomingLinksReport.find('top_referrers').as_json,
       top_traffic_sources: IncomingLinksReport.find('top_traffic_sources').as_json,
       top_referred_topics: IncomingLinksReport.find('top_referred_topics').as_json
     }.merge(
-      SiteSetting.version_checks? ? {version_check: DiscourseUpdates.check_version} : {}
+      SiteSetting.version_checks? ? {version_check: DiscourseUpdates.check_version.as_json} : {}
     )
   end
 
@@ -89,15 +95,23 @@ class AdminDashboardData
   end
 
   def facebook_config_check
-    I18n.t('dashboard.facebook_config_warning') if SiteSetting.enable_facebook_logins and (!SiteSetting.facebook_app_id.present? or !SiteSetting.facebook_app_secret.present?)
+    I18n.t('dashboard.facebook_config_warning') if SiteSetting.enable_facebook_logins and (SiteSetting.facebook_app_id.blank? or SiteSetting.facebook_app_secret.blank?)
   end
 
   def twitter_config_check
-    I18n.t('dashboard.twitter_config_warning') if SiteSetting.enable_twitter_logins and (!SiteSetting.twitter_consumer_key.present? or !SiteSetting.twitter_consumer_secret.present?)
+    I18n.t('dashboard.twitter_config_warning') if SiteSetting.enable_twitter_logins and (SiteSetting.twitter_consumer_key.blank? or SiteSetting.twitter_consumer_secret.blank?)
   end
 
   def github_config_check
-    I18n.t('dashboard.github_config_warning') if SiteSetting.enable_github_logins and (!SiteSetting.github_client_id.present? or !SiteSetting.github_client_secret.present?)
+    I18n.t('dashboard.github_config_warning') if SiteSetting.enable_github_logins and (SiteSetting.github_client_id.blank? or SiteSetting.github_client_secret.blank?)
+  end
+
+  def s3_config_check
+    I18n.t('dashboard.s3_config_warning') if SiteSetting.enable_s3_uploads and (SiteSetting.s3_access_key_id.blank? or SiteSetting.s3_secret_access_key.blank? or SiteSetting.s3_upload_bucket.blank?)
+  end
+
+  def image_magick_check
+    I18n.t('dashboard.image_magick_warning') if SiteSetting.create_thumbnails and !system("command -v convert >/dev/null;")
   end
 
   def failing_emails_check
@@ -125,5 +139,31 @@ class AdminDashboardData
   def send_consumer_email_check
     I18n.t('dashboard.consumer_email_warning') if Rails.env == 'production' and ActionMailer::Base.smtp_settings[:address] =~ /gmail\.com|live\.com|yahoo\.com/
   end
+
+  def system_username_check
+    I18n.t('dashboard.system_username_warning') if SiteSetting.system_username.blank?
+  end
+
+  def notification_email_check
+    I18n.t('dashboard.notification_email_warning') if SiteSetting.notification_email.blank?
+  end
+
+
+  # TODO: generalize this method of putting i18n keys with expiry in redis
+  #       that should be reported on the admin dashboard:
+  def access_password_removal
+    if i18n_key = $redis.get(AdminDashboardData.access_password_removal_key)
+      I18n.t(i18n_key)
+    end
+  end
+  def self.report_access_password_removal
+    $redis.setex access_password_removal_key, 172_800, 'dashboard.access_password_removal'
+  end
+
+  private
+
+    def self.access_password_removal_key
+      'dash-data:access_password_removal'
+    end
 
 end

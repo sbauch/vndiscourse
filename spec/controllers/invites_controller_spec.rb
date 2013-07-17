@@ -29,7 +29,7 @@ describe InvitesController do
       end
 
       it "destroys the invite" do
-        Invite.any_instance.expects(:trash!)
+        Invite.any_instance.expects(:trash!).with(user)
         delete :destroy, email: invite.email
       end
 
@@ -118,24 +118,6 @@ describe InvitesController do
           it "doesn't send a welcome message if not set" do
             user.expects(:enqueue_welcome_message).with('welcome_invite').never
             get :show, id: invite.invite_key
-          end
-
-        end
-
-        context 'access_required' do
-
-          it "doesn't set a cookie for access if there is no access required" do
-            SiteSetting.stubs(:access_password).returns(nil)
-            Invite.any_instance.expects(:redeem).returns(user)
-            get :show, id: invite.invite_key
-            cookies[:_access].should be_blank
-          end
-
-          it "sets the cookie when access is required" do
-            SiteSetting.stubs(:access_password).returns('adventure time!')
-            Invite.any_instance.expects(:redeem).returns(user)
-            get :show, id: invite.invite_key
-            cookies[:_access].should == 'adventure time!'
           end
 
         end

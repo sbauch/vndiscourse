@@ -14,7 +14,8 @@ describe PostsController do
 
   describe 'show' do
 
-    let(:post) { Fabricate(:post, user: log_in) }
+    let(:user) { log_in }
+    let(:post) { Fabricate(:post, user: user) }
 
     it 'ensures the user can see the post' do
       Guardian.any_instance.expects(:can_see?).with(post).returns(false)
@@ -30,7 +31,7 @@ describe PostsController do
     context "deleted post" do
 
       before do
-        post.trash!
+        post.trash!(user)
       end
 
       it "can't find deleted posts as an anonymous user" do
@@ -56,13 +57,7 @@ describe PostsController do
 
   describe 'versions' do
 
-    it 'raises an exception when not logged in' do
-      lambda { xhr :get, :versions, post_id: 123 }.should raise_error(Discourse::NotLoggedIn)
-    end
-
-    describe 'when logged in' do
-      let(:post) { Fabricate(:post, user: log_in) }
-
+    shared_examples 'posts_controller versions examples' do
       it "raises an error if the user doesn't have permission to see the post" do
         Guardian.any_instance.expects(:can_see?).with(post).returns(false)
         xhr :get, :versions, post_id: post.id
@@ -73,7 +68,16 @@ describe PostsController do
         xhr :get, :versions, post_id: post.id
         ::JSON.parse(response.body).should be_present
       end
+    end
 
+    context 'when not logged in' do
+      let(:post) { Fabricate(:post) }
+      include_examples 'posts_controller versions examples'
+    end
+
+    context 'when logged in' do
+      let(:post) { Fabricate(:post, user: log_in) }
+      include_examples 'posts_controller versions examples'
     end
 
   end
@@ -120,8 +124,9 @@ describe PostsController do
         response.should be_forbidden
       end
 
-      it "calls recover" do
+      it "calls recover and updates the topic's statistics" do
         Post.any_instance.expects(:recover!)
+        Topic.any_instance.expects(:update_statistics)
         xhr :put, :recover, post_id: post.id
       end
 

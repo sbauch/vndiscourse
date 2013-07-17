@@ -124,7 +124,7 @@ module Discourse
     # ember stuff only used for asset precompliation, production variant plays up
     config.ember.variant = :development
     config.ember.ember_location = "#{Rails.root}/app/assets/javascripts/external_production/ember.js"
-    config.ember.handlebars_location = "#{Rails.root}/app/assets/javascripts/external/handlebars-1.0.rc.4.js"
+    config.ember.handlebars_location = "#{Rails.root}/app/assets/javascripts/external/handlebars.js"
 
     # Since we are using strong_parameters, we can disable and remove
     # attr_accessible.
@@ -133,6 +133,18 @@ module Discourse
     # So open id logs somewhere sane
     config.after_initialize do
       OpenID::Util.logger = Rails.logger
+
+      if ENV['EMBED_CLOCKWORK']
+        puts ">> Running clockwork in background thread"
+        require_relative "clock"
+
+        Thread.new do
+          Clockwork.run
+        end
+      end
+
     end
+
+
   end
 end

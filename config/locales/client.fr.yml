@@ -11,6 +11,74 @@
 
 fr:
   js:
+    number:
+      human:
+        storage_units:
+          format: "%n %u"
+          units:
+            byte:
+              one:   "octet"
+              other: "octets"
+            kb: "ko"
+            mb: "Mo"
+            gb: "Go"
+            tb: "To"
+    dates:
+      tiny:
+        half_a_minute: "< 1m"
+        less_than_x_seconds:
+          one:   "< 1s"
+          other: "< %{count}s"
+        x_seconds:
+          one:   "1s"
+          other: "%{count}s"
+        less_than_x_minutes:
+          one:   "< 1m"
+          other: "< %{count}m"
+        x_minutes:
+          one:   "1m"
+          other: "%{count}m"
+        about_x_hours:
+          one:   "1h"
+          other: "%{count}h"
+        x_days:
+          one:   "1d"
+          other: "%{count}d"
+        about_x_months:
+          one:   "1mois"
+          other: "%{count}mois"
+        x_months:
+          one:   "1mois"
+          other: "%{count}mois"
+        about_x_years:
+          one:   "1an"
+          other: "%{count}an"
+        over_x_years:
+          one:   "> 1an"
+          other: "> %{count}an"
+        almost_x_years:
+          one:   "1an"
+          other: "%{count}an"
+      medium:
+        x_minutes:
+          one: "1 min"
+          other: "%{count} mins"
+        x_hours:
+          one: "1 hour"
+          other: "%{count} heures"
+        x_days:
+          one: "1 day"
+          other: "%{count} jours"
+      medium_with_ago:
+        x_minutes:
+          one: "Iy a 1 min"
+          other: "Il y a %{count} minutes"
+        x_hours:
+          one: "Il y a 1 heure"
+          other: "Il y a %{count} heures"
+        x_days:
+          one: "Il y a 1 jour"
+          other: "Il y a %{count} jours"
     share:
       topic: 'partager un lien vers cette discussion'
       post: 'partager un lien vers ce message'
@@ -109,10 +177,10 @@ fr:
 
     user:
       profile: "profil"
-      title: "Utilisateur"
       mute: "couper"
       edit: "Éditer les préférences"
       download_archive: "télécharger l'archive de mes messages"
+      dynamic_favicon: "Afficher les notifications de messages entrants sur le favicon"
       private_message: "Message privé"
       private_messages: "Messages"
       activity_stream: "Activité"
@@ -167,7 +235,7 @@ fr:
         global_match: "L'adresse email correspond au pseudo enregistré."
         global_mismatch: "Déjà enregistré. Essayez {{suggestion}} ?"
         not_available: "Pas disponible. Essayez {{suggestion}} ?"
-        too_short: Votre pseudo est trop court."
+        too_short: "Votre pseudo est trop court."
         too_long: "Votre pseudo est trop long."
         checking: "Vérification de la disponibilité de votre pseudo..."
         enter_email: "Pseudo trouvé. Entrez l'adresse email correspondante."
@@ -374,11 +442,8 @@ fr:
       quote_text: "Citation"
       code_title: "Bout de code"
       code_text: "renseignez ici votre code"
-      image_title: "Image"
-      image_description: "renseignez ici la description de l'image"
-      image_dialog_title: "Insérez l'image"
-      image_optional_text: "titre optionnel"
-      image_hosting_hint: "Besoin <a href='https://www.google.fr/search?q=hébergement+d'image+gratuit' target='_blank'>d'un hébergeur d'image gratuit ?</a>"
+      upload_title: "Envois de fichier"
+      upload_description: "renseignez ici la description de votre fichier"
       olist_title: "Liste numérotée"
       ulist_title: "Liste à puces"
       list_item: "Elément"
@@ -421,17 +486,17 @@ fr:
       moved_post: "<i title='moved post' class='icon icon-arrow-right'></i> {{username}} a déplacé le message vers {{link}}"
       total_flagged: "Nombre total de messages signalés"
 
-    image_selector:
-      title: "Insérer une image"
+    upload_selector:
+      title: "Insérer un fichier"
       from_my_computer: "Local"
       from_the_web: "Depuis internet"
-      add_image: "Ajouter une image"
-      remote_title: "Image distante"
-      remote_tip: "saisissez l'url de l'image"
-      local_title: "Image locale"
-      local_tip: "Cliquez pour sélectionner une image depuis votre ordinateur."
+      add_image: "Ajouter un fichier"
+      remote_title: "Fichier distant"
+      remote_tip: "saisissez l'url du fichier"
+      local_title: "Fichier local"
+      local_tip: "Cliquez pour sélectionner un fichier depuis votre ordinateur."
       upload: "Envoyer"
-      uploading_image: "Image en cours d'envoi"
+      upload_file: "Fichier en cours d'envoi"
 
     search:
       title: "Rechercher les discussions, messages, utilisateurs ou catégories"
@@ -511,7 +576,7 @@ fr:
       browse_all_categories: 'Voir toutes les catégories'
 
       view_latest_topics: "voir la liste des discussions populaires"
-      suggest_create_topic: "pourquoi ne pas créer une nouvelle discussion ?"
+      suggest_create_topic: "Pourquoi ne pas créer une nouvelle discussion ?"
       read_position_reset: "Votre position de lecture à été remise à zéro."
       jump_reply_up: "aller à des réponses précédentes"
       jump_reply_down: "allez à des réponses ultérieures"
@@ -670,8 +735,9 @@ fr:
         edit: "Désolé, il y a eu une erreur lors de l'édition de votre message. Merci de réessayer."
         upload: "Désolé, il y a eu une erreur lors de l'envoi du fichier. Merci de réessayer."
         upload_too_large: "Désolé, le fichier que vous êtes en train d'envoyer est trop grand (maximum {{max_size_kb}}Kb). Merci de le redimensionner et de réessayer."
-        upload_too_many_images: "Désolé, vous ne pouvez envoyer qu'une seule image à la fois."
-        only_images_are_supported: "Désolé, seulement l'envoi d'image est supporté."
+        too_many_uploads: "Désolé, vous ne pouvez envoyer qu'un seul fichier à la fois."
+        upload_not_authorized: "Désole, le fichier que vous êtes en train d'uploader n'est pas autorisé (extensions autorisées : {{authorized_extensions}})."
+        upload_not_allowed_for_new_user: "Désolé, les nouveaux utilisateurs ne peuvent pas uploader d'images."
 
       abandon: "Voulez-vous vraiment abandonner ce message ?"
 
@@ -931,6 +997,7 @@ fr:
         no_problems: "Aucun problème n'à été trouvé."
         moderators: "Modérateurs :"
         admins: "Administateurs :"
+        blocked : "Bloqués:"
         private_messages_short: "MPs"
         private_messages_title: "Messages Privés"
 
@@ -961,12 +1028,15 @@ fr:
         flagged_by: "Signalé par"
         error: "Quelque chose s'est mal passé"
         view_message: "Voir le message"
+        no_results: "Il n'y a aucun signalements."
 
       groups:
         title: "Groupes"
         edit: "Editer les groupes"
         selector_placeholder: "ajouter des utilisateurs"
         name_placeholder: "Nom du groupe, sans espace, mêmes règles que pour les noms d'utilisateurs"
+        about: "Modifier votre adhésion et les noms ici"
+        can_not_edit_automatic: "L'adhésion au groupe est défini automatiquement, les administrateurs assignent des rôles et niveaux de confiance"
 
       api:
         title: "API"
@@ -975,7 +1045,7 @@ fr:
         generate: "Générer une clé pour l'API"
         regenerate: "Regénérer une clé pour l'API"
         info_html: "Cette clé vous permettra de créer et mettre à jour des discussions à l'aide d'appels JSON."
-        note_html: "Gardez cette clé <strong>secrête</strong> ! Tous les personnes qui la possède peuvent créer des messages sur ce forum au nom de n'import quel utilisateur."
+        note_html: "Gardez cette clé <strong>secrète</strong> ! Tous les personnes qui la possède peuvent créer des messages sur ce forum au nom de n'import quel utilisateur."
 
       customize:
         title: "Personnaliser"
@@ -994,13 +1064,25 @@ fr:
         about: "Vous pouvez modifier les feuillets de styles et en-têtes de votre site. Choisissez ou ajouter un style pour commencer l'édition."
 
       email:
+        settings: "Paramètres"
+        logs: "Logs"
         title: "Historique des mails"
         sent_at: "Envoyer à"
+        user: "Utilisateur"
         email_type: "Type d'email"
         to_address: "À l'adresse"
         test_email_address: "Adresse mail à tester"
         send_test: "Envoyer le mail de test"
         sent_test: "Envoyé !"
+        delivery_method: "Moyen d'envoi"
+        preview_digest: "Prévisualisation de l'email"
+        preview_digest_desc: "Ceci est un outil pour prévisualiser le contenu de l'email généré envoyé depuis votre forum."
+        refresh: "Rafraîchir"
+        format: "Format"
+        html: "html"
+        text: "texte"
+        last_seen_user: "Dernière utilisateur vu: :"
+        reply_key: "Répondre"
 
       impersonate:
         title: "Se faire passer pour un utilisateur"
@@ -1014,9 +1096,11 @@ fr:
         create: 'Ajouter un administateur'
         last_emailed: "Derniers contacts"
         not_found: "Désolé cet utilisateur n'existe pas dans notre système."
-        new: "Nouveau"
         active: "Actif"
-        pending: "En attente"
+        nav:
+          new: "Nouveau"
+          active: "Actif"
+          pending: "En attente"
         approved: "Approuvé ?"
         approved_selected:
           one: "Approuver l'utilisateur"
@@ -1044,6 +1128,8 @@ fr:
         moderator: "Modérateur ?"
         admin: "Admin ?"
         show_admin_profile: "Admin"
+        edit_title: "Editer le titre"
+        save_title: "Sauvegarder le titre"
         refresh_browsers: "Forcer le rafraîchissement du navigateur"
         show_public_profile: "Montrer un profil public"
         impersonate: 'Imiter'
@@ -1076,6 +1162,13 @@ fr:
         activate_failed: "Il y a eu un problème lors de l'activation du compte."
         deactivate_account: "Désactive le compte"
         deactivate_failed: "Il y a eu un problème lors de la désactivation du compte."
+        unblock_failed: "Problème rencontré lors du déblocage de l'utilisateur"
+        block_failed: "Problème rencontré lors du blocage de l'utilisateur"
+        deactivate_explanation: "Un compte désactivé doit être revalidé par email"
+        banned_explanation: "Un utilisateur banni ne peut se connecter"
+        block_explanation: "Un utilisateur bloqué ne peut poster ou créer de discussions."
+        blocked: "Bloqué ?"
+        block: "Bloqué"
 
       site_content:
         none: "Choisissez un type de contenu afin de commencer l'édition."
@@ -1086,3 +1179,4 @@ fr:
         show_overriden: 'Ne montrer que ce qui a été changé'
         title: 'Paramètres du site'
         reset: 'rétablir par défaut'
+        none: 'rien'

@@ -7,6 +7,18 @@
 
 it:
   js:
+    number:
+      human:
+        storage_units:
+          format: ! '%n %u'
+          units:
+            byte:
+              one: Byte
+              other: Byte
+            gb: GB
+            kb: KB
+            mb: MB
+            tb: TB
     share:
       topic: 'condividi un link a questo topic'
       post: 'condividi un link a questo post'
@@ -370,11 +382,8 @@ it:
       quote_text: "Blockquote"
       code_title: "Esempio di codice"
       code_text: "inserisci il codice qui"
-      image_title: "Immagine"
-      image_description: "descrizione dell'immagine"
-      image_dialog_title: "Inserisci Immagine"
-      image_optional_text: "titolo facoltativo"
-      image_hosting_hint: "Hai bisogno di <a href='http://www.google.com/search?q=free+image+hosting' target='_blank'>free image hosting?</a>"
+      upload_title: "Immagine"
+      upload_description: "descrizione dell'immagine"
       olist_title: "Lista Numerata"
       ulist_title: "Lista non Numerata"
       list_item: "Elemento della lista"
@@ -406,7 +415,7 @@ it:
       moved_post: "<i title='post spostato' class='icon icon-arrow-right'></i> {{username}} ha spostato il post qui {{link}}"
       total_flagged: "totale post segnalati"
 
-    image_selector:
+    upload_selector:
       title: "Inserisci Immagine"
       from_my_computer: "Dal mio dispositivo"
       from_the_web: "Dal Web"
@@ -416,7 +425,7 @@ it:
       local_title: "immagine locale"
       local_tip: "clicca per selezionare un'immagine dal tuo dispositivo."
       upload: "Upload"
-      uploading_image: "Carico l'immagine"
+      upload_file: "Carico l'immagine"
 
     search:
       title: "cerca topic, post, utenti o categorie"
@@ -652,8 +661,7 @@ it:
         edit: "Spiacenti, si è verificato un errore durante la modifica del tuo post. Per favore, prova di nuovo."
         upload: "Spiacenti, si è verificato un errore durante il caricamento del file. Per favore, prova di nuovo."
         upload_too_large: "Spiacenti, il file che stai cercando di caricare è troppo grande (la dimensione massima è {{max_size_kb}}kb), per favore ridimensionalo e prova di nuovo."
-        upload_too_many_images: "Spiacenti, puoi caricare un'immagine per volta."
-        only_images_are_supported: "Spiacenti, puoi caricare solo immagini."
+        too_many_uploads: "Spiacenti, puoi caricare un'immagine per volta."
 
       abandon: "Sei sicuro di voler abbandonare il tuo post?"
 
@@ -943,7 +951,7 @@ it:
         delete_title: "cancella post (se è il primo post il topic verrà cancellato)"
         flagged_by: "Segnalato da"
         error: "Qualcosa è andato storto"
-        view_message: "view message"
+        view_message: "Reply"
 
       groups:
         title: "Gruppi"
@@ -997,9 +1005,11 @@ it:
         create: 'Aggiungi Amministratore'
         last_emailed: "Ultima Email"
         not_found: "Spiacenti quell'username non esiste nel sistema."
-        new: "Nuovi"
         active: "Attivi"
-        pending: "In Sospeso"
+        nav:
+          new: "Nuovi"
+          active: "Attivi"
+          pending: "In Sospeso"
         approved: "Approvare?"
         approved_selected:
           one: "approva utente"

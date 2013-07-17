@@ -18,13 +18,25 @@ describe TopicView do
     lambda { topic_view }.should raise_error(Discourse::InvalidAccess)
   end
 
+  it "handles deleted topics" do
+    topic.trash!(coding_horror)
+    lambda { TopicView.new(topic.id, coding_horror) }.should raise_error(Discourse::NotFound)
+    coding_horror.stubs(:staff?).returns(true)
+    lambda { TopicView.new(topic.id, coding_horror) }.should_not raise_error
+  end
+
+
   context "with a few sample posts" do
     let!(:p1) { Fabricate(:post, topic: topic, user: first_poster, percent_rank: 1 )}
     let!(:p2) { Fabricate(:post, topic: topic, user: coding_horror, percent_rank: 0.5 )}
     let!(:p3) { Fabricate(:post, topic: topic, user: first_poster, percent_rank: 0 )}
 
+    let(:moderator) { Fabricate(:moderator) }
+    let(:admin) { Fabricate(:admin)
+    }
     it "it can find the best responses" do
-      best2 = TopicView.new(topic.id, nil, best: 2)
+
+      best2 = TopicView.new(topic.id, coding_horror, best: 2)
       best2.posts.count.should == 2
       best2.posts[0].id.should == p2.id
       best2.posts[1].id.should == p3.id
@@ -35,7 +47,45 @@ describe TopicView do
       # should not get the status post
       best = TopicView.new(topic.id, nil, best: 99)
       best.posts.count.should == 2
-      best.filtered_posts_count.should == 3
+      best.filtered_post_ids.size.should == 3
+      best.current_post_ids.should =~ [p2.id, p3.id]
+
+      # should get no results for trust level too low
+      best = TopicView.new(topic.id, nil, best: 99, min_trust_level: coding_horror.trust_level + 1)
+      best.posts.count.should == 0
+
+
+      # should filter out the posts with a score that is too low
+      best = TopicView.new(topic.id, nil, best: 99, min_score: 99)
+      best.posts.count.should == 0
+
+      # should filter out everything if min replies not met
+      best = TopicView.new(topic.id, nil, best: 99, min_replies: 99)
+      best.posts.count.should == 0
+
+      # should punch through posts if the score is high enough
+      p2.update_column(:score, 100)
+
+      best = TopicView.new(topic.id, nil, best: 99, bypass_trust_level_score: 100, min_trust_level: coding_horror.trust_level + 1)
+      best.posts.count.should == 1
+
+      # 0 means ignore
+      best = TopicView.new(topic.id, nil, best: 99, bypass_trust_level_score: 0, min_trust_level: coding_horror.trust_level + 1)
+      best.posts.count.should == 0
+
+      # If we restrict to posts a moderator liked, return none
+      best = TopicView.new(topic.id, nil, best: 99, only_moderator_liked: true)
+      best.posts.count.should == 0
+
+      # It doesn't count likes from admins
+      PostAction.act(admin, p3, PostActionType.types[:like])
+      best = TopicView.new(topic.id, nil, best: 99, only_moderator_liked: true)
+      best.posts.count.should == 0
+
+      # It should find the post liked by the moderator
+      PostAction.act(moderator, p2, PostActionType.types[:like])
+      best = TopicView.new(topic.id, nil, best: 99, only_moderator_liked: true)
+      best.posts.count.should == 1
 
     end
 
@@ -89,10 +139,9 @@ describe TopicView do
     end
 
     describe "#next_page" do
-      let(:posts) { [stub(post_number: 1), stub(post_number: 2)] }
+      let(:p2) { stub(post_number: 2) }
       let(:topic) do
         topic = Fabricate(:topic)
-        topic.stubs(:posts).returns(posts)
         topic.stubs(:highest_post_number).returns(5)
         topic
       end
@@ -101,11 +150,12 @@ describe TopicView do
       before do
         described_class.any_instance.expects(:find_topic).with(1234).returns(topic)
         described_class.any_instance.stubs(:filter_posts)
+        described_class.any_instance.stubs(:last_post).returns(p2)
         SiteSetting.stubs(:posts_per_page).returns(2)
       end
 
       it "should return the next page" do
-        described_class.new(1234, user).next_page.should eql(1)
+        described_class.new(1234, user).next_page.should eql(2)
       end
     end
 
@@ -129,12 +179,6 @@ describe TopicView do
       it 'returns the like' do
         PostAction.act(coding_horror, p1, PostActionType.types[:like])
         topic_view.all_post_actions[p1.id][PostActionType.types[:like]].should be_present
-      end
-    end
-
-    context '.post_action_visibility' do
-      it "is allows users to see likes" do
-        topic_view.post_action_visibility.include?(PostActionType.types[:like]).should be_true
       end
     end
 
@@ -203,75 +247,13 @@ describe TopicView do
       end
     end
 
-    describe "filter_posts_after" do
-      it "returns undeleted posts after a post" do
-        topic_view.filter_posts_after(p1.post_number).map(&:id).should == [p2.id, p3.id, p5.id]
-        topic_view.should_not be_initial_load
-        topic_view.index_offset.should == 1
-        topic_view.index_reverse.should be_false
-      end
-
-      it "clips to the end boundary" do
-        topic_view.filter_posts_after(p2.post_number).should == [p3, p5]
-        topic_view.index_offset.should == 2
-        topic_view.index_reverse.should be_false
-      end
-
-      it "returns nothing after the last post" do
-        topic_view.filter_posts_after(p5.post_number).should be_blank
-      end
-
-      it "returns nothing after an invalid post number" do
-        topic_view.filter_posts_after(1000).should be_blank
-      end
-
-      it "returns deleted posts to an admin" do
-        coding_horror.admin = true
-        topic_view.filter_posts_after(p1.post_number).should == [p2, p3, p4]
-        topic_view.index_offset.should == 1
-        topic_view.index_reverse.should be_false
-      end
-    end
-
     describe '#filter_posts_paged' do
-      before { SiteSetting.stubs(:posts_per_page).returns(1) }
+      before { SiteSetting.stubs(:posts_per_page).returns(2) }
 
       it 'returns correct posts for all pages' do
         topic_view.filter_posts_paged(1).should == [p1, p2]
-        topic_view.filter_posts_paged(2).should == [p2, p3]
-        topic_view.filter_posts_paged(4).should == [p5]
+        topic_view.filter_posts_paged(2).should == [p3, p5]
         topic_view.filter_posts_paged(100).should == []
-      end
-    end
-
-    describe "filter_posts_before" do
-      it "returns undeleted posts before a post" do
-        topic_view.filter_posts_before(p5.post_number).should == [p3, p2, p1]
-        topic_view.should_not be_initial_load
-        topic_view.index_offset.should == 3
-        topic_view.index_reverse.should be_true
-      end
-
-      it "clips to the beginning boundary" do
-        topic_view.filter_posts_before(p3.post_number).should == [p2, p1]
-        topic_view.index_offset.should == 2
-        topic_view.index_reverse.should be_true
-      end
-
-      it "returns nothing before the first post" do
-        topic_view.filter_posts_before(p1.post_number).should be_blank
-      end
-
-      it "returns nothing before an invalid post number" do
-        topic_view.filter_posts_before(-10).should be_blank
-        topic_view.filter_posts_before(1000).should be_blank
-      end
-
-      it "returns deleted posts to an admin" do
-        coding_horror.admin = true
-        topic_view.filter_posts_before(p5.post_number).should == [p4, p3, p2]
-        topic_view.index_offset.should == 4
-        topic_view.index_reverse.should be_true
       end
     end
 
@@ -283,31 +265,27 @@ describe TopicView do
 
       it "snaps to the lower boundary" do
         near_view = topic_view_near(p1)
+        near_view.desired_post.should == p1
         near_view.posts.should == [p1, p2, p3]
-        near_view.index_offset.should == 0
-        near_view.index_reverse.should be_false
       end
 
       it "snaps to the upper boundary" do
         near_view = topic_view_near(p5)
+        near_view.desired_post.should == p5
         near_view.posts.should == [p2, p3, p5]
-        near_view.index_offset.should == 1
-        near_view.index_reverse.should be_false
       end
 
       it "returns the posts in the middle" do
         near_view = topic_view_near(p2)
+        near_view.desired_post.should == p2
         near_view.posts.should == [p1, p2, p3]
-        near_view.index_offset.should == 0
-        near_view.index_reverse.should be_false
       end
 
       it "returns deleted posts to an admin" do
         coding_horror.admin = true
         near_view = topic_view_near(p3)
+        near_view.desired_post.should == p3
         near_view.posts.should == [p2, p3, p4]
-        near_view.index_offset.should == 1
-        near_view.index_reverse.should be_false
       end
 
       context "when 'posts per page' exceeds the number of posts" do
@@ -316,8 +294,6 @@ describe TopicView do
         it 'returns all the posts' do
           near_view = topic_view_near(p5)
           near_view.posts.should == [p1, p2, p3, p5]
-          near_view.index_offset.should == 0
-          near_view.index_reverse.should be_false
         end
       end
     end

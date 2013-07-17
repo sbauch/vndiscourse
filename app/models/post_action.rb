@@ -15,12 +15,11 @@ class PostAction < ActiveRecord::Base
 
   rate_limit :post_action_rate_limiter
 
-  validate :message_quality
-
   scope :spam_flags, -> { where(post_action_type_id: PostActionType.types[:spam]) }
 
   def self.update_flagged_posts_count
     posts_flagged_count = PostAction.joins(post: :topic)
+                                    .where('defer = false or defer IS NULL')
                                     .where('post_actions.post_action_type_id' => PostActionType.notify_flag_type_ids,
                                            'posts.deleted_at' => nil,
                                            'topics.deleted_at' => nil)
@@ -64,9 +63,28 @@ class PostAction < ActiveRecord::Base
       moderator_id == -1 ? PostActionType.auto_action_flag_types.values : PostActionType.flag_types.values
     end
 
-    PostAction.update_all({ deleted_at: Time.zone.now, deleted_by: moderator_id }, { post_id: post.id, post_action_type_id: actions })
+    PostAction.where({ post_id: post.id, post_action_type_id: actions }).update_all({ deleted_at: Time.zone.now, deleted_by_id: moderator_id })
     f = actions.map{|t| ["#{PostActionType.types[t]}_count", 0]}
-    Post.with_deleted.update_all(Hash[*f.flatten], id: post.id)
+    Post.where(id: post.id).with_deleted.update_all(Hash[*f.flatten])
+    update_flagged_posts_count
+  end
+
+  def self.defer_flags!(post, moderator_id)
+    actions = PostAction.where(
+      defer: nil,
+      post_id: post.id,
+      post_action_type_id:
+      PostActionType.flag_types.values,
+      deleted_at: nil
+    )
+
+    actions.each do |a|
+      a.defer = true
+      a.defer_by = moderator_id
+      # so callback is called
+      a.save
+    end
+
     update_flagged_posts_count
   end
 
@@ -118,14 +136,17 @@ class PostAction < ActiveRecord::Base
   end
 
   def self.remove_act(user, post, post_action_type_id)
-    if action = where(post_id: post.id, user_id: user.id, post_action_type_id: post_action_type_id).first
-      action.trash!
+    if action = where(post_id: post.id,
+                      user_id: user.id,
+                      post_action_type_id:
+                      post_action_type_id).first
+      action.trash!(user)
       action.run_callbacks(:save)
     end
   end
 
   def remove_act!(user)
-    trash!
+    trash!(user)
     run_callbacks(:save)
   end
 
@@ -160,12 +181,6 @@ class PostAction < ActiveRecord::Base
     end
   end
 
-  def message_quality
-    return if message.blank?
-    sentinel = TextSentinel.title_sentinel(message)
-    errors.add(:message, I18n.t(:is_invalid)) unless sentinel.valid?
-  end
-
   before_create do
     post_action_type_ids = is_flag? ? PostActionType.flag_types.values : post_action_type_id
     raise AlreadyActed if PostAction.where(user_id: user_id,
@@ -179,12 +194,12 @@ class PostAction < ActiveRecord::Base
   # can weigh flags differently.
   def self.flag_counts_for(post_id)
     flag_counts = exec_sql("SELECT SUM(CASE
-                                         WHEN pa.deleted_at IS NULL AND pa.staff_took_action THEN :flags_required_to_hide_post
+                                         WHEN pa.deleted_at IS NULL AND (pa.staff_took_action) THEN :flags_required_to_hide_post
                                          WHEN pa.deleted_at IS NULL AND (NOT pa.staff_took_action) THEN 1
                                          ELSE 0
                                        END) AS new_flags,
                                    SUM(CASE
-                                         WHEN pa.deleted_at IS NOT NULL AND pa.staff_took_action THEN :flags_required_to_hide_post
+                                         WHEN pa.deleted_at IS NOT NULL AND (pa.staff_took_action) THEN :flags_required_to_hide_post
                                          WHEN pa.deleted_at IS NOT NULL AND (NOT pa.staff_took_action) THEN 1
                                          ELSE 0
                                        END) AS old_flags
@@ -209,117 +224,153 @@ class PostAction < ActiveRecord::Base
     case post_action_type
     when :vote
       # Voting also changes the sort_order
-      Post.update_all ["vote_count = vote_count + :delta, sort_order = :max - (vote_count + :delta)",
+      Post.where(id: post_id).update_all ["vote_count = vote_count + :delta, sort_order = :max - (vote_count + :delta)",
                         delta: delta,
-                        max: Topic.max_sort_order], id: post_id
+                        max: Topic.max_sort_order]
     when :like
       # `like_score` is weighted higher for staff accounts
-      Post.update_all ["like_count = like_count + :delta, like_score = like_score + :score_delta",
+      Post.where(id: post_id).update_all ["like_count = like_count + :delta, like_score = like_score + :score_delta",
                         delta: delta,
-                        score_delta: user.staff? ? delta * SiteSetting.staff_like_weight : delta], id: post_id
+                        score_delta: user.staff? ? delta * SiteSetting.staff_like_weight : delta]
     else
-      Post.update_all ["#{column} = #{column} + ?", delta], id: post_id
+      Post.where(id: post_id).update_all ["#{column} = #{column} + ?", delta]
     end
 
-    Topic.update_all ["#{column} = #{column} + ?", delta], id: post.topic_id
+    Topic.where(id: post.topic_id).update_all ["#{column} = #{column} + ?", delta]
 
 
     if PostActionType.notify_flag_type_ids.include?(post_action_type_id)
       PostAction.update_flagged_posts_count
     end
 
-    if PostActionType.auto_action_flag_types.include?(post_action_type) && SiteSetting.flags_required_to_hide_post > 0
-      # automatic hiding of posts
-      old_flags, new_flags = PostAction.flag_counts_for(post.id)
-
-      if new_flags >= SiteSetting.flags_required_to_hide_post
-        reason = old_flags > 0 ? Post.hidden_reasons[:flag_threshold_reached_again] : Post.hidden_reasons[:flag_threshold_reached]
-        Post.update_all(["hidden = true, hidden_reason_id = COALESCE(hidden_reason_id, ?)", reason], id: post_id)
-        Topic.update_all({ visible: false },
-                         ["id = :topic_id AND NOT EXISTS(SELECT 1 FROM POSTS WHERE topic_id = :topic_id AND NOT hidden)",
-                          topic_id: post.topic_id])
-
-        # inform user
-        if post.user
-          SystemMessage.create(post.user, :post_hidden,
-                               url: post.url,
-                               edit_delay: SiteSetting.cooldown_minutes_after_hiding_posts)
-        end
-      end
-    end
+    PostAction.auto_hide_if_needed(post, post_action_type)
 
     SpamRulesEnforcer.enforce!(post.user) if post_action_type == :spam
   end
 
+  def self.auto_hide_if_needed(post, post_action_type)
+    return if post.hidden
+
+    if PostActionType.auto_action_flag_types.include?(post_action_type) &&
+       SiteSetting.flags_required_to_hide_post > 0
+
+      old_flags, new_flags = PostAction.flag_counts_for(post.id)
+
+      if new_flags >= SiteSetting.flags_required_to_hide_post
+        hide_post!(post, guess_hide_reason(old_flags))
+      end
+    end
+  end
+
+
+  def self.hide_post!(post, reason=nil)
+    return if post.hidden
+
+    unless reason
+      old_flags,_ = PostAction.flag_counts_for(post.id)
+      reason = guess_hide_reason(old_flags)
+    end
+
+    Post.where(id: post.id).update_all(["hidden = true, hidden_reason_id = COALESCE(hidden_reason_id, ?)", reason])
+    Topic.where(["id = :topic_id AND NOT EXISTS(SELECT 1 FROM POSTS WHERE topic_id = :topic_id AND NOT hidden)",
+                      topic_id: post.topic_id]).update_all({ visible: false })
+
+    # inform user
+    if post.user
+      SystemMessage.create(post.user,
+                           :post_hidden,
+                           url: post.url,
+                           edit_delay: SiteSetting.cooldown_minutes_after_hiding_posts)
+    end
+  end
+
+  def self.guess_hide_reason(old_flags)
+    old_flags > 0 ?
+      Post.hidden_reasons[:flag_threshold_reached_again] :
+      Post.hidden_reasons[:flag_threshold_reached]
+  end
+
   def self.flagged_posts_report(filter)
-    posts = flagged_posts(filter)
-    return nil if posts.blank?
+
+    actions = flagged_post_actions(filter)
+
+    post_ids = actions.limit(300).pluck(:post_id).uniq
+    return nil if post_ids.blank?
+
+    posts = SqlBuilder.new("SELECT p.id, t.title, p.cooked, p.user_id,
+      p.topic_id, p.post_number, p.hidden, t.visible topic_visible,
+      p.deleted_at, t.deleted_at topic_deleted_at
+      FROM posts p
+      JOIN topics t ON t.id = p.topic_id
+      WHERE p.id in (:post_ids)").map_exec(OpenStruct, post_ids: post_ids)
 
     post_lookup = {}
     users = Set.new
 
     posts.each do |p|
-      users << p["user_id"]
-      p["excerpt"] = Post.excerpt(p.delete("cooked"))
-      p[:topic_slug] = Slug.for(p["title"])
-      post_lookup[p["id"].to_i] = p
+      users << p.user_id
+      p.excerpt = Post.excerpt(p.cooked)
+      p.topic_slug = Slug.for(p.title)
+      post_lookup[p.id] = p
     end
 
-    post_actions = PostAction.includes({:related_post => :topic})
-                              .where(post_action_type_id: PostActionType.notify_flag_type_ids)
-                              .where(post_id: post_lookup.keys)
-    post_actions = post_actions.with_deleted if filter == 'old'
+    # maintain order
+    posts = post_ids.map{|id| post_lookup[id]}
+
+    post_actions = actions.where(:post_id => post_ids)
+    # TODO this is so far from optimal, it should not be
+    # selecting all the columns but the includes stops working
+    # with the code below
+    #
+                          # .select('post_actions.id,
+                          #          post_actions.user_id,
+                          #          post_action_type_id,
+                          #          post_actions.created_at,
+                          #          post_actions.post_id,
+                          #          post_actions.message')
+                          # .to_a
 
     post_actions.each do |pa|
       post = post_lookup[pa.post_id]
-      post[:post_actions] ||= []
-      action = pa.attributes.slice('id', 'user_id', 'post_action_type_id', 'created_at', 'post_id', 'message')
+      post.post_actions ||= []
+      action = pa.attributes
       if (pa.related_post && pa.related_post.topic)
         action.merge!(topic_id: pa.related_post.topic_id,
                      slug: pa.related_post.topic.slug,
                      permalink: pa.related_post.topic.url)
       end
-      post[:post_actions] << action
+      post.post_actions << action
       users << pa.user_id
     end
 
+    # TODO add serializer so we can skip this
+    posts.map!(&:marshal_dump)
     [posts, User.select([:id, :username, :email]).where(id: users.to_a).all]
   end
 
   protected
 
-  def self.flagged_posts(filter)
-    sql = SqlBuilder.new "select p.id, t.title, p.cooked, p.user_id, p.topic_id, p.post_number, p.hidden, t.visible topic_visible
-                          from posts p
-                          join topics t on t.id = topic_id
-                          join (
-                            select
-                              post_id,
-                              count(*) as cnt,
-                              max(created_at) max
-                              from post_actions
-                              /*where2*/
-                              group by post_id
-                          ) as a on a.post_id = p.id
-                          /*where*/
-                          /*order_by*/
-                          limit 100"
+  def self.flagged_post_actions(filter)
+    post_actions = PostAction
+                      .includes({:related_post => :topic})
+                      .where(post_action_type_id: PostActionType.notify_flag_type_ids)
+                      .joins(:post => :topic)
+                      .order('post_actions.created_at DESC')
 
-    sql.where2 "post_action_type_id in (:flag_types)", flag_types: PostActionType.notify_flag_type_ids
-
-    # it may make sense to add a view that shows flags on deleted posts,
-    # we don't clear the flags on post deletion, just supress counts
-    #   they may have deleted_at on the action not set
     if filter == 'old'
-      sql.where2 "deleted_at is not null"
-      sql.order_by "max desc"
+      post_actions
+        .with_deleted
+        .where('post_actions.deleted_at IS NOT NULL OR
+                defer = true OR
+                topics.deleted_at IS NOT NULL OR
+                posts.deleted_at IS NOT NULL')
     else
-      sql.where "p.deleted_at is null and t.deleted_at is null"
-      sql.where2 "deleted_at is null"
-      sql.order_by "cnt desc, max asc"
+      post_actions
+        .where('defer IS NULL OR
+                defer = false')
+        .where('posts.deleted_at IS NULL AND
+                topics.deleted_at IS NULL')
     end
-
-    sql.exec.to_a
   end
 
   def self.target_moderators
@@ -339,10 +390,12 @@ end
 #  deleted_at          :datetime
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  deleted_by          :integer
+#  deleted_by_id       :integer
 #  message             :text
 #  related_post_id     :integer
 #  staff_took_action   :boolean          default(FALSE), not null
+#  defer               :boolean
+#  defer_by            :integer
 #
 # Indexes
 #

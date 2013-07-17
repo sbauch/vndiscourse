@@ -10,7 +10,7 @@
             <a {{bindAttr class=":star topic.starred:starred"}} {{action toggleStar}} href='#' {{bindAttr title="topic.favoriteTooltip"}}></a>
           {{/if}}
           <h1>
-          {{#if topic.fancy_title}}
+          {{#if topic.details.loaded}}
             {{topicStatus topic=topic}}
             <a class='topic-link' href='{{unbound topic.url}}'>{{{topic.fancy_title}}}</a>
           {{else}}
@@ -20,7 +20,7 @@
               {{i18n topic.loading}}
             {{/if}}
           {{/if}}
-          {{categoryLink topic.category}}
+          {{boundCategoryLink topic.category}}
           </h1>
         </div>
       </div>
@@ -85,7 +85,7 @@
         </li>
         <li class='current-user'>
           {{#if currentUser}}
-            {{#titledLinkTo user.activity currentUser titleKey="current_user" class="icon"}}{{avatar currentUser imageSize="medium" }}{{/titledLinkTo}}
+            {{#titledLinkTo 'user.activity' currentUser titleKey="current_user" class="icon"}}{{avatar currentUser imageSize="medium" }}{{/titledLinkTo}}
           {{else}}
             <div class="icon not-logged-in-avatar" {{action showLogin}}><i class='icon-user'></i></div>
           {{/if}}
@@ -110,9 +110,9 @@
       </section>
 
       <section class='d-dropdown' id='site-map-dropdown'>
-      <ul>
+      <ul class="location-links">
         {{#if currentUser.staff}}
-          <li><a href="/admin"><i class='icon icon-cog'></i>{{i18n admin_title}}</a></li>
+          <li><a href="/admin"><i class='icon icon-wrench'></i>{{i18n admin_title}}</a></li>
           <li><a href="/admin/flags/active"><i class='icon icon-flag'></i>{{i18n flags_title}}</a>
           {{#if currentUser.site_flagged_posts_count}}
             <a href='/admin/flags/active' title='{{i18n notifications.total_flagged}}' class='badge-notification flagged-posts'>{{currentUser.site_flagged_posts_count}}</a>
@@ -122,8 +122,11 @@
         <li>
           {{#titledLinkTo "list.latest" titleKey="filters.latest.help"}}{{i18n filters.latest.title}}{{/titledLinkTo}}
         </li>
-        <li>{{#linkTo 'faq'}}{{i18n faq}}{{/linkTo}}</li>
-        {{#if categories}}
+        <li>{{faqLink}}</li>
+      </ul>
+
+      {{#if categories}}
+        <ul class="category-links">
           <li class='heading' title="{{i18n filters.categories.help}}">
             {{#linkTo "list.categories"}}{{i18n filters.categories.title}}{{/linkTo}}
           </li>
@@ -134,9 +137,9 @@
               <b>{{unbound topic_count}}</b></a>
             </li>
           {{/each}}
-        {{/if}}
+        </ul>
+      {{/if}}
 
-      </ul>
     </section>
 
     </div>

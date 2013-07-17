@@ -20,7 +20,8 @@ class UserSerializer < BasicUserSerializer
              :position,
              :events_attended,
              :moderator,
-             :admin
+             :admin,
+             :title
 
   has_one :invited_by, embed: :object, serializer: BasicUserSerializer
 

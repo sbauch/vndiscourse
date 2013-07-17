@@ -3,8 +3,11 @@ TopicStatusUpdate = Struct.new(:topic, :user) do
     status = Status.new(status, enabled)
 
     Topic.transaction do
-      change status
-      create_moderator_post_for status
+      change(status)
+      highest_post_number = topic.highest_post_number
+
+      create_moderator_post_for(status)
+      update_read_state_for(status, highest_post_number)
     end
   end
 
@@ -18,10 +21,23 @@ TopicStatusUpdate = Struct.new(:topic, :user) do
     else
       topic.update_column status.name, status.enabled?
     end
+
+    if status.manually_closing_topic? && topic.auto_close_at
+      topic.reload.set_auto_close(nil).save
+    end
   end
 
   def create_moderator_post_for(status)
     topic.add_moderator_post(user, message_for(status), options_for(status))
+    topic.reload
+  end
+
+  def update_read_state_for(status, old_highest_read)
+    if status.autoclosed?
+      # let's pretend all the people that read up to the autoclose message
+      #  actually read the topic
+      PostTiming.pretend_read(topic.id, old_highest_read, topic.highest_post_number)
+    end
   end
 
   def message_for(status)
@@ -56,6 +72,10 @@ TopicStatusUpdate = Struct.new(:topic, :user) do
 
     def reopening_topic?
       (closed? || autoclosed?) && disabled?
+    end
+
+    def manually_closing_topic?
+      closed? && enabled?
     end
   end
 end

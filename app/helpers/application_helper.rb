@@ -19,6 +19,14 @@ module ApplicationHelper
     end
   end
 
+  def escape_unicode(javascript)
+    if javascript
+      javascript.gsub(/\342\200\250/u, '&#x2028;').gsub(/(<\/)/u, '\u003C/').html_safe
+    else
+      ''
+    end
+  end
+
   def with_format(format, &block)
     old_formats = formats
     self.formats = [format]
@@ -70,15 +78,23 @@ module ApplicationHelper
       end
     end
 
+    # Add workaround tag for old crawlers which ignores <noscript>
+    # (see https://developers.google.com/webmasters/ajax-crawling/docs/specification)
+    result << tag('meta', name: "fragment", content: "!") if SiteSetting.enable_escaped_fragments
+
     result
   end
 
+  # Look up site content for a key. If the key is blank, you can supply a block and that
+  # will be rendered instead.
   def markdown_content(key, replacements=nil)
-    PrettyText.cook(SiteContent.content_for(key, replacements || {})).html_safe
-  end
-
-  def faq_path
-    return "#{Discourse::base_uri}/faq"
+    result = PrettyText.cook(SiteContent.content_for(key, replacements || {})).html_safe
+    if result.blank? && block_given?
+      yield
+      nil
+    else
+      result
+    end
   end
 
   def login_path

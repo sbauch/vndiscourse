@@ -10,14 +10,14 @@ Discourse.ReplyButton = Discourse.ButtonView.extend({
   classNames: ['btn', 'btn-primary', 'create'],
   attributeBindings: ['disabled'],
   helpKey: 'topic.reply.help',
-  disabled: Em.computed.not('controller.content.can_create_post'),
+  disabled: Em.computed.not('controller.model.details.can_create_post'),
 
   text: function() {
     var archetypeCapitalized = this.get('controller.content.archetype').capitalize();
     var customTitle = this.get("parentView.replyButtonText" + archetypeCapitalized);
     if (customTitle) { return customTitle; }
 
-    return Em.String.i18n("topic.reply.title");
+    return I18n.t("topic.reply.title");
   }.property(),
 
   renderIcon: function(buffer) {

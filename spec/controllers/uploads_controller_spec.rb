@@ -17,7 +17,6 @@ describe UploadsController do
       let(:logo) do
         ActionDispatch::Http::UploadedFile.new({
           filename: 'logo.png',
-          type: 'image/png',
           tempfile: File.new("#{Rails.root}/spec/fixtures/images/logo.png")
         })
       end
@@ -25,7 +24,6 @@ describe UploadsController do
       let(:logo_dev) do
         ActionDispatch::Http::UploadedFile.new({
           filename: 'logo-dev.png',
-          type: 'image/png',
           tempfile: File.new("#{Rails.root}/spec/fixtures/images/logo-dev.png")
         })
       end
@@ -33,7 +31,6 @@ describe UploadsController do
       let(:text_file) do
         ActionDispatch::Http::UploadedFile.new({
           filename: 'LICENSE.txt',
-          type: 'text/plain',
           tempfile: File.new("#{Rails.root}/LICENSE.txt")
         })
       end
@@ -41,20 +38,34 @@ describe UploadsController do
       let(:files) { [ logo_dev, logo ] }
 
       context 'with a file' do
-        it 'is succesful' do
-          xhr :post, :create, file: logo
-          response.should be_success
+
+        context 'when authorized' do
+
+          before { SiteSetting.stubs(:authorized_extensions).returns(".txt") }
+
+          it 'is successful' do
+            xhr :post, :create, file: text_file
+            response.status.should eq 200
+          end
+
         end
 
-        it 'supports only images' do
-          xhr :post, :create, file: text_file
-          response.status.should eq 415
+        context 'when not authorized' do
+
+          before { SiteSetting.stubs(:authorized_extensions).returns(".png") }
+
+          it 'rejects the upload' do
+            xhr :post, :create, file: text_file
+            response.status.should eq 415
+          end
+
         end
+
       end
 
       context 'with some files' do
 
-        it 'is succesful' do
+        it 'is successful' do
           xhr :post, :create, files: files
           response.should be_success
         end

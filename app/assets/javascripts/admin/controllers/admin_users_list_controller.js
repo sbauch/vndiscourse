@@ -13,6 +13,10 @@ Discourse.AdminUsersListController = Ember.ArrayController.extend(Discourse.Pres
   content: null,
   loading: false,
 
+  queryNew: Em.computed.equal('query', 'new'),
+  queryPending: Em.computed.equal('query', 'pending'),
+  queryHasApproval: Em.computed.or('queryNew', 'queryPending'),
+
   /**
     Triggered when the selectAll property is changed
 
@@ -49,7 +53,7 @@ Discourse.AdminUsersListController = Ember.ArrayController.extend(Discourse.Pres
     @property title
   **/
   title: function() {
-    return Em.String.i18n('admin.users.titles.' + this.get('query'));
+    return I18n.t('admin.users.titles.' + this.get('query'));
   }.property('query'),
 
   /**
@@ -58,10 +62,8 @@ Discourse.AdminUsersListController = Ember.ArrayController.extend(Discourse.Pres
     @property showApproval
   **/
   showApproval: function() {
-    if (!Discourse.SiteSettings.must_approve_users) return false;
-    if (this.get('query') === 'new') return true;
-    if (this.get('query') === 'pending') return true;
-  }.property('query'),
+    return Discourse.SiteSettings.must_approve_users && this.get('queryHasApproval');
+  }.property('queryPending'),
 
   /**
     How many users are currently selected
@@ -78,9 +80,7 @@ Discourse.AdminUsersListController = Ember.ArrayController.extend(Discourse.Pres
 
     @property hasSelection
   **/
-  hasSelection: function() {
-    return this.get('selectedCount') > 0;
-  }.property('selectedCount'),
+  hasSelection: Em.computed.gt('selectedCount', 0),
 
   /**
     Refresh the current list of users.
@@ -94,7 +94,7 @@ Discourse.AdminUsersListController = Ember.ArrayController.extend(Discourse.Pres
     Discourse.AdminUser.findAll(this.get('query'), this.get('username')).then(function (result) {
       adminUsersListController.set('content', result);
       adminUsersListController.set('loading', false);
-    })
+    });
   },
 
 

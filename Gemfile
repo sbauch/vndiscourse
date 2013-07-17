@@ -7,8 +7,8 @@ gem 'active_model_serializers', git: 'git://github.com/rails-api/active_model_se
 # we had issues with latest, stick to the rev till we figure this out
 # PR that makes it all hang together welcome
 gem 'ember-rails'
-gem 'ember-source', '1.0.0.rc5' # or the version you need
-gem 'handlebars-source', '1.0.0.rc4' # or the version you need
+gem 'ember-source', '1.0.0.rc6.2'
+gem 'handlebars-source', '1.0.12'
 gem 'barber'
 
 gem 'vestal_versions', git: 'https://github.com/zhangyuan/vestal_versions'
@@ -29,10 +29,9 @@ gem 'fast_xs'
 gem 'fast_xor', git: 'https://github.com/CodeMonkeySteve/fast_xor.git'
 gem 'fastimage'
 gem 'fog', require: false
-gem 'has_ip_address'
 gem 'hiredis'
 
-gem 'email_reply_parser'
+gem 'email_reply_parser', git: 'https://github.com/lawrencepit/email_reply_parser.git'
 
 # note: for image_optim to correctly work you need
 # sudo apt-get install -y advancecomp gifsicle jpegoptim libjpeg-progs optipng pngcrush
@@ -70,10 +69,12 @@ gem 'sinatra', require: nil
 gem 'slim'  # required for sidekiq-web
 gem 'strong_parameters' # remove when we upgrade to Rails 4
 gem 'therubyracer', require: 'v8'
-gem 'thin'
 gem 'httparty'
+gem 'thin', require: false
 gem 'diffy', require: false
 gem 'highline', require: false
+
+gem 'puma'
 
 # Gem that enables support for plugins. It is required.
 gem 'discourse_plugin', path: 'vendor/gems/discourse_plugin'
@@ -104,16 +105,12 @@ group :test do
 end
 
 group :test, :development do
-  gem 'jshint_on_rails'
   gem 'listen', require: false
-  gem 'guard-jshint-on-rails', require: false
   gem 'certified', require: false
   gem 'fabrication', require: false
   gem 'qunit-rails'
-  gem 'guard-jasmine', require: false
   gem 'guard-rspec', require: false
   gem 'guard-spork', require: false
-  gem 'jasminerice'
   gem 'mocha', require: false
   gem 'rb-fsevent', require: RUBY_PLATFORM =~ /darwin/i ? 'rb-fsevent' : false
   gem 'rb-inotify', '~> 0.9', require: RUBY_PLATFORM =~ /linux/i ? 'rb-inotify' : false
@@ -152,15 +149,15 @@ gem 'lru_redux'
 # IMPORTANT: mini profiler monkey patches, so it better be required last
 #  If you want to amend mini profiler to do the monkey patches in the railstie
 #  we are open to it. by deferring require to the initializer we can configure disourse installs without it
-gem 'rack-mini-profiler', require: false  # require: false #, git: 'git://github.com/SamSaffron/MiniProfiler'
+gem 'rack-mini-profiler', '0.1.27', require: false  # require: false #, git: 'git://github.com/SamSaffron/MiniProfiler'
 
 # used for caching, optional
 # redis-rack-cache is missing a sane expiry policy, it hogs redis
 # https://github.com/jodosha/redis-store/pull/183
 gem 'redis-rack-cache', git: 'https://github.com/SamSaffron/redis-rack-cache.git', require: false
 gem 'rack-cache', require: false
-
 gem 'rack-cors', require: false
+gem 'unicorn', require: false
 
 # perftools only works on 1.9 atm
 group :profile do

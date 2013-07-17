@@ -15,15 +15,15 @@ test
     end
 
     it "produces a quote even with new lines in it" do
-      PrettyText.cook("[quote=\"EvilTrout, post:123, topic:456, full:true\"]ddd\n[/quote]").should match_html "<p></p><aside class=\"quote\" data-post=\"123\" data-topic=\"456\" data-full=\"true\"><div class=\"title\">\n    <div class=\"quote-controls\"></div>\n  <img width=\"20\" height=\"20\" src=\"/users/eviltrout/avatar/40?__ws=http%3A%2F%2Ftest.localhost\" class=\"avatar \" title=\"\">\n  EvilTrout\n  said:\n  </div>\n  <blockquote>ddd</blockquote>\n</aside><p>  </p>"
+      PrettyText.cook("[quote=\"EvilTrout, post:123, topic:456, full:true\"]ddd\n[/quote]").should match_html "<p></p><aside class=\"quote\" data-post=\"123\" data-topic=\"456\" data-full=\"true\"><div class=\"title\">\n    <div class=\"quote-controls\"></div>\n  <img width=\"20\" height=\"20\" src=\"/users/eviltrout/avatar/40?__ws=http%3A%2F%2Ftest.localhost\" class=\"avatar \" title=\"\">\n  EvilTrout said:\n  </div>\n  <blockquote>ddd</blockquote>\n</aside><p></p>"
     end
 
     it "should produce a quote" do
-      PrettyText.cook("[quote=\"EvilTrout, post:123, topic:456, full:true\"]ddd[/quote]").should match_html "<p></p><aside class=\"quote\" data-post=\"123\" data-topic=\"456\" data-full=\"true\"><div class=\"title\">\n    <div class=\"quote-controls\"></div>\n  <img width=\"20\" height=\"20\" src=\"/users/eviltrout/avatar/40?__ws=http%3A%2F%2Ftest.localhost\" class=\"avatar \" title=\"\">\n  EvilTrout\n  said:\n  </div>\n  <blockquote>ddd</blockquote>\n</aside><p>  </p>"
+      PrettyText.cook("[quote=\"EvilTrout, post:123, topic:456, full:true\"]ddd[/quote]").should match_html "<p></p><aside class=\"quote\" data-post=\"123\" data-topic=\"456\" data-full=\"true\"><div class=\"title\">\n    <div class=\"quote-controls\"></div>\n  <img width=\"20\" height=\"20\" src=\"/users/eviltrout/avatar/40?__ws=http%3A%2F%2Ftest.localhost\" class=\"avatar \" title=\"\">\n  EvilTrout said:\n  </div>\n  <blockquote>ddd</blockquote>\n</aside><p></p>"
     end
 
     it "trims spaces on quote params" do
-      PrettyText.cook("[quote=\"EvilTrout, post:555, topic: 666\"]ddd[/quote]").should match_html "<p></p><aside class=\"quote\" data-post=\"555\" data-topic=\"666\"><div class=\"title\">\n    <div class=\"quote-controls\"></div>\n  <img width=\"20\" height=\"20\" src=\"/users/eviltrout/avatar/40?__ws=http%3A%2F%2Ftest.localhost\" class=\"avatar \" title=\"\">\n  EvilTrout\n  said:\n  </div>\n  <blockquote>ddd</blockquote>\n</aside><p>  </p>"
+      PrettyText.cook("[quote=\"EvilTrout, post:555, topic: 666\"]ddd[/quote]").should match_html "<p></p><aside class=\"quote\" data-post=\"555\" data-topic=\"666\"><div class=\"title\">\n    <div class=\"quote-controls\"></div>\n  <img width=\"20\" height=\"20\" src=\"/users/eviltrout/avatar/40?__ws=http%3A%2F%2Ftest.localhost\" class=\"avatar \" title=\"\">\n  EvilTrout said:\n  </div>\n  <blockquote>ddd</blockquote>\n</aside><p></p>"
     end
 
 
@@ -213,9 +213,15 @@ test
       PrettyText.apply_cdn("<a href='/hello.png'>hello</a><img src='/a.jpeg'>","http://a.com").should ==
         "<a href=\"http://a.com/hello.png\">hello</a><img src=\"http://a.com/a.jpeg\">"
     end
+
     it "should not touch non images" do
       PrettyText.apply_cdn("<a href='/hello'>hello</a>","http://a.com").should ==
         "<a href=\"/hello\">hello</a>"
+    end
+
+    it "should not touch schemaless links" do
+      PrettyText.apply_cdn("<a href='//hello'>hello</a>","http://a.com").should ==
+        "<a href=\"//hello\">hello</a>"
     end
   end
 end

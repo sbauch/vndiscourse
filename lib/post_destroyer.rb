@@ -30,19 +30,21 @@ class PostDestroyer
 
         # If the poster doesn't have any other posts in the topic, clear their posted flag
         unless Post.exists?(["topic_id = ? and user_id = ? and id <> ?", @post.topic_id, @post.user_id, @post.id])
-          TopicUser.update_all 'posted = false', topic_id: @post.topic_id, user_id: @post.user_id
+          TopicUser.where(topic_id: @post.topic_id, user_id: @post.user_id).update_all 'posted = false'
         end
       end
 
       # Feature users in the topic
       Jobs.enqueue(:feature_topic_users, topic_id: @post.topic_id, except_post_id: @post.id)
 
-      @post.post_actions.map(&:trash!)
+      @post.post_actions.each do |pa|
+        pa.trash!(@user)
+      end
 
       f = PostActionType.types.map{|k,v| ["#{k}_count", 0]}
-      Post.with_deleted.update_all(Hash[*f.flatten], id: @post.id)
+      Post.with_deleted.where(id: @post.id).update_all(Hash[*f.flatten])
 
-      @post.trash!
+      @post.trash!(@user)
 
       Topic.reset_highest(@post.topic_id)
 
@@ -59,7 +61,7 @@ class PostDestroyer
       # Remove any notifications that point to this deleted post
       Notification.delete_all topic_id: @post.topic_id, post_number: @post.post_number
 
-      @post.topic.trash! if @post.post_number == 1
+      @post.topic.trash!(@user) if @post.post_number == 1
     end
   end
 

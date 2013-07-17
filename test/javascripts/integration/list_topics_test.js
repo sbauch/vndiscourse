@@ -1,22 +1,30 @@
-/*global module:true test:true ok:true visit:true expect:true exists:true count:true */
+integration("List Topics");
 
-module("List Topics", {
-  setup: function() {
-    Ember.run(Discourse, Discourse.advanceReadiness);
-  },
-
-  teardown: function() {
-    Discourse.reset();
-  }
-});
-
-test("/", function() {
+test("Default List", function() {
+  expect(2);
 
   visit("/").then(function() {
     ok(exists("#topic-list"), "The list of topics was rendered");
-    ok(count('#topic-list .topic-list-item') > 0, "has topics");
+    ok(exists('#topic-list .topic-list-item'), "has topics");
   });
-
 });
+
+test("List one Category", function() {
+  expect(2);
+
+  visit("/category/bug").then(function() {
+    ok(exists("#topic-list"), "The list of topics was rendered");
+    ok(exists('#topic-list .topic-list-item'), "has topics");
+  });
+});
+
+test("Categories List", function() {
+  expect(1);
+
+  visit("/categories").then(function() {
+    ok(exists('.category-list-item'), "has a list of categories");
+  });
+});
+
 
 

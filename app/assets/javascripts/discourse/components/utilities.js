@@ -88,9 +88,8 @@ Discourse.Utilities = {
   },
 
   emailValid: function(email) {
-   // see:  http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
-   var re;
-    re = /^[a-zA-Z0-9!#$%&'*+\/=?\^_`{|}~\-]+(?:\.[a-zA-Z0-9!#$%&'\*+\/=?\^_`{|}~\-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?$/;
+    // see:  http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
+    var re = /^[a-zA-Z0-9!#$%&'*+\/=?\^_`{|}~\-]+(?:\.[a-zA-Z0-9!#$%&'\*+\/=?\^_`{|}~\-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?$/;
     return re.test(email);
   },
 
@@ -159,42 +158,87 @@ Discourse.Utilities = {
   },
 
   /**
-  validateFilesForUpload
-
-  **/
-  /**
     Validate a list of files to be uploaded
 
     @method validateFilesForUpload
     @param {Array} files The list of files we want to upload
   **/
   validateFilesForUpload: function(files) {
-    if (files) {
-      // can only upload one file at a time
-      if (files.length > 1) {
-        bootbox.alert(Em.String.i18n('post.errors.upload_too_many_images'));
-        return false;
-      } else if (files.length > 0) {
-        // check that the uploaded file is an image
-        // TODO: we should provide support for other types of file
-        if (files[0].type && files[0].type.indexOf('image/') !== 0) {
-          bootbox.alert(Em.String.i18n('post.errors.only_images_are_supported'));
-          return false;
-        }
-        // check file size
-        if (files[0].size && files[0].size > 0) {
-          var fileSizeInKB = files[0].size / 1024;
-          if (fileSizeInKB > Discourse.SiteSettings.max_upload_size_kb) {
-            bootbox.alert(Em.String.i18n('post.errors.upload_too_large', { max_size_kb: Discourse.SiteSettings.max_upload_size_kb }));
-            return false;
-          }
-          // everything is fine
-          return true;
-        }
-      }
+    if (!files || files.length === 0) { return false; }
+    // can only upload one file at a time
+    if (files.length > 1) {
+      bootbox.alert(I18n.t('post.errors.too_many_uploads'));
+      return false;
     }
-    // there has been an error
-    return false;
+    var upload = files[0];
+    // ensures that new users can upload image
+    if (Discourse.User.current('trust_level') === 0 && Discourse.SiteSettings.newuser_max_images === 0) {
+      bootbox.alert(I18n.t('post.errors.upload_not_allowed_for_new_user'));
+      return false;
+    }
+    // if the image was pasted, sets its name to a default one
+    if (upload instanceof Blob && !(upload instanceof File) && upload.type === "image/png") { upload.name = "blob.png"; }
+    // check that the uploaded file is authorized
+    if (!Discourse.Utilities.isAuthorizedUpload(upload)) {
+      var extensions = Discourse.SiteSettings.authorized_extensions.replace(/\|/g, ", ");
+      bootbox.alert(I18n.t('post.errors.upload_not_authorized', { authorized_extensions: extensions }));
+      return false;
+    }
+    // check file size
+    var fileSizeKB = upload.size / 1024;
+    var maxSizeKB = Discourse.Utilities.maxUploadSizeInKB(upload.name);
+    if (fileSizeKB > maxSizeKB) {
+      bootbox.alert(I18n.t('post.errors.upload_too_large', { max_size_kb: maxSizeKB }));
+      return false;
+    }
+    // everything went fine
+    return true;
+  },
+
+  /**
+    Check the extension of the file against the list of authorized extensions
+
+    @method isAuthorizedUpload
+    @param {File} files The file we want to upload
+  **/
+  isAuthorizedUpload: function(file) {
+    var extensions = Discourse.SiteSettings.authorized_extensions;
+    var regexp = new RegExp("(" + extensions + ")$", "i");
+    return file && file.name ? file.name.match(regexp) : false;
+  },
+
+  /**
+    Get the markdown template for an upload (either an image or an attachment)
+
+    @method getUploadMarkdown
+    @param {Upload} upload The upload we want the markdown from
+  **/
+  getUploadMarkdown: function(upload) {
+    if (Discourse.Utilities.isAnImage(upload.original_filename)) {
+      return '<img src="' + upload.url + '" width="' + upload.width + '" height="' + upload.height + '">';
+    } else {
+      return '<a class="attachment" href="' + upload.url + '">' + upload.original_filename + '</a><span class="size">(' + I18n.toHumanSize(upload.filesize) + ')</span>';
+    }
+  },
+
+  /**
+    Check whether the path is refering to an image
+
+    @method isAnImage
+    @param {String} path The path
+  **/
+  isAnImage: function(path) {
+    return path && path.match(/\.(png|jpg|jpeg|gif|bmp|tif|tiff)$/i);
+  },
+
+  /**
+    Retrieve max upload size in KB depending on the file is an image or not
+
+    @method maxUploadSizeInKB
+    @param {String} path The path
+  **/
+  maxUploadSizeInKB: function(path) {
+    return Discourse.Utilities.isAnImage(path) ? Discourse.SiteSettings.max_image_size_kb : Discourse.SiteSettings.max_attachment_size_kb;
   }
 
 };

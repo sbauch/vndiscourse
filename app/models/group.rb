@@ -10,6 +10,7 @@ class Group < ActiveRecord::Base
   validate :name_format_validator
 
   AUTO_GROUPS = {
+    :everyone => 0,
     :admins => 1,
     :moderators => 2,
     :staff => 3,
@@ -34,7 +35,17 @@ class Group < ActiveRecord::Base
       group.save!
     end
 
+    # the everyone group is special, it can include non-users so there is no
+    # way to have the membership in a table
+    return group if name == :everyone
+
     group.name = I18n.t("groups.default_names.#{name}")
+
+    # don't allow shoddy localization to break this
+    validator = UsernameValidator.new(group.name)
+    unless validator.valid_format?
+      group.name = name
+    end
 
     real_ids = case name
                when :admins
@@ -139,10 +150,7 @@ class Group < ActiveRecord::Base
   protected
 
   def name_format_validator
-    validator = UsernameValidator.new(name)
-    unless validator.valid_format?
-      validator.errors.each { |e| errors.add(:name, e) }
-    end
+    UsernameValidator.perform_validation(self, 'name')
   end
 
   # hack around AR

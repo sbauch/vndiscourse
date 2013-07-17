@@ -236,7 +236,7 @@ describe TopicLink do
       it 'has the correct results' do
         TopicLink.extract_from(post)
         topic_link = post.topic.topic_links.first
-        TopicLinkClick.create(topic_link: topic_link, ip: '192.168.1.1')
+        TopicLinkClick.create(topic_link: topic_link, ip_address: '192.168.1.1')
 
         counts_for[post.id].should be_present
         counts_for[post.id].find {|l| l[:url] == 'http://google.com'}[:clicks].should == 0
@@ -258,8 +258,7 @@ describe TopicLink do
         TopicLink.topic_summary(Guardian.new, post.topic_id).count.should == 1
         TopicLink.counts_for(Guardian.new, post.topic, [post]).length.should == 1
 
-        category.deny(:all)
-        category.allow(Group[:staff])
+        category.set_permissions(:staff => :full)
         category.save
 
         admin = Fabricate(:admin)

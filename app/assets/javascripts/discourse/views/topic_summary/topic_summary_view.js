@@ -7,32 +7,29 @@
   @module Discourse
 **/
 Discourse.TopicSummaryView = Discourse.ContainerView.extend({
-  topicBinding: 'controller.content',
   classNameBindings: ['hidden', ':topic-summary'],
-  LINKS_SHOWN: 5,
   allLinksShown: false,
 
+  topic: Em.computed.alias('controller.model'),
+
   showAllLinksControls: function() {
-    if (this.blank('topic.links')) return false;
     if (this.get('allLinksShown')) return false;
-    if (this.get('topic.links.length') <= this.LINKS_SHOWN) return false;
+    if ((this.get('topic.details.links.length') || 0) <= Discourse.TopicSummaryView.LINKS_SHOWN) return false;
     return true;
-  }.property('allLinksShown', 'topic.links'),
+  }.property('allLinksShown', 'topic.details.links'),
 
   infoLinks: function() {
-    if (this.blank('topic.links')) return [];
+    if (this.blank('topic.details.links')) return [];
 
-    var allLinks = this.get('topic.links');
+    var allLinks = this.get('topic.details.links');
     if (this.get('allLinksShown')) return allLinks;
-    return allLinks.slice(0, this.LINKS_SHOWN);
-  }.property('topic.links', 'allLinksShown'),
+    return allLinks.slice(0, Discourse.TopicSummaryView.LINKS_SHOWN);
+  }.property('topic.details.links', 'allLinksShown'),
 
-  newPostCreated: function() {
-    this.rerender();
-  }.observes('topic.posts_count'),
+  shouldRerender: Discourse.View.renderIfChanged('topic.posts_count'),
 
   hidden: function() {
-    if (this.get('post.post_number') !== 1) return true;
+    if (!this.get('post.firstPost')) return true;
     if (this.get('controller.content.archetype') === 'private_message') return false;
     if (this.get('controller.content.archetype') !== 'regular') return true;
     return this.get('controller.content.posts_count') < 2;
@@ -46,7 +43,7 @@ Discourse.TopicSummaryView = Discourse.ContainerView.extend({
       templateName: 'topic_summary/info',
       topic: this.get('topic'),
       summaryView: this
-    })
+    });
 
     this.trigger('appendSummaryInformation', this);
   },
@@ -77,4 +74,6 @@ Discourse.TopicSummaryView = Discourse.ContainerView.extend({
   }
 });
 
-
+Discourse.TopicSummaryView.reopenClass({
+  LINKS_SHOWN: 5
+});

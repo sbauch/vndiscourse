@@ -73,7 +73,7 @@
 .autocomplete {
   z-index: 999999;
   position: absolute;
-  width: 200px;
+  width: 240px;
   background-color: $white;
   border: 1px solid $gray;
   ul {
@@ -104,7 +104,7 @@
 }
 
 #reply-control {
-  .toggle-preview, #draft-status, #image-uploading {
+  .toggle-preview, #draft-status, #file-uploading {
     position: absolute;
     bottom: -31px;
     margin-top: 0px;
@@ -113,7 +113,7 @@
     right: 5px;
     text-decoration: underline;
   }
-  #image-uploading {
+  #file-uploading {
     left: 51%;
     font-size: 12px;
     color: darken($gray, 40);
@@ -293,12 +293,15 @@
     #wmd-input, #wmd-preview {
       color: $black;
       img {
-        // Otherwise we get the wrong size in JS
-        max-width: none;
+        max-width: 100%;
         border-radius: 4px;
         moz-border-radius: 4px;
         webkit-border-radius: 4px;
         ms-border-radius: 4px;
+      }
+      video {
+        max-width: 100%;
+        height: auto;
       }
     }
     #wmd-preview {

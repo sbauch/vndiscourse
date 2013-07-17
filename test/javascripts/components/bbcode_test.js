@@ -1,10 +1,10 @@
-/*global module:true test:true ok:true visit:true expect:true exists:true count:true equal:true present:true md5:true */
-
+/*global md5:true */
 module("Discourse.BBCode");
 
 var format = function(input, expected, text) {
+  // testing 1 2 3
   equal(Discourse.BBCode.format(input, {lookupAvatar: false}), expected, text);
-}
+};
 
 test('basic bbcode', function() {
   format("[b]strong[/b]", "<span class='bbcode-b'>strong</span>", "bolds text");
@@ -50,7 +50,7 @@ test("quotes", function() {
 
   var formatQuote = function(val, expected, text) {
     equal(Discourse.BBCode.buildQuoteBBCode(post, val), expected, text);
-  }
+  };
 
   formatQuote(undefined, "", "empty string for undefined content");
   formatQuote(null, "", "empty string for null content");
@@ -77,21 +77,21 @@ test("quote formatting", function() {
   // TODO: This HTML matching is quite ugly.
   format("[quote=\"eviltrout, post:1, topic:1\"]abc[/quote]",
          "</p><aside class='quote' data-post=\"1\" data-topic=\"1\" >\n  <div class='title'>\n    " +
-         "<div class='quote-controls'></div>\n  \n  eviltrout\n  said:\n  </div>\n  <blockquote>abc</blockquote>\n</aside>\n<p>",
+         "<div class='quote-controls'></div>\n  \n  eviltrout said:\n  </div>\n  <blockquote>abc</blockquote>\n</aside>\n<p>",
          "renders quotes properly");
 
   format("[quote=\"eviltrout, post:1, topic:1\"]abc[quote=\"eviltrout, post:2, topic:2\"]nested[/quote][/quote]",
          "</p><aside class='quote' data-post=\"1\" data-topic=\"1\" >\n  <div class='title'>\n    <div " +
-         "class='quote-controls'></div>\n  \n  eviltrout\n  said:\n  </div>\n  <blockquote>abc</p><aside " +
+         "class='quote-controls'></div>\n  \n  eviltrout said:\n  </div>\n  <blockquote>abc</p><aside " +
          "class='quote' data-post=\"2\" data-topic=\"2\" >\n  <div class='title'>\n    <div class='quote-" +
-         "controls'></div>\n  \n  eviltrout\n  said:\n  </div>\n  <blockquote>nested</blockquote>\n</aside>\n<p></blockquote>\n</aside>\n<p>",
+         "controls'></div>\n  \n  eviltrout said:\n  </div>\n  <blockquote>nested</blockquote>\n</aside>\n<p></blockquote>\n</aside>\n<p>",
          "can nest quotes");
 
   format("before[quote=\"eviltrout, post:1, topic:1\"]first[/quote]middle[quote=\"eviltrout, post:2, topic:2\"]second[/quote]after",
          "before</p><aside class='quote' data-post=\"1\" data-topic=\"1\" >\n  <div class='title'>\n    <div class='quote-cont" +
-         "rols'></div>\n  \n  eviltrout\n  said:\n  </div>\n  <blockquote>first</blockquote>\n</aside>\n<p>middle</p><aside cla" +
+         "rols'></div>\n  \n  eviltrout said:\n  </div>\n  <blockquote>first</blockquote>\n</aside>\n<p>middle</p><aside cla" +
          "ss='quote' data-post=\"2\" data-topic=\"2\" >\n  <div class='title'>\n    <div class='quote-controls'></div>\n  \n  " +
-         "eviltrout\n  said:\n  </div>\n  <blockquote>second</blockquote>\n</aside>\n<p>after",
+         "eviltrout said:\n  </div>\n  <blockquote>second</blockquote>\n</aside>\n<p>after",
          "can handle more than one quote");
 
 });

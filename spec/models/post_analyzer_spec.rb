@@ -2,10 +2,39 @@ require 'spec_helper'
 
 describe PostAnalyzer do
 
-  let(:topic) { Fabricate(:topic) }
-  let(:default_topic_id) { topic.id }
-  let(:post_args) do
-    {user: topic.user, topic: topic}
+  let(:default_topic_id) { 12 }
+
+  describe '#cook' do
+    let(:post_analyzer) { described_class.new nil, nil  }
+
+    let(:args) { [raw, options] }
+    let(:raw) { "Here's a tweet:\n#{url}" }
+    let(:options) { {} }
+
+    let(:url) {
+      'https://twitter.com/evil_trout/status/345954894420787200'
+    }
+
+    before { Oneboxer.stubs(:onebox) }
+
+    it 'fetches the onebox for any urls in the post' do
+      Oneboxer.expects(:onebox).with url
+      post_analyzer.cook(*args)
+    end
+
+    it 'does not invalidate the onebox cache' do
+      Oneboxer.expects(:invalidate).with(url).never
+      post_analyzer.cook(*args)
+    end
+
+    context 'when invalidating oneboxes' do
+      let(:options) {{ invalidate_oneboxes: true }}
+
+      it 'invalidates the oneboxes for urls in the post' do
+        Oneboxer.expects(:invalidate).with url
+        post_analyzer.cook(*args)
+      end
+    end
   end
 
   context "links" do
@@ -50,6 +79,11 @@ describe PostAnalyzer do
       it "it counts properly with more than one link on the same host" do
         post_analyzer = PostAnalyzer.new(raw_three_links, default_topic_id)
         post_analyzer.linked_hosts.should == {"discourse.org" => 1, "www.imdb.com" => 1}
+      end
+
+      it 'returns blank for ipv6 output' do
+        post_analyzer = PostAnalyzer.new('PING www.google.com(lb-in-x93.1e100.net) 56 data bytes', default_topic_id)
+        post_analyzer.linked_hosts.should be_blank
       end
     end
   end
@@ -115,6 +149,7 @@ describe PostAnalyzer do
     end
 
     it "finds links from markdown" do
+      Oneboxer.stubs :onebox
       post_analyzer = PostAnalyzer.new(raw_post_one_link_md, default_topic_id)
       post_analyzer.link_count.should == 1
     end

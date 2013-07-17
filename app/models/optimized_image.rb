@@ -3,7 +3,9 @@ require "digest/sha1"
 class OptimizedImage < ActiveRecord::Base
   belongs_to :upload
 
-  def self.create_for(upload, width=nil, height=nil)
+  def self.create_for(upload, width, height)
+    return unless width && height
+
     @image_sorcery_loaded ||= require "image_sorcery"
 
     original_path = "#{Rails.root}/public#{upload.url}"
@@ -11,15 +13,13 @@ class OptimizedImage < ActiveRecord::Base
     temp_file = Tempfile.new(["discourse", File.extname(original_path)])
     temp_path = temp_file.path
 
-    # do the resize when there is both dimensions
-    if width && height && ImageSorcery.new(original_path).convert(temp_path, resize: "#{width}x#{height}")
-      image_info = FastImage.new(temp_path)
+    if ImageSorcery.new(original_path).convert(temp_path, resize: "#{width}x#{height}")
       thumbnail = OptimizedImage.new({
         upload_id: upload.id,
         sha1: Digest::SHA1.file(temp_path).hexdigest,
         extension: File.extname(temp_path),
-        width: image_info.size[0],
-        height: image_info.size[1]
+        width: width,
+        height: height
       })
       # make sure the directory exists
       FileUtils.mkdir_p Pathname.new(thumbnail.path).dirname
@@ -36,20 +36,28 @@ class OptimizedImage < ActiveRecord::Base
     thumbnail
   end
 
+  def destroy
+    OptimizedImage.transaction do
+      remove_file
+      super
+    end
+  end
+
+  def remove_file
+    File.delete path
+  rescue Errno::ENOENT
+  end
+
   def url
-    "#{Upload.base_url}/#{optimized_path}/#{filename}"
+    "#{LocalStore.base_url}/#{optimized_path}/#{filename}"
   end
 
   def path
-    "#{path_root}/#{optimized_path}/#{filename}"
-  end
-
-  def path_root
-    @path_root ||= "#{Rails.root}/public"
+    "#{LocalStore.base_path}/#{optimized_path}/#{filename}"
   end
 
   def optimized_path
-    "uploads/#{RailsMultisite::ConnectionManagement.current_db}/_optimized/#{sha1[0..2]}/#{sha1[3..5]}"
+    "_optimized/#{sha1[0..2]}/#{sha1[3..5]}"
   end
 
   def filename

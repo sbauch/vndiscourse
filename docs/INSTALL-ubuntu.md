@@ -1,5 +1,12 @@
 # Discourse Install Guide on Ubuntu
 
+## What kind of hardware do you have?
+
+- We *strongly* recommend 2GB of memory minimum if you don't want to deal with swap partitions during the install.
+- We recommend at least a dual core CPU.
+
+You can get away with less than this if you are careful -- 1 GB of memory and a single core CPU are the minimums -- but it's simpler to just throw a bit more hardware at the problem.
+
 ## Install Ubuntu Server 12.04 LTS with the package groups:
 
 ![screenshot of package group selection screen](https://raw.github.com/discourse/discourse-docimages/master/install/ubuntu%20-%20install%20-%20software%20selection.png)
@@ -249,7 +256,7 @@ Not english? Set the default language as appropriate:
     SiteSetting.default_locale = 'fr'
 
     # Not sure if your locale is supported? Check at the rails console:
-    LocaleSiteSetting.all_values
+    LocaleSiteSetting.values
      => ["cs", "da", "de", "en", "es", "fr", "id", "it", "nb_NO", "nl", "pseudo", "pt", "ru", "sv", "zh_CN", "zh_TW"] 
 
 ## nginx setup
@@ -320,10 +327,28 @@ and create an account by logging in normally, then run the commands:
     RAILS_ENV=production bundle exec rails c
 
     # (in rails console)
-    > me = User.find_by_username_or_email('myemailaddress@me.com')[0]
+    > me = User.find_by_username_or_email('myemailaddress@me.com')
     > me.activate #use this in case you haven't configured your mail server and therefore can't receive the activation mail.
     > me.admin = true
     > me.save
+
+At this point we recommend you start going through the various items in the
+[Discourse Admin Quick Start Guide](https://github.com/discourse/discourse/wiki/The-Discourse-Admin-Quick-Start-Guide)
+to further prepare your site for users.
+
+## Site localization
+
+Custom assets such as images should be placed somewhere under:
+
+    DISCOURSE_HOME/public/
+
+For example, create a `local` directory and place it into:
+
+    DISCOURSE_HOME/public/uploads/local/michael.png
+
+The corresponding site setting is:
+
+    logo_small_url: /uploads/local/michael.png
 
 ## Updating Discourse
 
@@ -340,3 +365,5 @@ and create an account by logging in normally, then run the commands:
     RUBY_GC_MALLOC_LIMIT=90000000 RAILS_ENV=production rake db:migrate
     RUBY_GC_MALLOC_LIMIT=90000000 RAILS_ENV=production rake assets:precompile
     bluepill start
+
+Note that if bluepill *itself* needs to be restarted, it must be killed with `bluepill quit` and restarted with the same command that's in crontab

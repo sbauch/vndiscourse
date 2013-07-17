@@ -14,8 +14,9 @@ class SiteSetting < ActiveRecord::Base
   setting(:company_full_name, 'My Unconfigured Forum Ltd.')
   setting(:company_short_name, 'Unconfigured Forum')
   setting(:company_domain, 'www.example.com')
-  setting(:tos_url, '')
-  setting(:privacy_policy_url, '')
+  client_setting(:tos_url, '')
+  client_setting(:faq_url, '')
+  client_setting(:privacy_policy_url, '')
   setting(:api_key, '')
   client_setting(:traditional_markdown_linebreaks, false)
   client_setting(:top_menu, 'latest|new|unread|favorited|categories')
@@ -25,6 +26,8 @@ class SiteSetting < ActiveRecord::Base
   client_setting(:must_approve_users, false)
   client_setting(:ga_tracking_code, "")
   client_setting(:ga_domain_name, "")
+  client_setting(:enable_escaped_fragments, false)
+  client_setting(:enable_noscript_support, true)
   client_setting(:enable_long_polling, true)
   client_setting(:polling_interval, 3000)
   client_setting(:anon_polling_interval, 30000)
@@ -37,7 +40,8 @@ class SiteSetting < ActiveRecord::Base
   client_setting(:allow_uncategorized_topics, true)
   client_setting(:min_search_term_length, 3)
   client_setting(:flush_timings_secs, 5)
-  client_setting(:supress_reply_directly_below, true)
+  client_setting(:suppress_reply_directly_below, true)
+  client_setting(:suppress_reply_directly_above, true)
   client_setting(:email_domains_blacklist, 'mailinator.com')
   client_setting(:email_domains_whitelist)
   client_setting(:version_checks, true)
@@ -49,7 +53,9 @@ class SiteSetting < ActiveRecord::Base
   # auto-replace rules for title
   setting(:title_prettify, true)
 
-  client_setting(:max_upload_size_kb, 1024)
+  client_setting(:max_image_size_kb, 2048)
+  client_setting(:max_attachment_size_kb, 1024)
+  client_setting(:authorized_extensions, '.jpg|.jpeg|.png|.gif')
 
   # settings only available server side
   setting(:auto_track_topics_after, 240000)
@@ -67,14 +73,13 @@ class SiteSetting < ActiveRecord::Base
   setting(:port, Rails.env.development? ? 3000 : '')
   setting(:enable_private_messages, true)
   setting(:use_ssl, false)
-  setting(:access_password)
   setting(:queue_jobs, !Rails.env.test?)
   setting(:crawl_images, !Rails.env.test?)
   setting(:max_image_width, 690)
   setting(:create_thumbnails, false)
   client_setting(:category_featured_topics, 6)
   setting(:topics_per_page, 30)
-  setting(:posts_per_page, 20)
+  client_setting(:posts_per_page, 20)
   setting(:invite_expiry_days, 14)
   setting(:active_user_rate_limit_secs, 60)
   setting(:previous_visit_timeout_hours, 1)
@@ -103,7 +108,6 @@ class SiteSetting < ActiveRecord::Base
   setting(:max_flags_per_day, 20)
   setting(:max_edits_per_day, 30)
   setting(:max_favorites_per_day, 20)
-  setting(:auto_link_images_wider_than, 50)
 
   setting(:email_time_window_mins, 10)
 
@@ -127,6 +131,7 @@ class SiteSetting < ActiveRecord::Base
 
   # we need to think of a way to force users to enter certain settings, this is a minimal config thing
   setting(:notification_email, 'info@discourse.org')
+  setting(:email_custom_headers, 'Auto-Submitted: auto-generated')
 
   setting(:allow_index_in_robots_txt, true)
 
@@ -171,6 +176,8 @@ class SiteSetting < ActiveRecord::Base
   
   client_setting(:custom_avatars, false)
 
+  setting(:enable_flash_video_onebox, false)
+
   setting(:default_trust_level, 0)
   setting(:default_invitee_trust_level, 1)
 
@@ -182,7 +189,7 @@ class SiteSetting < ActiveRecord::Base
   setting(:basic_requires_read_posts, 50)
   setting(:basic_requires_time_spent_mins, 15)
 
-  setting(:regular_requires_topics_entered, 3)
+  setting(:regular_requires_topics_entered, 20)
   setting(:regular_requires_read_posts, 100)
   setting(:regular_requires_time_spent_mins, 60)
   setting(:regular_requires_days_visited, 15)
@@ -206,7 +213,7 @@ class SiteSetting < ActiveRecord::Base
   setting(:max_word_length, 30)
 
   setting(:newuser_max_links, 2)
-  setting(:newuser_max_images, 0)
+  client_setting(:newuser_max_images, 0)
 
   setting(:newuser_spam_host_threshold, 3)
 
@@ -225,6 +232,8 @@ class SiteSetting < ActiveRecord::Base
   client_setting(:topic_views_heat_high,   5000)
 
   setting(:minimum_topics_similar, 50)
+
+  client_setting(:relative_date_duration, 14)
 
   def self.generate_api_key!
     self.api_key = SecureRandom.hex(32)
@@ -255,14 +264,44 @@ class SiteSetting < ActiveRecord::Base
     min_private_message_post_length..max_post_length
   end
 
+  def self.top_menu_items
+    top_menu.split('|').map { |menu_item| TopMenuItem.new(menu_item) }
+  end
+
   def self.homepage
-    # TODO objectify this
-    top_menu.split('|')[0].split(',')[0]
+    top_menu_items[0].name
+  end
+
+  def self.anonymous_menu_items
+    @anonymous_menu_items ||= Set.new ['latest', 'hot', 'categories', 'category']
   end
 
   def self.anonymous_homepage
-    # TODO objectify this
-    top_menu.split('|').map{|f| f.split(',')[0] }.select{ |f| ['latest', 'hot', 'categories', 'category'].include? f}[0]
+    top_menu_items.map { |item| item.name }
+                  .select { |item| anonymous_menu_items.include?(item) }
+                  .first
+  end
+
+  def self.authorized_uploads
+    authorized_extensions.tr(" ", "")
+                         .split("|")
+                         .map { |extension| (extension.start_with?(".") ? "" : ".") + extension }
+  end
+
+  def self.authorized_upload?(file)
+    authorized_uploads.count > 0 && file.original_filename =~ /(#{authorized_uploads.join("|")})$/i
+  end
+
+  def self.images
+    @images ||= Set.new [".jpg", ".jpeg", ".png", ".gif", ".tif", ".tiff", ".bmp"]
+  end
+
+  def self.authorized_images
+    authorized_uploads.select { |extension| images.include?(extension) }
+  end
+
+  def self.authorized_image?(file)
+    authorized_images.count > 0 && file.original_filename =~ /(#{authorized_images.join("|")})$/i
   end
 
 end

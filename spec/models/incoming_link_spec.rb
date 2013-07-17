@@ -5,13 +5,9 @@ describe IncomingLink do
   it { should belong_to :topic }
   it { should validate_presence_of :url }
 
-  let :post do
-    Fabricate(:post)
-  end
+  let(:post) { Fabricate(:post) }
 
-  let :topic do
-    post.topic
-  end
+  let(:topic) { post.topic }
 
   let :incoming_link do
     IncomingLink.create(url: "/t/slug/#{topic.id}/#{post.post_number}",
@@ -52,6 +48,10 @@ describe IncomingLink do
       TestRequest.new(env)
     end
 
+    it "does not explode with bad referer" do
+      IncomingLink.add(req('http://sam.com','file:///Applications/Install/75067ABC-C9D1-47B7-8ACE-76AEDE3911B2/Install/'))
+    end
+
     it "does nothing if referer is empty" do
       IncomingLink.expects(:create).never
       IncomingLink.add(req('http://somesite.com'))
@@ -77,7 +77,7 @@ describe IncomingLink do
 
   describe 'non-topic url' do
     it 'has nothing set' do
-      link = Fabricate(:incoming_link_not_topic)
+      link = Fabricate.build(:incoming_link_not_topic)
       link.topic_id.should be_blank
       link.user_id.should be_blank
     end

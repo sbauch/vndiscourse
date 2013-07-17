@@ -1,6 +1,10 @@
-/*global module:true test:true ok:true visit:true equal:true exists:true count:true equal:true present:true md5:true */
+/*global sanitizeHtml:true */
 
-module("Discourse.Markdown");
+module("Discourse.Markdown", {
+  setup: function() {
+    Discourse.SiteSettings.traditional_markdown_linebreaks = false;
+  }
+});
 
 var cooked = function(input, expected, text) {
   equal(Discourse.Markdown.cook(input, {mentionLookup: false }), expected, text);
@@ -8,11 +12,27 @@ var cooked = function(input, expected, text) {
 
 var cookedOptions = function(input, opts, expected, text) {
   equal(Discourse.Markdown.cook(input, opts), expected, text);
-}
+};
 
 test("basic cooking", function() {
   cooked("hello", "<p>hello</p>", "surrounds text with paragraphs");
-  cooked("1\n2\n3", "<p>1 <br>\n2 <br>\n3</p>", "automatically handles trivial newlines");
+});
+
+test("Line Breaks", function() {
+
+  var input = "1\n2\n3";
+  cooked(input, "<p>1 <br>\n2 <br>\n3</p>", "automatically handles trivial newlines");
+
+  var traditionalOutput = "<p>1\n2\n3</p>";
+
+  cookedOptions(input,
+                {traditional_markdown_linebreaks: true},
+                traditionalOutput,
+                "It supports traditional markdown via an option");
+
+  Discourse.SiteSettings.traditional_markdown_linebreaks = true;
+  cooked(input, traditionalOutput, "It supports traditional markdown via a Site Setting");
+
 });
 
 test("Links", function() {
@@ -49,13 +69,13 @@ test("Quotes", function() {
   cookedOptions("1[quote=\"bob, post:1\"]my quote[/quote]2",
                 { topicId: 2, lookupAvatar: function(name) { return "" + name; } },
                 "<p>1</p><aside class='quote' data-post=\"1\" >\n  <div class='title'>\n    <div class='quote-controls'></div>\n" +
-                "  bob\n  bob\n  said:\n  </div>\n  <blockquote>my quote</blockquote>\n</aside>\n<p> <br>\n2</p>",
+                "  bob\n  bob said:\n  </div>\n  <blockquote>my quote</blockquote>\n</aside>\n<p></p>\n\n<p>2</p>",
                 "handles quotes properly");
 
   cookedOptions("1[quote=\"bob, post:1\"]my quote[/quote]2",
                 { topicId: 2, lookupAvatar: function(name) { } },
                 "<p>1</p><aside class='quote' data-post=\"1\" >\n  <div class='title'>\n    <div class='quote-controls'></div>\n" +
-                "  \n  bob\n  said:\n  </div>\n  <blockquote>my quote</blockquote>\n</aside>\n<p> <br>\n2</p>",
+                "  \n  bob said:\n  </div>\n  <blockquote>my quote</blockquote>\n</aside>\n<p></p>\n\n<p>2</p>",
                 "includes no avatar if none is found");
 });
 
@@ -93,3 +113,25 @@ test("Oneboxing", function() {
 
 });
 
+test("SanitizeHTML", function() {
+
+  equal(sanitizeHtml("<div><script>alert('hi');</script></div>"), "<div></div>");
+  equal(sanitizeHtml("<div><p class=\"funky\" wrong='1'>hello</p></div>"), "<div><p class=\"funky\">hello</p></div>");
+
+});
+
+test("URLs in BBCode tags", function() {
+
+  cooked("[img]http://eviltrout.com/eviltrout.png[/img][img]http://samsaffron.com/samsaffron.png[/img]",
+         "<p><img src=\"http://eviltrout.com/eviltrout.png\"><img src=\"http://samsaffron.com/samsaffron.png\"></p>",
+         "images are properly parsed");
+
+  cooked("[url]http://discourse.org[/url]",
+         "<p><a href=\"http://discourse.org\">http://discourse.org</a></p>",
+         "links are properly parsed");
+
+  cooked("[url=http://discourse.org]discourse[/url]",
+         "<p><a href=\"http://discourse.org\">discourse</a></p>",
+         "named links are properly parsed");
+
+});

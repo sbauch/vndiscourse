@@ -2,6 +2,8 @@ require 'spec_helper'
 require_dependency 'post_destroyer'
 
 describe Post do
+  before { Oneboxer.stubs :onebox }
+
   # Help us build a post with a raw body
   def post_with_body(body, user=nil)
     args = post_args.merge(raw: body)
@@ -44,7 +46,7 @@ describe Post do
 
     describe '#with_user' do
       it 'gives you a user' do
-        Fabricate(:post, user: Fabricate(:user))
+        Fabricate(:post, user: Fabricate.build(:user))
         Post.with_user.first.user.should be_a User
       end
     end

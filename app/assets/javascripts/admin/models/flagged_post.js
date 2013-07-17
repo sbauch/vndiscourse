@@ -10,11 +10,11 @@ Discourse.FlaggedPost = Discourse.Post.extend({
 
   summary: function(){
     return _(this.post_actions)
-      .groupBy(function(a){ return a.post_action_type_id })
+      .groupBy(function(a){ return a.post_action_type_id; })
       .map(function(v,k){
-        return Em.String.i18n("admin.flags.summary.action_type_" + k, {count: v.length});
+        return I18n.t('admin.flags.summary.action_type_' + k, {count: v.length});
       })
-      .join(",")
+      .join(',');
   }.property(),
 
   flaggers: function() {
@@ -22,7 +22,9 @@ Discourse.FlaggedPost = Discourse.Post.extend({
       _this = this;
     r = [];
     _.each(this.post_actions, function(action) {
-      r.push(_this.userLookup[action.user_id]);
+      var user = _this.userLookup[action.user_id];
+      var flagType = I18n.t('admin.flags.summary.action_type_' + action.post_action_type_id, {count: 1});
+      r.push({user: user, flagType: flagType, flaggedAt: action.created_at});
     });
     return r;
   }.property(),
@@ -52,34 +54,54 @@ Discourse.FlaggedPost = Discourse.Post.extend({
   }.property(),
 
   topicHidden: function() {
-    return this.get('topic_visible') === 'f';
+    return !this.get('topic_visible');
   }.property('topic_hidden'),
 
   deletePost: function() {
-    if (this.get('post_number') === "1") {
-      return Discourse.ajax("/t/" + this.topic_id, { type: 'DELETE', cache: false });
+    if (this.get('post_number') === '1') {
+      return Discourse.ajax('/t/' + this.topic_id, { type: 'DELETE', cache: false });
     } else {
-      return Discourse.ajax("/posts/" + this.id, { type: 'DELETE', cache: false });
+      return Discourse.ajax('/posts/' + this.id, { type: 'DELETE', cache: false });
     }
   },
 
-  clearFlags: function() {
-    return Discourse.ajax("/admin/flags/clear/" + this.id, { type: 'POST', cache: false });
+  disagreeFlags: function() {
+    return Discourse.ajax('/admin/flags/disagree/' + this.id, { type: 'POST', cache: false });
   },
 
-  hiddenClass: function() {
-    if (this.get('hidden') === "t") return "hidden-post";
-  }.property()
+  deferFlags: function() {
+    return Discourse.ajax('/admin/flags/defer/' + this.id, { type: 'POST', cache: false });
+  },
+
+  agreeFlags: function() {
+    return Discourse.ajax('/admin/flags/agree/' + this.id, { type: 'POST', cache: false });
+  },
+
+  postHidden: Em.computed.alias('hidden'),
+
+  extraClasses: function() {
+    var classes = [];
+    if (this.get('hidden')) {
+      classes.push('hidden-post');
+    }
+    if (this.get('deleted')){
+      classes.push('deleted');
+    }
+    return classes.join(' ');
+  }.property(),
+
+  deleted: Em.computed.or('deleted_at', 'topic_deleted_at')
+
 });
 
 Discourse.FlaggedPost.reopenClass({
   findAll: function(filter) {
     var result = Em.A();
     result.set('loading', true);
-    Discourse.ajax("/admin/flags/" + filter + ".json").then(function(data) {
+    Discourse.ajax('/admin/flags/' + filter + '.json').then(function(data) {
       var userLookup = {};
       _.each(data.users,function(user) {
-        userLookup[user.id] = Discourse.User.create(user);
+        userLookup[user.id] = Discourse.AdminUser.create(user);
       });
       _.each(data.posts,function(post) {
         var f = Discourse.FlaggedPost.create(post);

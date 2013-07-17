@@ -18,6 +18,7 @@ InviteRedeemer = Struct.new(:invite) do
     add_to_private_topics_if_invited
     add_user_to_invited_topics
     send_welcome_message
+    approve_account_if_needed
     notify_invitee
   end
 
@@ -27,9 +28,8 @@ InviteRedeemer = Struct.new(:invite) do
   end
 
   def mark_invite_redeemed
-    Invite.update_all('redeemed_at = CURRENT_TIMESTAMP',
-                      ['id = ? AND redeemed_at IS NULL AND created_at >= ?',
-                       invite.id, SiteSetting.invite_expiry_days.days.ago])
+    Invite.where(['id = ? AND redeemed_at IS NULL AND created_at >= ?',
+                       invite.id, SiteSetting.invite_expiry_days.days.ago]).update_all('redeemed_at = CURRENT_TIMESTAMP')
   end
 
   def get_invited_user
@@ -62,9 +62,13 @@ InviteRedeemer = Struct.new(:invite) do
   end
 
   def send_welcome_message
-    if Invite.update_all(['user_id = ?', invited_user.id], ['email = ?', invite.email]) == 1
+    if Invite.where(['email = ?', invite.email]).update_all(['user_id = ?', invited_user.id]) == 1
       invited_user.send_welcome_message = true
     end
+  end
+
+  def approve_account_if_needed
+    invited_user.approve(invite.invited_by_id, send_email=false)
   end
 
   def notify_invitee

@@ -8,6 +8,18 @@
 
 sv:
   js:
+    number:
+      human:
+        storage_units:
+          format: ! '%n %u'
+          units:
+            byte:
+              one: Byte
+              other: Bytes
+            gb: GB
+            kb: KB
+            mb: MB
+            tb: TB
     share:
       topic: 'dela en länk till denna tråd'
       post: 'dela en länk till denna tråd'
@@ -313,11 +325,8 @@ sv:
       quote_text: "Citat"
       code_title: "Kodexempel"
       code_text: "skriv din kod här"
-      image_title: "Bild"
-      image_description: "skriv en bildbeskrivning här"
-      image_dialog_title: "Infoga Bild"
-      image_optional_text: "valfri titel"
-      image_hosting_hint: "Behöver du <a href='http://www.google.com/search?q=free+image+hosting' target='_blank'>gratis bilduppladdning?</a>"
+      upload_title: "Bild"
+      upload_description: "skriv en bildbeskrivning här"
       olist_title: "Numrerad Lista"
       ulist_title: "Punktlista"
       list_item: "Listobjekt"
@@ -343,7 +352,7 @@ sv:
       invitee_accepted: "<i title='accepterade din inbjudan' class='icon icon-signin'></i> {{username}} accepterade din inbjudan"
       moved_post: "<i title='flyttade inlägg' class='icon icon-arrow-right'></i> {{username}} flyttade inlägg till {{link}}"
 
-    image_selector:
+    upload_selector:
       title: "Infoga Bild"
       from_my_computer: "Från Min Enhet"
       from_the_web: "Från Internet"
@@ -351,7 +360,7 @@ sv:
       remote_tip: "skriv in en adress till en bild i formen http://exempel.se/bild.jpg"
       local_tip: "klicka för att välja en bild från din enhet."
       upload: "Ladda Upp"
-      uploading_image: "Laddar upp bild"
+      upload_file: "Laddar upp bild"
 
     search:
       title: "sök efter trådar, inlägg, användare, eller kategorier"
@@ -570,8 +579,7 @@ sv:
         edit: "Tyvärr, det uppstod ett fel under ändringen av ditt inlägg. Var god försök igen."
         upload: "Tyvärr, det uppstod ett fel under uppladdandet av den filen. Vad god försök igen."
         upload_too_large: "Tyvärr, filen som du försöker ladda upp är för stor (maxstorlek är {{max_size_kb}}kb), var god ändra storlek och försök igen."
-        upload_too_many_images: "Tyvärr, du kan bara ladda upp en bild i taget."
-        only_images_are_supported: "Tyvärr, du kan bara ladda upp bilder."
+        too_many_uploads: "Tyvärr, du kan bara ladda upp en bild i taget."
 
       abandon: "Är du säker på att du vill överge ditt inlägg?"
 
@@ -868,9 +876,11 @@ sv:
         create: 'Lägg till Administratör'
         last_emailed: "Senast Mailad"
         not_found: "Tyvärr den användaren existerar inte i vårt system."
-        new: "Ny"
         active: "Aktiv"
-        pending: "Avvaktande"
+        nav:
+          new: "Ny"
+          active: "Aktiv"
+          pending: "Avvaktande"
         approved: "Godkänd?"
         approved_selected:
           one: "godkänd användare"

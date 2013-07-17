@@ -22,8 +22,8 @@ Discourse.InvitePrivateController = Discourse.ObjectController.extend(Discourse.
   }.property('emailOrUsername', 'saving'),
 
   buttonTitle: function() {
-    if (this.get('saving')) return Em.String.i18n('topic.inviting');
-    return Em.String.i18n('topic.invite_private.action');
+    if (this.get('saving')) return I18n.t('topic.inviting');
+    return I18n.t('topic.invite_private.action');
   }.property('saving'),
 
   invite: function() {
@@ -40,7 +40,7 @@ Discourse.InvitePrivateController = Discourse.ObjectController.extend(Discourse.
       invitePrivateController.set('finished', true);
 
       if(result && result.user) {
-        invitePrivateController.get('content.allowed_users').pushObject(result.user);
+        invitePrivateController.get('content.details.allowed_users').pushObject(result.user);
       }
     }, function() {
       // Failure
