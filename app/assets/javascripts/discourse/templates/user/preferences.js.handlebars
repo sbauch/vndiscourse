@@ -13,34 +13,6 @@
     </div>
   </div>
 
-  <!-- <div class="control-group">
-    <label class="control-label">{{i18n user.name.title}}</label>
-    <div class="controls">
-      {{textField value=name classNames="input-xxlarge"}}
-    </div>
-    <div class='instructions'>
-      {{i18n user.name.instructions}}
-    </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label">{{i18n user.email.title}}</label>
-    <div class="controls">
-      <span class='static'>{{email}}</span>
-      {{#linkTo "preferences.email" class="btn pad-left"}}{{i18n user.change_email.action}}{{/linkTo}}
-    </div>
-    <div class='instructions'>
-      {{i18n user.email.instructions}}
-    </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label">{{i18n user.password.title}}</label>
-    <div class="controls">
-      <a href="#" {{action changePassword}} class='btn'>{{i18n user.change_password.action}}</a> {{passwordProgress}}
-    </div>
-  </div> -->
-
   <div class="control-group">
     <label class="control-label">{{i18n user.avatar.title}}</label>
     {{#if Discourse.SiteSettings.custom_avatars}}
@@ -66,12 +38,6 @@
     {{/if}}
   </div>
 
-  <!-- <div class="control-group">
-    <label class="control-label">{{i18n user.bio}}</label>
-    <div class="controls">
-      {{view Discourse.PagedownEditor valueBinding="content.bio_raw"}}
-    </div>
-  </div> -->
 <!-- begin VM custom -->
 <form class="form-horizontal">
   <div class="control-group">
@@ -103,7 +69,7 @@
     </div>
   </div>
 
-  <div class="control-group">
+   <div class="control-group">
     <label class="control-label">{{i18n user.email_settings}}</label>
     <div class="controls">
       <label>{{view Ember.Checkbox checkedBinding="email_digests"}}

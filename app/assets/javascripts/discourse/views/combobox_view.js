@@ -24,7 +24,7 @@ Discourse.ComboboxView = Discourse.View.extend({
     if (selected) { selected = selected.toString(); }
 
     if (this.get('content')) {
-
+			console.log(this.get('content'));
       var comboboxView = this;
       _.each(this.get('content'),function(o) {
         var val = o[comboboxView.get('valueAttribute')];
