@@ -14,7 +14,7 @@ Discourse.PreferencesView = Discourse.View.extend({
 	upload: function(){
 		var _this = this;
 		var $uploadTarget = $('#custom-avatar');
-		var username = Discourse.currentUser.username;
+		var username = Discourse.User.current().username;
 		
 		$uploadTarget.fileupload({
       	url: '/users/' + username + '/custom_avatar' ,

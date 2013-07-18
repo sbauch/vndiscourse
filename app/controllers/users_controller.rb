@@ -47,7 +47,13 @@ class UsersController < ApplicationController
       if website
         website = "http://" + website unless website =~ /^http/
       end
+      
+      if params[:teams]
+        raise 'teams'
+      end  
 
+      raise params.inspect
+      
       u.bio_raw = params[:bio_raw] || u.bio_raw
       u.name = params[:name] || u.name
       u.website = website || u.website
@@ -257,7 +263,7 @@ class UsersController < ApplicationController
   def custom_avatar_upload
     user = fetch_user_from_params
     file = params[:file] || params[:files].first
-    upload = Upload.create_for(user.id, file, params[:topic_id])
+    upload = Upload.create_for(user.id, file)
     user.update_attribute(:custom_avatar_url, upload.url)
     render_serialized(upload, UploadSerializer, root: false)
   end

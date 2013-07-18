@@ -1,4 +1,4 @@
-{{#with user}}
+{{#with model}}
   <div id='user-info'>
     <nav class='buttons'>
       {{#if can_edit}}
@@ -15,9 +15,9 @@
     <div class='clearfix'></div>
 
     <ul class='action-list nav-stacked side-nav'>
-      {{activityFilter count=statsCountNonPM}}
-      {{#each statsExcludingPms}}
-        {{activityFilter content=this}}
+      {{activityFilter count=statsCountNonPM user=this}}
+      {{#each stat in statsExcludingPms}}
+        {{activityFilter content=stat user=model}}
       {{/each}}
     </ul>
     <div class='show'>
@@ -50,4 +50,4 @@
   </div>
 {{/with}}
 
-{{userStream stream=model}}
+{{userStream stream=stream}}
