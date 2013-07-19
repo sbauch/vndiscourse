@@ -91,13 +91,13 @@ var getUploadMarkdown = function(filename) {
     filesize: 42,
     width: 100,
     height: 200,
-    url: "/upload/123/abcdef.ext"
+    url: "/uploads/123/abcdef.ext"
   });
 };
 
 test("getUploadMarkdown", function() {
-  ok(getUploadMarkdown("lolcat.gif") === '<img src="/upload/123/abcdef.ext" width="100" height="200">');
-  ok(getUploadMarkdown("important.txt") === '<a class="attachment" href="/upload/123/abcdef.ext">important.txt</a><span class="size">(42 Bytes)</span>');
+  ok(getUploadMarkdown("lolcat.gif") === '<img src="/uploads/123/abcdef.ext" width="100" height="200">');
+  ok(getUploadMarkdown("important.txt") === '<a class="attachment" href="/uploads/123/abcdef.ext">important.txt</a><span class="size">(42 Bytes)</span>');
 });
 
 test("isAnImage", function() {
@@ -109,4 +109,36 @@ test("isAnImage", function() {
   ok(!utils.isAnImage("file.txt"));
   ok(!utils.isAnImage("http://foo.bar/path/to/file.txt"));
   ok(!utils.isAnImage(""));
+});
+
+test("avatarUrl", function() {
+  blank(Discourse.Utilities.avatarUrl('', 'tiny'), "no avatar url returns blank");
+  blank(Discourse.Utilities.avatarUrl('this is not a username', 'tiny'), "invalid username returns blank");
+
+  equal(Discourse.Utilities.avatarUrl('eviltrout', 'tiny'), "/users/eviltrout/avatar/20?__ws=", "simple avatar url");
+  equal(Discourse.Utilities.avatarUrl('eviltrout', 'large'), "/users/eviltrout/avatar/45?__ws=", "different size");
+  equal(Discourse.Utilities.avatarUrl('EvilTrout', 'tiny'), "/users/eviltrout/avatar/20?__ws=", "lowercases username");
+  equal(Discourse.Utilities.avatarUrl('eviltrout', 'tiny', 'test{size}'), "test20", "replaces the size in a template");
+});
+
+test("avatarUrl with a baseUrl", function() {
+  Discourse.BaseUrl = "http://try.discourse.org";
+  equal(Discourse.Utilities.avatarUrl('eviltrout', 'tiny'), "/users/eviltrout/avatar/20?__ws=http%3A%2F%2Ftry.discourse.org", "simple avatar url");
+});
+
+test("avatarImg", function() {
+  equal(Discourse.Utilities.avatarImg({username: 'eviltrout', size: 'tiny'}),
+        "<img width='20' height='20' src='/users/eviltrout/avatar/20?__ws=' class='avatar'>",
+        "it returns the avatar html");
+
+  equal(Discourse.Utilities.avatarImg({username: 'eviltrout', size: 'tiny', title: 'evilest trout'}),
+        "<img width='20' height='20' src='/users/eviltrout/avatar/20?__ws=' class='avatar' title='evilest trout'>",
+        "it adds a title if supplied");
+
+  equal(Discourse.Utilities.avatarImg({username: 'eviltrout', size: 'tiny', extraClasses: 'evil fish'}),
+        "<img width='20' height='20' src='/users/eviltrout/avatar/20?__ws=' class='avatar evil fish'>",
+        "it adds extra classes if supplied");
+
+  blank(Discourse.Utilities.avatarImg({username: 'weird*username', size: 'tiny'}),
+        "it doesn't render avatars for invalid usernames");
 });
