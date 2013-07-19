@@ -21,7 +21,9 @@ class UserSerializer < BasicUserSerializer
              :events_attended,
              :moderator,
              :admin,
-             :title
+             :title,
+             :teams,
+             :team_hash
 
   has_one :invited_by, embed: :object, serializer: BasicUserSerializer
 

@@ -163,7 +163,8 @@ Discourse.User = Discourse.Model.extend({
                                'enable_quoting',
 															 'fact_one',
 															 'fact_two',
-															 'fact_three'),
+															 'fact_three',
+															 'teams'),
       type: 'PUT'
     }).then(function(data) {
       user.set('bio_excerpt',data.user.bio_excerpt);

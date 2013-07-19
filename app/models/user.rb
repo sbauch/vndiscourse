@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
   include Roleable
 
   attr_accessible :name, :username, :password, :email, :bio_raw, :website, :teams, :position, :short_position,
-                  :fact_one, :fact_two, :fact_three, :start_date, :custom_avatar_url
+                  :fact_one, :fact_two, :fact_three, :start_date, :custom_avatar_url, :teams, :team_hash
 
  has_many :posts
   has_many :notifications
@@ -45,6 +45,8 @@ class User < ActiveRecord::Base
   has_many :secure_categories, through: :groups, source: :categories
 
   has_one :user_search_data
+  
+  serialize :teams_hash, Hash
 
   validates_presence_of :username
   validates_presence_of :email

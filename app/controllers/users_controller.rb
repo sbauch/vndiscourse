@@ -49,11 +49,22 @@ class UsersController < ApplicationController
       end
       
       if params[:teams]
-        raise 'teams'
+        # raise params[:teams].inspect
+        @ary = Array.new
+        @hsh = Hash.new
+        params[:teams].each do |t|
+          @tm = Team.find(t.to_i)
+          @ary << @tm.name
+          @hsh[t] = @tm.name
+        end
+        u.team_hash = @hsh
+        u.teams = @ary.to_sentence
+        if u.teams_changed?
+          HTTParty.put("https://vaynerpeople.herokuapp.com/api/users/teams?token=cqOR1F80vsKOGndLWS7ekg&email=#{u.email}&[teams]=#{CGI.escape(@ary.join(','))}")
+        end    
       end  
-
-      raise params.inspect
       
+            
       u.bio_raw = params[:bio_raw] || u.bio_raw
       u.name = params[:name] || u.name
       u.website = website || u.website

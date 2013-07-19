@@ -1,3 +1,12 @@
+desc "pull teams from vaynernet API"
+task "vm:teamss:pull" => :environment do
+  resp = HTTParty.get('https://vaynerpeople.herokuapp.com/api/teams?token=cqOR1F80vsKOGndLWS7ekg').parsed_response['teams']
+  resp.each do |t|
+    Team.find_or_create_by_name(t['name'])
+  end
+end
+
+
 desc "pull users from vaynernet API"
 task "vm:users:pull" => :environment do
   resp = HTTParty.get('https://vaynerpeople.herokuapp.com/api/users/all?token=cqOR1F80vsKOGndLWS7ekg').parsed_response

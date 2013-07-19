@@ -37,9 +37,16 @@
       </div>
     {{/if}}
   </div>
-
+  
 <!-- begin VM custom -->
 <form class="form-horizontal">
+  <div class="control-group">
+    <label class="control-label">Teams</label>
+    <div class="controls">
+      {{multicombobox name='teams' multiple="true" class="chzn" valueAttribute="value" valueBinding='content.teams' selectionBinding='controller.teamSelected' preselected=controller.teamSelected contentBinding="controller.teamOptions" optionValuePath="content.id" optionLabelPath="content.name"}}
+    </div>
+  </div>
+
   <div class="control-group">
     <label class="control-label">Fact One</label>
     <div class="controls">
@@ -126,5 +133,5 @@
         {{#if saved}}{{i18n saved}}{{/if}}
     </div>
   </div>
-
 </form>
+

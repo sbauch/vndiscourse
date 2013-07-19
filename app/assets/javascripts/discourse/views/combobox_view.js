@@ -12,7 +12,6 @@ Discourse.ComboboxView = Discourse.View.extend({
   valueAttribute: 'id',
 
   render: function(buffer) {
-
     var nameProperty = this.get('nameProperty') || 'name';
 
     // Add none option if required
@@ -24,7 +23,6 @@ Discourse.ComboboxView = Discourse.View.extend({
     if (selected) { selected = selected.toString(); }
 
     if (this.get('content')) {
-			console.log(this.get('content'));
       var comboboxView = this;
       _.each(this.get('content'),function(o) {
         var val = o[comboboxView.get('valueAttribute')];
@@ -42,6 +40,7 @@ Discourse.ComboboxView = Discourse.View.extend({
       });
     }
   },
+
 
   valueChanged: function() {
     var $combo = this.$();

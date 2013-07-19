@@ -36,7 +36,12 @@ Discourse.PreferencesView = Discourse.View.extend({
 	
 	add: function() {	
 		console.log('added!');
-	}
+	},
+		
+		afterRender: function(){
+			console.log('after render');
+  		$('chzn').chosen();
+		}
 
 });
 
