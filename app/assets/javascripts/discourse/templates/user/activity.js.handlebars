@@ -23,6 +23,7 @@
       {{#each stat in statsExcludingPms}}
         {{activityFilter content=stat user=model}}
       {{/each}}
+    {{/if}}  
     </ul>
     <div class='show'>
       <dl>
@@ -51,13 +52,5 @@
       </div>
     {{/if}}
   </ul>
-  
-  {{#if can_edit}}
-    <div style='margin-top: 10px'>
-      <button class='btn' data-not-implemented='true' disabled title="{{i18n not_implemented}}">{{i18n user.download_archive}}</button>
-    </div>
-  {{/if}}
 </div>
-
-
 {{userStream stream=stream}}
