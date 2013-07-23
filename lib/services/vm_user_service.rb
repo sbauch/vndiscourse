@@ -69,7 +69,13 @@ class VmUserService
         when "Project Manager"               
           "PM"
         when "Associate Project Manager"
-          "APM"  
+          "APM" 
+        when "Chief Financial Officer"
+          "CFO"
+        when "Engagement OFficer"
+          "EM"
+        when "Creative Director"
+          "CD"       
       end    
     end
   end
