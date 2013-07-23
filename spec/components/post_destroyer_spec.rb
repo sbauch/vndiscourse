@@ -8,15 +8,58 @@ describe PostDestroyer do
   end
 
   let(:moderator) { Fabricate(:moderator) }
-  let(:post) { Fabricate(:post) }
+  let(:admin) { Fabricate(:admin) }
+  let(:post) { create_post }
+
+  describe 'destroy_old_stubs' do
+    it 'destroys stubs for deleted by user posts' do
+      Fabricate(:admin)
+      topic = post.topic
+      reply1 = create_post(topic: topic)
+      reply2 = create_post(topic: topic)
+      reply3 = create_post(topic: topic)
+
+      PostDestroyer.new(reply1.user, reply1).destroy
+      PostDestroyer.new(reply2.user, reply2).destroy
+
+      reply2.update_column(:updated_at, 2.days.ago)
+
+      PostDestroyer.destroy_stubs
+
+      reply1.reload
+      reply2.reload
+      reply3.reload
+
+      reply1.deleted_at.should == nil
+      reply2.deleted_at.should_not == nil
+      reply3.deleted_at.should == nil
+
+      # if topic is deleted we should still be able to destroy stubs
+
+      topic.trash!
+      reply1.update_column(:updated_at, 2.days.ago)
+      PostDestroyer.destroy_stubs
+
+      reply1.reload
+      reply1.deleted_at.should == nil
+
+      # flag the post, it should not nuke the stub anymore
+      topic.recover!
+      PostAction.act(Fabricate(:coding_horror), reply1, PostActionType.types[:spam])
+
+      PostDestroyer.destroy_stubs
+
+      reply1.reload
+      reply1.deleted_at.should == nil
+
+    end
+  end
 
   describe 'basic destroying' do
 
-    let(:moderator) { Fabricate(:moderator) }
-    let(:admin) { Fabricate(:admin) }
-
     context "as the creator of the post" do
       before do
+        @orig = post.cooked
         PostDestroyer.new(post.user, post).destroy
         post.reload
       end
@@ -24,8 +67,16 @@ describe PostDestroyer do
       it "doesn't delete the post" do
         post.deleted_at.should be_blank
         post.deleted_by.should be_blank
+        post.user_deleted.should be_true
         post.raw.should == I18n.t('js.post.deleted_by_author')
         post.version.should == 2
+
+        # lets try to recover
+        PostDestroyer.new(post.user, post).recover
+        post.reload
+        post.version.should == 3
+        post.user_deleted.should be_false
+        post.cooked.should == @orig
       end
     end
 
@@ -56,10 +107,10 @@ describe PostDestroyer do
   context 'deleting the second post in a topic' do
 
     let(:user) { Fabricate(:user) }
-    let!(:post) { Fabricate(:post, user: user) }
-    let(:topic) { post.topic }
+    let!(:post) { create_post(user: user) }
+    let(:topic) { post.topic.reload }
     let(:second_user) { Fabricate(:coding_horror) }
-    let!(:second_post) { Fabricate(:post, topic: topic, user: second_user) }
+    let!(:second_post) { create_post(topic: topic, user: second_user) }
 
     before do
       PostDestroyer.new(moderator, second_post).destroy
@@ -91,6 +142,37 @@ describe PostDestroyer do
 
     end
 
+  end
+
+  context "deleting a post belonging to a deleted topic" do
+    let!(:topic) { post.topic }
+
+    before do
+      topic.trash!(admin)
+      post.reload
+    end
+
+    context "as a moderator" do
+      before do
+        PostDestroyer.new(moderator, post).destroy
+      end
+
+      it "deletes the post" do
+        post.deleted_at.should be_present
+        post.deleted_by.should == moderator
+      end
+    end
+
+    context "as an admin" do
+      before do
+        PostDestroyer.new(admin, post).destroy
+      end
+
+      it "deletes the post" do
+        post.deleted_at.should be_present
+        post.deleted_by.should == admin
+      end
+    end
   end
 
   describe 'after delete' do

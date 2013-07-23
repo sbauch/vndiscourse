@@ -1,6 +1,6 @@
 class Admin::GroupsController < Admin::AdminController
   def index
-    groups = Group.order(:name).all
+    groups = Group.order(:name).to_a
     render_serialized(groups, BasicGroupSerializer)
   end
 
@@ -43,7 +43,7 @@ class Admin::GroupsController < Admin::AdminController
       can_not_modify_automatic
     else
       group.destroy
-      render json: "ok"
+      render json: success_json
     end
   end
 

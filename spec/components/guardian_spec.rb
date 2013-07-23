@@ -485,6 +485,16 @@ describe Guardian do
         Guardian.new(post.user).can_edit?(post).should be_true
       end
 
+      it 'returns false if you are trying to edit a post you soft deleted' do
+        post.user_deleted = true
+        Guardian.new(post.user).can_edit?(post).should be_false
+      end
+
+      it 'returns false if you are trying to edit a deleted post' do
+        post.deleted_at = 1.day.ago
+        Guardian.new(post.user).can_edit?(post).should be_false
+      end
+
       it 'returns false if another regular user tries to edit your post' do
         Guardian.new(coding_horror).can_edit?(post).should be_false
       end
@@ -1028,6 +1038,26 @@ describe Guardian do
 
     it 'is false without a user to look at' do
       Guardian.new(admin).can_grant_title?(nil).should be_false
+    end
+  end
+
+
+  describe 'can_change_trust_level?' do
+
+    it 'is false without a logged in user' do
+      Guardian.new(nil).can_change_trust_level?(user).should be_false
+    end
+
+    it 'is false for regular users' do
+      Guardian.new(user).can_change_trust_level?(user).should be_false
+    end
+
+    it 'is true for moderators' do
+      Guardian.new(moderator).can_change_trust_level?(user).should be_true
+    end
+
+    it 'is true for admins' do
+      Guardian.new(admin).can_change_trust_level?(user).should be_true
     end
   end
 
