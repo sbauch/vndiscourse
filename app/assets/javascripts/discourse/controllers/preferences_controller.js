@@ -180,14 +180,8 @@ Discourse.PreferencesController = Discourse.ObjectController.extend({
     this.set('saved', false);
 		
     // Cook the bio for preview
-<<<<<<< HEAD
-    var model = this.get('content');
 
-		console.log(this.get('content'));	
-			
-=======
     var model = this.get('model');
->>>>>>> 44bebf255dbf123f092b06ff43fe0bdb8d54ed99
     return model.save().then(function() {
       // model was saved
       preferencesController.set('saving', false);
