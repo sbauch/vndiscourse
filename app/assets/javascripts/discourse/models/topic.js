@@ -167,25 +167,6 @@ Discourse.Topic = Discourse.Model.extend({
       }
     });
   },
-	
-	toggleRsvp: function() {
-    var topic = this;
-    // topic.toggleProperty('starred');
-    return $.ajax({
-      url: "" + (this.get('url')) + "/rsvp",
-      type: 'PUT',
-      data: { rsvp: topic.get('starred') ? true : false },
-			success: function( data ){
-				topic.set('user_rsvp_status', data.status);
-				console.log(topic.user_rsvp_status);
-			},
-      error: function(error) {
-        // topic.toggleProperty('starred');
-        var errors = $.parseJSON(error.responseText).errors;
-        return bootbox.alert(errors[0]);
-      }
-    });
-  },
 
   // Save any changes we've made to the model
   save: function() {

@@ -4,16 +4,18 @@
   @namespace Discourse
   @module Discourse
 **/
-Discourse.AttendanceModalView = Discourse.View.extend({
+Discourse.AttendanceView = Discourse.ModalBodyView.extend({
   templateName: 'modal/attendance',
   title: 'Take Attendance',
 	
 	init: function() {
-		console.log(this.get("attendees"));
-			this._super();
-			if ( this.get("attendees") == null){
+			this.set('attendees', this.get('model'));
+			if ( this.get('attendees') == null){
 				this.getAttendees();
+				console.log('got');
 				}	
+			this._super();
+	
 	  	}, 
 
 	getAttendees: function() {
@@ -30,7 +32,7 @@ Discourse.AttendanceModalView = Discourse.View.extend({
 	
 	didAttend: function(event) {
     return $.ajax({
-      url: "" + (this.get('url')) + '/' + event.username + "/attended",
+      url: event.username + "/attended",
       type: 'PUT',
       data: { present: true },
 			success: function( data ){
@@ -46,7 +48,7 @@ Discourse.AttendanceModalView = Discourse.View.extend({
 	
 	absent: function(event) {
 		  return $.ajax({
-      url: "" + (this.get('url')) + '/' + event.username + "/attended",
+      url: event.username + "/attended",
       type: 'PUT',
       data: { present: false },
 			success: function( data ){

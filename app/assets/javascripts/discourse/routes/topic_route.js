@@ -18,6 +18,10 @@ Discourse.TopicRoute = Discourse.Route.extend({
       this.controllerFor('flag').setProperties({ selected: null });
     },
 
+		showAttendance: function(topic){
+			Discourse.Route.showModal(this, 'attendance', this.modelFor('topic'));
+		},
+
     showAutoClose: function() {
       Discourse.Route.showModal(this, 'editTopicAutoClose', this.modelFor('topic'));
       this.controllerFor('modal').set('modalClass', 'edit-auto-close-modal');

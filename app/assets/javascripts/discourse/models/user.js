@@ -15,7 +15,7 @@ Discourse.User = Discourse.Model.extend({
     @type {Boolean}
   **/
   staff: Em.computed.or('admin', 'moderator'),
-
+	
   /**
     Large version of this user's avatar.
 
@@ -319,6 +319,7 @@ Discourse.User.reopenClass({
 
     return this.currentUser;
   },
+
 
   /**
     Logs out the currently logged in user

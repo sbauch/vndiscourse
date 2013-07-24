@@ -64,6 +64,7 @@ Discourse.TopicFooterButtonsView = Discourse.ContainerView.extend({
 						},
 
             click: function() {
+							console.log(this.get('controller'));
             	this.get('controller').toggleRsvp();
 						}
           }));

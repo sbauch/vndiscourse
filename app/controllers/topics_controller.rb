@@ -271,8 +271,9 @@ class TopicsController < ApplicationController
   end
   
   def attendance
-    user = User.find_by_username(params[:username])
-    reservation = user.reservations.where(topic_id: params[:topic_id].to_i ).first
+    user = User.find_by_username_lower(params[:username].downcase)
+    topic = Topic.find_by_slug(params[:slug])
+    reservation = user.reservations.where(topic_id: topic.id).first
     reservation.update_attribute(:status, params[:present] == 'true' ? 'attended' : 'absent')
     render :nothing => true
   end

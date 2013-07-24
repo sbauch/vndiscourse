@@ -295,9 +295,17 @@ Discourse = Ember.Application.createWithMixins({
         });
       }
       bus.subscribe("/notification/" + user.get('id'), (function(data) {
+				console.log(data);
         user.set('unread_notifications', data.unread_notifications);
         user.set('unread_private_messages', data.unread_private_messages);
       }), user.notification_channel_position);
+
+			bus.subscribe("/alert/" + user.get('id'), (function(data) {
+				console.log(data);
+        user.set('unread_alerts', data.unread_alerts);
+								console.log(Discourse.User.current('unread_alerts'));
+
+      }), 0);
 
       bus.subscribe("/categories", function(data){
         var site = Discourse.Site.instance();

@@ -16,6 +16,7 @@ class AlertsController < ApplicationController
                       :post_number => 1,
                       :message => params[:topic_title],
                       :data => { topic_title: params[:topic_title]}.to_json)
+      u.publish_alerts_state                
       end                
       render :nothing => true
       #=> #<Alert id: nil, alert_type: nil, user_id: nil, data: nil, read: false, created_at: nil, updated_at: nil, topic_id: nil, post_number: nil, message: nil>

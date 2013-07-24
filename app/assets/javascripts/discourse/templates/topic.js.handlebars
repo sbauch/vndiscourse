@@ -70,6 +70,7 @@
           {{#if postStream.lastPostLoaded}}
 
             {{view Discourse.TopicClosingView topicBinding="model"}}
+            <span class='gcal'>{{{gcal}}}</span>
             {{view Discourse.TopicFooterButtonsView topicBinding="model"}}
 
             {{#if details.suggested_topics.length}}
@@ -135,7 +136,6 @@
 
 {{render share}}
 {{render quoteButton}}
-
 {{#if currentUser.staff}}
   {{render topicAdminMenu content}}
 {{/if}}
