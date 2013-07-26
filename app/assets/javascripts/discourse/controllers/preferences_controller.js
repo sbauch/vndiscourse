@@ -60,10 +60,10 @@ Discourse.PreferencesController = Discourse.ObjectController.extend({
     opts = Em.A();
 		var teamsHash = this.get('content.team_hash')
 		_.each(teamsHash, function(team){
-			opts.addObject({ name: team.name, value: team.id });
+			console.log(team);
+			var obj = opts.addObject({ name: team.name, value: team.id });
 
 		})
-		console.log(opts);
 		return opts;
 		}).property(),
 	

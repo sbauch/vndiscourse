@@ -41,7 +41,7 @@
   <div class="control-group">
     <label class="control-label">Teams</label>
     <div class="controls">
-      {{multicombobox name='teams' multiple="true" class="chzn" valueAttribute="value" valueBinding='content.teams' selectionBinding='controller.teamSelected' preselected=controller.teamSelected contentBinding="controller.teamOptions" optionValuePath="content.id" optionLabelPath="content.name"}}
+      {{multicombobox name='teamsHash' multiple="true" class="chzn" valueBinding='content.team_hash' valueAttribute='value'  selectionBinding='controller.teamSelected' preselected=controller.teamSelected contentBinding="controller.teamOptions" optionValuePath="content.id" optionLabelPath="content.name"}}
 
     </div>
   </div>

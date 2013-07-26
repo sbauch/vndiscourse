@@ -26,6 +26,15 @@ class UserSerializer < BasicUserSerializer
              :team_hash
 
   has_one :invited_by, embed: :object, serializer: BasicUserSerializer
+  
+  def team_hash
+    @return_array = []
+    hash = begin YAML.load(object.team_hash) rescue object.team_hash end
+    hash.each do |k,v|
+      @return_array << {:id => k, :name => v}
+    end
+    @return_array
+  end  
 
   def self.private_attributes(*attrs)
     attributes *attrs

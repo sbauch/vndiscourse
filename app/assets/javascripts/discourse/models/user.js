@@ -164,7 +164,7 @@ Discourse.User = Discourse.Model.extend({
 															 'fact_one',
 															 'fact_two',
 															 'fact_three',
-															 'teams'),
+															 'team_hash'),
       type: 'PUT'
     }).then(function(data) {
       user.set('bio_excerpt',data.user.bio_excerpt);

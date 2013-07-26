@@ -39,30 +39,43 @@ class UsersController < ApplicationController
   end
 
   def update
-    user = User.where(username_lower: params[:username].downcase).first
-    guardian.ensure_can_edit!(user)
-    json_result(user, serializer: UserSerializer) do |u|
+    @user = User.where(username_lower: params[:username].downcase).first
+    guardian.ensure_can_edit!(@user)
+    
+    if params[:team_hash]
+      @ary = Array.new
+      @hsh = Hash.new
+      
+      if params[:team_hash].is_a?(Array)
+         params[:team_hash].each do |t|
+          @tm = Team.find(t)
+          @ary << @tm.name
+          @hsh[t] = @tm.name
+        end
+      else  
+      # raise params[:teams].inspect
+
+        params[:team_hash].each do |k,v|
+          @ary << v['name']
+          @hsh[v['id']] = v['name']
+        end
+      end
+      
+      @user.team_hash = @hsh
+      @user.teams = @ary.to_sentence
+      if @user.teams_changed?
+        HTTParty.put("https://vaynerpeople.herokuapp.com/api/users/teams?token=cqOR1F80vsKOGndLWS7ekg&email=#{@user.email}&[teams]=#{CGI.escape(@ary.join(','))}")
+      end    
+    end  
+      
+    
+    @user.tap do |u|
 
       website = params[:website]
       if website
         website = "http://" + website unless website =~ /^http/
       end
       
-      if params[:teams]
-        # raise params[:teams].inspect
-        @ary = Array.new
-        @hsh = Hash.new
-        params[:teams].each do |t|
-          @tm = Team.find(t.to_i)
-          @ary << @tm.name
-          @hsh[t] = @tm.name
-        end
-        u.team_hash = @hsh
-        u.teams = @ary.to_sentence
-        if u.teams_changed?
-          HTTParty.put("https://vaynerpeople.herokuapp.com/api/users/teams?token=cqOR1F80vsKOGndLWS7ekg&email=#{u.email}&[teams]=#{CGI.escape(@ary.join(','))}")
-        end    
-      end  
       
             
       u.bio_raw = params[:bio_raw] || u.bio_raw
@@ -84,11 +97,15 @@ class UsersController < ApplicationController
       end
 
       if u.save
-        u
+        user_serializer = UserSerializer.new(u, scope: guardian, root: 'user')
+        render_json_dump(user_serializer)
       else
         nil
       end
     end
+    
+    
+    
   end
 
   def username
