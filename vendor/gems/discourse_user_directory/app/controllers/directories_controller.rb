@@ -2,7 +2,7 @@ class DirectoriesController < ApplicationController
   def index
     if params[:filter].present?
       if params[:filter] == 'show-me-all'
-        @users = User.order('username ASC') 
+        @users = User.order('username ASC').where('active IS TRUE') 
       else     
         params[:filter].split(' ').each do |filter|
           @users = User.order("COALESCE(last_seen_at, to_date('1970-01-01', 'YYYY-MM-DD')) DESC, username") unless !@users.nil?
