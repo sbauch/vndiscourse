@@ -13,7 +13,7 @@ class AvatarLookup
 
   def users
     @users ||= User.where(:id => @user_ids)
-                   .select([:id, :email, :username, :use_uploaded_avatar, :uploaded_avatar_template, :uploaded_avatar_id])
+                   .select([:id, :email, :username, :use_uploaded_avatar, :uploaded_avatar_template, :uploaded_avatar_id, :custom_avatar_url])
                    .inject({}) do |hash, user|
       hash.merge({user.id => user})
     end

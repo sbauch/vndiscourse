@@ -75,6 +75,7 @@ Discourse.Utilities = {
   },
 
   tinyAvatar: function(avatarTemplate) {
+	console.log(avatarTemplate);
     return Discourse.Utilities.avatarImg({avatarTemplate: avatarTemplate, size: 'tiny' });
   },
 

@@ -148,9 +148,10 @@ Handlebars.registerHelper('avatar', function(user, options) {
       avatarTemplate = Em.get(user, template);
       if (!avatarTemplate) avatarTemplate = Em.get(user, 'user.' + template);
     }
-
+			
     if (!avatarTemplate) avatarTemplate = Em.get(user, 'avatar_template');
-    if (!avatarTemplate) avatarTemplate = Em.get(user, 'user.avatar_template');
+
+		if (!avatarTemplate) avatarTemplate = Em.get(user, 'user.avatar_template');
 
     var title;
     if (!options.hash.ignoreTitle) {

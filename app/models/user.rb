@@ -386,7 +386,7 @@ class User < ActiveRecord::Base
   # the avatars might take a while to generate
   # so return the url of the original image in the meantime
   def uploaded_avatar_path
-    return unless SiteSetting.custom_avatars? && self.custom_avatar_url?
+    return unless SiteSetting.custom_avatars? && !self.custom_avatar_url.nil?
     custom_avatar_url
   end
 
