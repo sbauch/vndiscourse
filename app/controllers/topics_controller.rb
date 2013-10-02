@@ -23,8 +23,7 @@ class TopicsController < ApplicationController
 
   before_filter :consider_user_for_promotion, only: :show
 
-  skip_before_filter :check_xhr, only: [:avatar, :show, :feed]
-  caches_action :avatar, cache_path: Proc.new {|c| "#{c.params[:post_number]}-#{c.params[:topic_id]}" }
+  skip_before_filter :check_xhr, only: [:show, :feed]
 
   def show
 

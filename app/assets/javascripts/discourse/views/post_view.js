@@ -2,22 +2,21 @@
   This view renders a post.
 
   @class PostView
-  @extends Discourse.View
+  @extends Discourse.GroupedView
   @namespace Discourse
   @module Discourse
 **/
-Discourse.PostView = Discourse.View.extend({
+Discourse.PostView = Discourse.GroupedView.extend({
   classNames: ['topic-post', 'clearfix'],
   templateName: 'post',
   classNameBindings: ['postTypeClass',
                       'selected',
                       'post.hidden:hidden',
-                      'post.deleted',
-                      'parentPost:replies-above'],
+                      'post.deleted'],
   postBinding: 'content',
 
   postTypeClass: function() {
-    return this.get('post.post_type') === Discourse.Site.instance().get('post_types.moderator_action') ? 'moderator' : 'regular';
+    return this.get('post.post_type') === Discourse.Site.currentProp('post_types.moderator_action') ? 'moderator' : 'regular';
   }.property('post.post_type'),
 
   // If the cooked content changed, add the quote controls
@@ -28,17 +27,11 @@ Discourse.PostView = Discourse.View.extend({
     });
   }.observes('post.cooked'),
 
-  init: function() {
-    this._super();
-    this.set('context', this.get('content'));
-  },
-
   mouseUp: function(e) {
     if (this.get('controller.multiSelect') && (e.metaKey || e.ctrlKey)) {
       this.get('controller').selectPost(this.get('post'));
     }
   },
-
 
   selected: function() {
     var selectedPosts = this.get('controller.selectedPosts');
@@ -50,56 +43,7 @@ Discourse.PostView = Discourse.View.extend({
     return this.get('selected') ? I18n.t('topic.multi_select.selected', { count: this.get('controller.selectedPostsCount') }) : I18n.t('topic.multi_select.select');
   }.property('selected', 'controller.selectedPostsCount'),
 
-  repliesHidden: Em.computed.not('repliesShown'),
-
-  // Click on the replies button
-  showReplies: function() {
-    var postView = this;
-    if (this.get('repliesShown')) {
-      this.set('repliesShown', false);
-    } else {
-      this.get('post').loadReplies().then(function() {
-        postView.set('repliesShown', true);
-      });
-    }
-    return false;
-  },
-
-  // Toggle visibility of parent post
-  toggleParent: function(e) {
-    var postView = this;
-    var post = this.get('post');
-    var $parent = this.$('.parent-post');
-    var inReplyTo = post.get('reply_to_post_number');
-
-    if (post.get('post_number') - 1 === inReplyTo) {
-      // true means ... avoid scroll if possible
-      Discourse.TopicView.jumpToPost(post.get('topic_id'), inReplyTo, true);
-      return;
-    }
-
-    if (this.get('parentPost')) {
-      $('nav', $parent).removeClass('toggled');
-      // Don't animate on touch
-      if (Discourse.get('touch')) {
-        $parent.hide();
-        this.set('parentPost', null);
-      } else {
-        $parent.slideUp(function() { postView.set('parentPost', null); });
-      }
-    } else {
-      this.set('loadingParent', true);
-      $('nav', $parent).addClass('toggled');
-
-      Discourse.Post.loadByPostNumber(post.get('topic_id'), inReplyTo).then(function(result) {
-        postView.set('loadingParent', false);
-        // Give the post a reference back to the topic
-        result.topic = postView.get('post.topic');
-        postView.set('parentPost', result);
-      });
-    }
-    return false;
-  },
+  repliesShown: Em.computed.gt('post.replies.length', 0),
 
   updateQuoteElements: function($aside, desc) {
     var navLink = "";
@@ -149,7 +93,7 @@ Discourse.PostView = Discourse.View.extend({
       if ($aside.data('topic')) {
         topic_id = $aside.data('topic');
       }
-      Discourse.ajax("/posts/by_number/" + topic_id + "/" + ($aside.data('post'))).then(function (result) {
+      Discourse.ajax("/posts/by_number/" + topic_id + "/" + $aside.data('post')).then(function (result) {
         var parsed = $(result.cooked);
         parsed.replaceText(originalText, "<span class='highlighted'>" + originalText + "</span>");
         $blockQuote.showHtml(parsed);
@@ -209,7 +153,7 @@ Discourse.PostView = Discourse.View.extend({
   },
 
   willDestroyElement: function() {
-    Discourse.ScreenTrack.instance().stopTracking(this.$().prop('id'));
+    Discourse.ScreenTrack.current().stopTracking(this.$().prop('id'));
   },
 
   didInsertElement: function() {
@@ -218,7 +162,7 @@ Discourse.PostView = Discourse.View.extend({
     this.showLinkCounts();
 
     // Track this post
-    Discourse.ScreenTrack.instance().track(this.$().prop('id'), this.get('post.post_number'));
+    Discourse.ScreenTrack.current().track(this.$().prop('id'), this.get('post.post_number'));
 
     // Add syntax highlighting
     Discourse.SyntaxHighlighting.apply($post);

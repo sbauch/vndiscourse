@@ -57,6 +57,16 @@ Discourse.AdminFlagsController = Ember.ArrayController.extend({
   },
 
   /**
+    Deletes a user and all posts and topics created by that user.
+
+    @method deleteSpammer
+    @param {Discourse.FlaggedPost} item The post to delete
+  **/
+  deleteSpammer: function(item) {
+    item.get('user').deleteAsSpammer(function() { window.location.reload(); });
+  },
+
+  /**
     Are we viewing the 'old' view?
 
     @property adminOldFlagsView
@@ -68,6 +78,16 @@ Discourse.AdminFlagsController = Ember.ArrayController.extend({
 
     @property adminActiveFlagsView
   **/
-  adminActiveFlagsView: Em.computed.equal('query', 'active')
+  adminActiveFlagsView: Em.computed.equal('query', 'active'),
+
+  loadMore: function(){
+    var flags = this.get('model');
+    return Discourse.FlaggedPost.findAll(this.get('query'),flags.length+1).then(function(data){
+      if(data.length===0){
+        flags.set('allLoaded',true);
+      }
+      flags.addObjects(data);
+    });
+  }
 
 });

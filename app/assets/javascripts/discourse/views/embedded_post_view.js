@@ -6,16 +6,16 @@
   @namespace Discourse
   @module Discourse
 **/
-Discourse.EmbeddedPostView = Discourse.View.extend({
+Discourse.EmbeddedPostView = Discourse.GroupedView.extend({
   templateName: 'embedded_post',
   classNames: ['reply'],
 
   didInsertElement: function() {
-    Discourse.ScreenTrack.instance().track(this.get('elementId'), this.get('post.post_number'));
+    Discourse.ScreenTrack.current().track(this.get('elementId'), this.get('post.post_number'));
   },
 
   willDestroyElement: function() {
-    Discourse.ScreenTrack.instance().stopTracking(this.get('elementId'));
+    Discourse.ScreenTrack.current().stopTracking(this.get('elementId'));
   }
 
 });

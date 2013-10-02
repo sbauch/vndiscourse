@@ -10,6 +10,7 @@ Discourse.QuoteButtonView = Discourse.View.extend({
   classNames: ['quote-button'],
   classNameBindings: ['visible'],
   isMouseDown: false,
+  isTouchInProgress: false,
 
   /**
     Determines whether the pop-up quote button should be visible.
@@ -47,7 +48,7 @@ Discourse.QuoteButtonView = Discourse.View.extend({
         view.set('isMouseDown', true);
         if ($(e.target).hasClass('quote-button') || $(e.target).hasClass('create')) return;
         // do *not* deselect when quoting has been disabled by the user
-        if (!Discourse.User.current('enable_quoting')) return;
+        if (!Discourse.User.currentProp('enable_quoting')) return;
         // deselects only when the user left click
         // (allows anyone to `extend` their selection using shift+click)
         if (e.which === 1 && !e.shiftKey) controller.deselectText();
@@ -56,9 +57,16 @@ Discourse.QuoteButtonView = Discourse.View.extend({
         view.selectText(e.target, controller);
         view.set('isMouseDown', false);
       })
+      .on('touchstart.quote-button', function(e){
+        view.set('isTouchInProgress', true);
+      })
+      .on('touchend.quote-button', function(e){
+        view.set('isTouchInProgress', false);
+      })
       .on('selectionchange', function() {
         // there is no need to handle this event when the mouse is down
-        if (view.get('isMouseDown')) return;
+        // or if there is not a touch in progress
+        if (view.get('isMouseDown') || !view.get('isTouchInProgress')) return;
         // `selection.anchorNode` is used as a target
         view.selectText(window.getSelection().anchorNode, controller);
       });
@@ -72,7 +80,7 @@ Discourse.QuoteButtonView = Discourse.View.extend({
   selectText: function(target, controller) {
     var $target = $(target);
     // breaks if quoting has been disabled by the user
-    if (!Discourse.User.current('enable_quoting')) return;
+    if (!Discourse.User.currentProp('enable_quoting')) return;
     // retrieve the post id from the DOM
     var postId = $target.closest('.boxed').data('post-id');
     // select the text
@@ -88,6 +96,8 @@ Discourse.QuoteButtonView = Discourse.View.extend({
     $(document)
       .off("mousedown.quote-button")
       .off("mouseup.quote-button")
+      .off("touchstart.quote-button")
+      .off("touchend.quote-button")
       .off("selectionchange");
   },
 

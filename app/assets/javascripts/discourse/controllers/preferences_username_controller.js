@@ -1,33 +1,4 @@
 /**
-  The route for updating a user's username
-
-  @class PreferencesUsernameRoute
-  @extends Discourse.RestrictedUserRoute
-  @namespace Discourse
-  @module Discourse
-**/
-Discourse.PreferencesUsernameRoute = Discourse.RestrictedUserRoute.extend({
-  model: function() {
-    return this.modelFor('user');
-  },
-
-  renderTemplate: function() {
-    return this.render({ into: 'user', outlet: 'userOutlet' });
-  },
-
-  // A bit odd, but if we leave to /preferences we need to re-render that outlet
-  exit: function() {
-    this._super();
-    this.render('preferences', { into: 'user', outlet: 'userOutlet', controller: 'preferences' });
-  },
-
-  setupController: function(controller, user) {
-    controller.setProperties({ model: user, newUsername: user.get('username') });
-  }
-});
-
-
-/**
   This controller supports actions related to updating one's username
 
   @class PreferencesUsernameController
@@ -55,7 +26,7 @@ Discourse.PreferencesUsernameController = Discourse.ObjectController.extend({
       this.set('errorMessage', null);
       if (this.blank('newUsername')) return;
       if (this.get('unchanged')) return;
-      Discourse.User.checkUsername(this.get('newUsername')).then(function(result) {
+      Discourse.User.checkUsername(this.get('newUsername'), undefined, this.get('content.id')).then(function(result) {
         if (result.errors) {
           preferencesUsernameController.set('errorMessage', result.errors.join(' '));
         } else if (result.available === false) {

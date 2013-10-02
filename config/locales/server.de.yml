@@ -336,7 +336,7 @@ de:
       xaxis: "Tag"
       yaxis: "Zahl der Mails"
     user_to_user_private_messages:
-      title: "Beutzer-zu-Benutzer"
+      title: "Benutzer-zu-Benutzer"
       xaxis: "Tag"
       yaxis: "Zahl der privaten Nachrichten"
     system_private_messages:
@@ -375,7 +375,6 @@ de:
     rails_env_warning: "Dein Server läuft im %{env}-Modus."
     host_names_warning: "Deine config/database.yml-Datei verwendet localhost als Hostname. Trage hier den Hostnamen deiner Webseite ein."
     gc_warning: 'Dein Server verwendet die Standardparameter für Rubys Garbage-Collector, die nicht optimal sind. Lese dieses Thema über Performanzeinstellungen (en): <a href="http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126">Tuning Ruby and Rails for Discourse</a>.'
-    clockwork_warning: 'Clockwork läuft nicht. Stelle sicher, dass immer ein Clockwork-Prozess läuft, so dass wichtige Jobs eingeplant werden können. <a href="https://github.com/tomykaira/clockwork">Mehr über Clockwork erfährst du hier (en)</a>.'
     sidekiq_warning: 'Sidekiq läuft nicht. Viele Aufgaben, wie zum Beispiel das Versenden von Mails, werden asynchron durch Sidekiq ausgeführt. Stelle sicher, dass mindestens eine Sidekiq-Prozess läuft. <a href="https://github.com/mperham/sidekiq">Mehr über Sidekiq erfährst du hier (en)</a>.'
     queue_size_warning: 'Die Anzahl der Aktionen in der Warteschlange ist mit %{queue_size} ziemlich hoch. Das könnte auf ein Problem mit dem Sidekiq Prozess(en) hinweisen, oder du musst mehr Sidekiq Arbeiter hinzufügen.'
     memory_warning: 'Dein Server läuft mit weniger als 1 GB Hauptspeicher. Mindestens 1 GB Hauptspeicher werden empfohlen.'
@@ -592,8 +591,8 @@ de:
     min_body_similar_length: "Minimale Länge eines Beitragstextes, bevor nach ähnlichen Themen gesucht wird."
 
     category_colors: "Eine durch senkrechte Striche getrennte Liste hexadezimaler Farbwerte, die als Kategoriefarben erlaubt sind."
-    max_image_size_kb: "Maximale Größe in Kilobytes (kB), die von Benutzer hochgeladene Bilder groß sein dürfen. Stelle sicher, dass dieser Wert auch in nginx (client_max_body_size) / apache und Proxies konfiguriert ist."
-    max_similar_results: "Zahl der Themen, die ein Nutzer sieht während sei ein neues Thema erstellen."
+    max_image_size_kb: "Maximale Größe in Kilobytes (kB), die von Benutzern hochgeladene Bilder groß sein dürfen. Stelle sicher, dass dieser Wert auch in nginx (client_max_body_size) / apache und Proxies konfiguriert ist."
+    max_similar_results: "Anzahl ähnlicher Themen, die ein Nutzer sieht, während er ein neues Thema erstellen."
 
     title_prettify: "Verhindert gängige Fehler im Titel, wie reine Grossschreibung, Kleinbuchstaben am Anfang, mehrere ! und ?, überflüssiger . am Ende, etc."
 
@@ -673,6 +672,7 @@ de:
       must_begin_with_alphanumeric: "muss mit einer Zahl oder einem Buchstaben anfangen"
     email:
       not_allowed: "ist für diesen Mailprovider nicht erlaubt. Bitte verwende eine andere Mailadresse."
+    change: "Ändern"
 
   invite_mailer:
     subject_template: "[%{site_name}] %{invitee_name} lädt Dich ein, an einer Diskussion auf %{site_name} teilzunehmen"
@@ -903,7 +903,7 @@ de:
         Um zu antworten, besuche den folgenden Link: %{base_url}%{url}
 
     user_posted:
-      subject_template: "[%{site_name}] %{username} hat auf '%{topic_title}' geantwortet"
+      subject_template: "[%{site_name}] %{subject_prefix}%{username} hat auf '%{topic_title}' geantwortet"
       text_body_template: |
         %{username} hat in '%{topic_title}' auf %{site_name} geantwortet:
 
@@ -922,17 +922,6 @@ de:
       click_here: "klicke hier"
       from: "%{site_name} Übersicht"
       read_more: "Weiterlesen"
-
-    private_message:
-      subject_template: "[%{site_name}] %{subject_prefix}%{topic_title}"
-      text_body_template: |
-        %{private_message_from} hat Die eine private Nachricht geschickt:
-
-        ---
-        %{message}
-
-        ---
-        Um zu antworten, besuche den folgenden Link: %{base_url}%{url}
 
     forgot_password:
       subject_template: "[%{site_name}] Passwort zurückgesetzt"
@@ -1004,7 +993,7 @@ de:
 
   upload:
     pasted_image_filename: ""
-    image:
+    images:
       fetch_failure: "Entschuldige, beim Laden des Bildes ist ein Fehler aufgetreten."
       unknown_image_type: "Entschuldige, aber die Datei die Du hochladen möchtest schein kein Bild zu sein."
       size_not_found: "Entschuldige, aber wir konnten die Grösse des Bildes nicht feststellen. Vielleicht ist das Bild defekt?"

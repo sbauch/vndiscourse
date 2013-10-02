@@ -1,4 +1,5 @@
 require 'sidekiq/web'
+require 'sidetiq/web'
 
 require_dependency 'admin_constraint'
 require_dependency 'staff_constraint'
@@ -37,6 +38,7 @@ Discourse::Application.routes.draw do
       collection do
         get 'list/:query' => 'users#index'
         put 'approve-bulk' => 'users#approve_bulk'
+        delete 'reject-bulk' => 'users#reject_bulk'
       end
       put 'ban'
       put 'delete_all_posts'
@@ -62,6 +64,12 @@ Discourse::Application.routes.draw do
         get 'logs'
         get 'preview-digest' => 'email#preview_digest'
       end
+    end
+
+    scope '/logs' do
+      resources :staff_action_logs, only: [:index]
+      resources :screened_emails,   only: [:index]
+      resources :screened_urls,     only: [:index]
     end
 
     get 'customize' => 'site_customizations#index', constraints: AdminConstraint.new
@@ -98,6 +106,8 @@ Discourse::Application.routes.draw do
     end
   end
 
+  get 'session/csrf' => 'session#csrf'
+
   resources :users, except: [:show, :update] do
     collection do
       get 'check_username'
@@ -133,7 +143,11 @@ Discourse::Application.routes.draw do
   get 'users/:username/preferences/about-me' => 'users#preferences', constraints: {username: USERNAME_ROUTE_FORMAT}
   get 'users/:username/preferences/username' => 'users#preferences', constraints: {username: USERNAME_ROUTE_FORMAT}
   put 'users/:username/preferences/username' => 'users#username', constraints: {username: USERNAME_ROUTE_FORMAT}
+  # LEGACY ROUTE
   get 'users/:username/avatar(/:size)' => 'users#avatar', constraints: {username: USERNAME_ROUTE_FORMAT}
+  get 'users/:username/preferences/avatar' => 'users#preferences', constraints: {username: USERNAME_ROUTE_FORMAT}
+  put 'users/:username/preferences/avatar/toggle' => 'users#toggle_avatar', constraints: {username: USERNAME_ROUTE_FORMAT}
+  post 'users/:username/preferences/avatar' => 'users#upload_avatar', constraints: {username: USERNAME_ROUTE_FORMAT}
   get 'users/:username/invited' => 'users#invited', constraints: {username: USERNAME_ROUTE_FORMAT}
   get 'users/:username/send_activation_email' => 'users#send_activation_email', constraints: {username: USERNAME_ROUTE_FORMAT}
   post 'users/:username/custom_avatar' => 'users#custom_avatar_upload', constraints: {username: USERNAME_ROUTE_FORMAT}
@@ -142,8 +156,8 @@ Discourse::Application.routes.draw do
 
   resources :uploads
 
-
   get 'posts/by_number/:topic_id/:post_number' => 'posts#by_number'
+  get 'posts/:id/reply-history' => 'posts#reply_history'
   resources :posts do
     get 'versions'
     put 'bookmark'
@@ -210,9 +224,7 @@ Discourse::Application.routes.draw do
   post 't' => 'topics#create'
   post 'topics/timings'
   get 'topics/similar_to'
-
-  # Legacy route for old avatars
-  get 'threads/:topic_id/:post_number/avatar' => 'topics#avatar', constraints: {topic_id: /\d+/, post_number: /\d+/}
+  get 'topics/created-by/:username' => 'list#topics_by', as: 'topics_by', constraints: {username: USERNAME_ROUTE_FORMAT}
 
   # Topic routes
   get 't/:slug/:topic_id/wordpress' => 'topics#wordpress', constraints: {topic_id: /\d+/}
@@ -272,5 +284,7 @@ Discourse::Application.routes.draw do
   end
   # special case for categories
   root to: "categories#index", constraints: HomePageConstraint.new("categories"), :as => "categories_index"
-
+  
+  post '/teams/new' => 'teams#create' 
+  
 end

@@ -4,7 +4,9 @@
     <label class="control-label">{{i18n user.username.title}}</label>
     <div class="controls">
       <span class='static'>{{username}}</span>
-      {{#linkTo "preferences.username" class="btn pad-left"}}{{i18n user.change}}{{/linkTo}}
+      {{#if can_edit_username}}
+        {{#linkTo "preferences.username" class="btn pad-left"}}<i class="icon-pencil"></i>{{/linkTo}}
+      {{/if}}
     </div>
     <div class='instructions'>
       {{{i18n user.username.short_instructions username="username"}}}
@@ -41,8 +43,7 @@
   <div class="control-group">
     <label class="control-label">Teams</label>
     <div class="controls">
-      {{multicombobox name='teamsHash' multiple="true" class="chzn" valueBinding='content.team_hash' valueAttribute='value'  selectionBinding='controller.teamSelected' preselected=controller.teamSelected contentBinding="controller.teamOptions" optionValuePath="content.id" optionLabelPath="content.name"}}
-
+      {{multicombobox name='teamsHash[]' multiple=true valueBinding='content.team_hash' valueAttribute='value'  selectionBinding='controller.teamSelected' preselected=controller.teamSelected  contentBinding="controller.teamOptions" optionValuePath="content.id" optionLabelPath="content.name"}}
     </div>
   </div>
 
@@ -50,7 +51,6 @@
     <label class="control-label">Fact One</label>
     <div class="controls">
       {{view Ember.TextField valueBinding="content.fact_one" classNames="input-xxlarge"}}
-
     </div>
   </div>
 
@@ -97,17 +97,8 @@
     </div>
   </div>
 
-  <div class="control-group">
-    <label class="control-label">{{i18n user.notifications}}</label>
-    <div class="controls">
-      <label>
-        {{view Ember.Checkbox checkedBinding="dynamic_favicon"}}
-        {{i18n user.dynamic_favicon}}
-      </label>
-    </div>
-  </div>
-
   <div class="control-group other">
+
     <label class="control-label">{{i18n user.other_settings}}</label>
     <div class="controls">
       <label>{{i18n user.auto_track_topics}}</label>
@@ -125,6 +116,14 @@
       <label>{{view Ember.Checkbox checkedBinding="enable_quoting"}}
       {{i18n user.enable_quoting}}</label>
     </div>
+
+    <div class="controls">
+      <label>
+        {{view Ember.Checkbox checkedBinding="dynamic_favicon"}}
+        {{i18n user.dynamic_favicon}}
+      </label>
+    </div>
+
   </div>
 
   <div class="control-group">

@@ -13,7 +13,6 @@ describe PostsController do
   end
 
   describe 'show' do
-
     let(:user) { log_in }
     let(:post) { Fabricate(:post, user: user) }
 
@@ -52,8 +51,25 @@ describe PostsController do
       end
 
     end
-
   end
+
+  describe 'reply_history' do
+    let(:user) { log_in }
+    let(:post) { Fabricate(:post, user: user) }
+
+    it 'ensures the user can see the post' do
+      Guardian.any_instance.expects(:can_see?).with(post).returns(false)
+      xhr :get, :reply_history, id: post.id
+      response.should be_forbidden
+    end
+
+    it 'suceeds' do
+      Post.any_instance.expects(:reply_history)
+      xhr :get, :reply_history, id: post.id
+      response.should be_success
+    end
+  end
+
 
   describe 'versions' do
 
@@ -280,6 +296,18 @@ describe PostsController do
         PostCreator.any_instance.expects(:create).returns(new_post)
         xhr :post, :create, {raw: 'test'}
         ::JSON.parse(response.body).should be_present
+      end
+
+      it 'protects against dupes' do
+        # TODO we really should be using a mock redis here
+        xhr :post, :create, {raw: 'this is a test post 123', title: 'this is a test title 123', wpid: 1}
+        response.should be_success
+        original = response.body
+
+        xhr :post, :create, {raw: 'this is a test post 123', title: 'this is a test title 123', wpid: 2}
+        response.should be_success
+
+        response.body.should == original
       end
 
       context "errors" do

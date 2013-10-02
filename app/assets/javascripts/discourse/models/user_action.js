@@ -91,15 +91,19 @@ Discourse.UserAction = Discourse.Model.extend({
   }.property('descriptionKey'),
 
   sameUser: function() {
-    return this.get('username') === Discourse.User.current('username');
+    return this.get('username') === Discourse.User.currentProp('username');
   }.property('username'),
 
   targetUser: function() {
-    return this.get('target_username') === Discourse.User.current('username');
+    return this.get('target_username') === Discourse.User.currentProp('username');
   }.property('target_username'),
 
   targetUserUrl: Discourse.computed.url('target_username', '/users/%@'),
-  userUrl: Discourse.computed.url('username', '/users/%@'),
+  usernameLower: function() {
+    return this.get('username').toLowerCase();
+  }.property('username'),
+
+  userUrl: Discourse.computed.url('usernameLower', '/users/%@'),
 
   postUrl: function() {
     return Discourse.Utilities.postUrl(this.get('slug'), this.get('topic_id'), this.get('post_number'));

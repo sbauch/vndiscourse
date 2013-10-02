@@ -9,9 +9,12 @@
           <li>{{#linkTo 'adminSiteContents'}}{{i18n admin.site_content.title}}{{/linkTo}}</li>
         {{/if}}
         <li>{{#linkTo 'adminUsersList'}}{{i18n admin.users.title}}{{/linkTo}}</li>
-        <li>{{#linkTo 'admin.groups'}}{{i18n admin.groups.title}}{{/linkTo}}</li>
+        {{#if currentUser.admin}}
+          <li>{{#linkTo 'admin.groups'}}{{i18n admin.groups.title}}{{/linkTo}}</li>
+        {{/if}}
         <li>{{#linkTo 'adminEmail'}}{{i18n admin.email.title}}{{/linkTo}}</li>
         <li>{{#linkTo 'adminFlags'}}{{i18n admin.flags.title}}{{/linkTo}}</li>
+        <li>{{#linkTo 'adminLogs'}}{{i18n admin.logs.title}}{{/linkTo}}</li>
         {{#if currentUser.admin}}
           <li>{{#linkTo 'admin.customize'}}{{i18n admin.customize.title}}{{/linkTo}}</li>
           <li>{{#linkTo 'admin.api'}}{{i18n admin.api.title}}{{/linkTo}}</li>

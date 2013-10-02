@@ -1,3 +1,4 @@
+
 <div id='user-info'>
   <nav class='buttons'>
     {{#if can_edit}}
@@ -46,11 +47,6 @@
       </dl>
     </div>
 
-    {{#if can_edit}}
-      <div style='margin-top: 10px'>
-        <button class='btn' data-not-implemented='true' disabled title="{{i18n not_implemented}}">{{i18n user.download_archive}}</button>
-      </div>
-    {{/if}}
-  </ul>
+<div id='user-activity'>
+  {{outlet activity}}
 </div>
-{{userStream stream=stream}}

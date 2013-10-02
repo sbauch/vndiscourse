@@ -13,7 +13,11 @@ Discourse.EditCategoryController = Discourse.ObjectController.extend(Discourse.M
   settingsSelected: Ember.computed.equal('selectedTab', 'settings'),
   foregroundColors: ['FFFFFF', '000000'],
 
-  descriptionChanged: function() {
+  onShow: function() {
+    this.changeSize();
+  },
+
+  changeSize: function() {
     if (this.present('description')) {
       this.set('controllers.modal.modalClass', 'edit-category-modal full');
     } else {
@@ -23,12 +27,12 @@ Discourse.EditCategoryController = Discourse.ObjectController.extend(Discourse.M
 
   title: function() {
     if (this.get('id')) {
-      return I18n.t("category.edit_long") + ": " + this.get('model.name');
+      return I18n.t("category.edit_long") + " : " + this.get('model.name');
     }
     if (this.get('isUncategorized')){
       return I18n.t("category.edit_uncategorized");
     }
-    return I18n.t("category.create") + " : " + this.get('model.name');
+    return I18n.t("category.create") + (this.get('model.name') ? (" : " + this.get('model.name')) : '');
   }.property('id', 'model.name'),
 
   titleChanged: function() {

@@ -386,7 +386,6 @@ fr:
     rails_env_warning: "Votre serveur fonctionne dans l'environnement de %{env}."
     host_names_warning: "Le fichier config/database.yml utilise le nom d'hôte par défaut. Veuillez renseigner votre nom d'hôte."
     gc_warning: "Votre serveur utilise les paramètres par défaut de collection du GC de ruby, ce qui ne vous donneras pas les meilleures performances. Merci de lire cette discussion sur <a href=\"http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126\">l'optimisation des performances de Ruby et Rails pour Discourse [EN]</a>."
-    clockwork_warning: "Clockwork n'est pas lancé. Assurez-vous qu'un processus clockwork soit toujours lancé afin que les tâches importantes soient planifiées. <a href=\"https://github.com/tomykaira/clockwork\">En savoir plus sur clockwork [EN]</a>."
     sidekiq_warning: "Sidekiq n'est pas lancé. De nombreuses tâches, comme l'envoie d'e-mails, sont executées de manière asynchrome par sidekiq. Assurez-vous d'avoir au moins un processus sidekiq de lancé. <a href=\"https://github.com/mperham/sidekiq\">En savoir plus sur sidekiq [EN]</a>."
     queue_size_warning: "Il y a %{queue_size} tâches dans la file d'attente, ce qui est beaucoup. Cela peut provenir d'un problème avec les processus Sidekiq, ou à un manque de processus Sidekiq travailleurs."
     memory_warning: "Votre serveur dispose de moins de 1 Go de mémoire vive. Au moins 1 Go de RAM est recommandé."
@@ -612,6 +611,8 @@ fr:
     pop3s_polling_password: "Le mot de passe pour le polling POPS3 par email"
 
     minimum_topics_similar: "Combien de topics ont besoin d'exister dans la base de données avant que des topics similaires soit présentés."
+
+    allow_uploaded_avatars: "Permet aux utilisateurs d'uploader leur propre avatar"
 
   notification_types:
     mentioned: "%{display_username} vous a mentionné dans %{link}"
@@ -883,7 +884,7 @@ fr:
         Merci de suivre ce lien pour répondre : %{base_url}%{url}
 
     user_posted:
-      subject_template: "[%{site_name}] nouveau message dans '%{topic_title}'"
+      subject_template: "[%{site_name}] %{subject_prefix}nouveau message dans '%{topic_title}'"
       text_body_template: |
         %{username} à répondu à '%{topic_title}' sur %{site_name}:
 
@@ -901,17 +902,6 @@ fr:
       unsubscribe: "Ce mail de résumé vous est envoyé comme une notification de courtoisie par le site %{site_link} que vous n'avez pas visité depuis 7 jours.\nSi vous voulez désactiver cette fonction ou changer vos préférences e-mail, utilisez ce lien : %{unsubscribe_link}."
       click_here: "cliquez ici"
       from: "Résumé de %{site_name}"
-
-    private_message:
-      subject_template: "[%{site_name}] %{subject_prefix}%{topic_title}"
-      text_body_template: |
-        %{from} vous a envoyé un message privé
-
-        ---
-        %{message}
-
-        ---
-        Merci de suivre ce lien pour répondre : %{base_url}%{url}
 
     forgot_password:
       subject_template: "[%{site_name}] Réinitialisation du mot de passe"
@@ -962,7 +952,10 @@ fr:
 
   upload:
     pasted_image_filename: "Image collée"
-    image:
+    attachments:
+      too_large: "Désolé, le fichier que vous êtes en train d'uploader est trop grand (la taille maximum est %{max_size_kb}% ko)."
+    images:
+      too_large: "Désolé, l'image que vous êtes en train d'uploader est trop grande (la taille maximum est %{max_size_kb}% ko)."
       fetch_failure: "Désolé, une erreur s'est produite lorsque nous avons essayé de récupérer l'image."
       unknown_image_type: "Désolé, mais le fichier que vous essayez d'envoyer ne semble pas être une image."
       size_not_found: "Désolé, mais nous n'avons pas réussit à déterminer la taille de l'image. Peut-être que l'image est corrompue ?"

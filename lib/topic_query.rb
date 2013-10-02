@@ -129,6 +129,13 @@ class TopicQuery
     create_list(:posted) {|l| l.where('tu.user_id IS NOT NULL') }
   end
 
+  def list_topics_by(user)
+    create_list(:user_topics) do |topics|
+      topics.where(user_id: user.id)
+    end
+  end
+
+
   def list_uncategorized
     create_list(:uncategorized, unordered: true) do |list|
       list = list.where(category_id: nil)
@@ -205,23 +212,23 @@ class TopicQuery
       end
 
       result = result.listable_topics.includes(category: :topic_only_relative_url)
-      result = result.where('categories.name is null or categories.name <> ?', options[:exclude_category]) if options[:exclude_category]
-      result = result.where('categories.name = ?', options[:only_category]) if options[:only_category]
+      result = result.where('categories.name is null or categories.name <> ?', options[:exclude_category]).references(:categories) if options[:exclude_category]
+      result = result.where('categories.name = ?', options[:only_category]).references(:categories) if options[:only_category]
       result = result.limit(options[:per_page]) unless options[:limit] == false
       result = result.visible if options[:visible] || @user.nil? || @user.regular?
-      result = result.where('topics.id <> ?', options[:except_topic_id]) if options[:except_topic_id]
+      result = result.where('topics.id <> ?', options[:except_topic_id]).references(:topics) if options[:except_topic_id]
       result = result.offset(options[:page].to_i * options[:per_page]) if options[:page]
 
       if options[:topic_ids]
-        result = result.where('topics.id in (?)', options[:topic_ids])
+        result = result.where('topics.id in (?)', options[:topic_ids]).references(:topics)
       end
 
       unless @user && @user.moderator?
         category_ids = @user.secure_category_ids if @user
         if category_ids.present?
-          result = result.where('categories.read_restricted IS NULL OR categories.read_restricted = ? OR categories.id IN (?)', false, category_ids)
+          result = result.where('categories.read_restricted IS NULL OR categories.read_restricted = ? OR categories.id IN (?)', false, category_ids).references(:categories)
         else
-          result = result.where('categories.read_restricted IS NULL OR categories.read_restricted = ?', false)
+          result = result.where('categories.read_restricted IS NULL OR categories.read_restricted = ?', false).references(:categories)
         end
       end
 
@@ -229,19 +236,17 @@ class TopicQuery
     end
 
     def new_results(options={})
-      TopicQuery.new_filter(default_results(options), @user.treat_as_new_topic_start_date)
+      result = TopicQuery.new_filter(default_results(options.reverse_merge(:unordered => true)),
+                                     @user.treat_as_new_topic_start_date)
+
+      suggested_ordering(result, options)
     end
 
     def unread_results(options={})
       result = TopicQuery.unread_filter(default_results(options.reverse_merge(:unordered => true)))
                          .order('CASE WHEN topics.user_id = tu.user_id THEN 1 ELSE 2 END')
 
-      # Prefer unread in the same category
-      if options[:topic] && options[:topic].category_id
-        result = result.order("CASE WHEN topics.category_id = #{options[:topic].category_id.to_i} THEN 0 ELSE 1 END")
-      end
-
-      result.order(TopicQuery.order_nocategory_with_pinned_sql)
+      suggested_ordering(result, options)
     end
 
     def random_suggested(topic, count)
@@ -255,4 +260,12 @@ class TopicQuery
       result.order("RANDOM()")
     end
 
+    def suggested_ordering(result, options)
+      # Prefer unread in the same category
+      if options[:topic] && options[:topic].category_id
+        result = result.order("CASE WHEN topics.category_id = #{options[:topic].category_id.to_i} THEN 0 ELSE 1 END")
+      end
+
+      result.order(TopicQuery.order_nocategory_with_pinned_sql)
+    end
 end

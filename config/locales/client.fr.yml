@@ -138,6 +138,10 @@ fr:
     saving: "Sauvegarde en cours..."
     saved: "Sauvegardé !"
 
+    save: "Envoyer"
+    saving: "Envois en cours..."
+    saved: "Envoyé !"
+
     choose_topic:
       none_found: "Aucune discussion trouvée."
       title:
@@ -214,6 +218,14 @@ fr:
         taken: "Désolé, cette adresse email est indisponible."
         error: "Il y a eu une erreur lors du changement d'email. Cette adresse est peut-être déjà utilisée ?"
         success: "Nous vous avons envoyé un mail à cette adresse. Merci de suivre les instructions."
+
+      change_avatar:
+        title: "Changez votre avatar"
+        upload_instructions: "Ou vous pourriez envoyer une image"
+        upload: "Envoyer une image"
+        uploading: "Image en cours d'envois..."
+        gravatar: "Gravatar"
+        uploaded_avatar: "Image envoyée"
 
       email:
         title: "Email"
@@ -309,8 +321,6 @@ fr:
         title: "Dernières adresses IP"
       avatar:
         title: "Avatar"
-        instructions: "Nous utilisons <a href='https://gravatar.com' target='_blank'>Gravatar</a> pour associer votre avatar avec votre adresse email."
-
       filters:
         all: "Tout"
 
@@ -497,12 +507,12 @@ fr:
       add_title_with_attachments: "Ajouter le fichier"
       remote_title: "Image distante"
       remote_title_with_attachments: "Fichier distant"
-      remote_tip: "saisissez l'url de l'image (par exemple : http://monsite.com/image.jpg)"
-      remote_tip_with_attachments: "saisissez l'url du fichier (par exemple : http://monsite.com/fichier.txt)"
+      remote_tip: "saisissez l'url de l'image - par exemple : http://monsite.com/image.jpg (extensions autorisées : {{authorized_extensions}})."
+      remote_tip_with_attachments: "saisissez l'url du fichier - par exemple : http://monsite.com/fichier.txt (extensions autorisées : {{authorized_extensions}})."
       local_title: "Image locale"
       local_title_with_attachments: "Fichier local"
-      local_tip: "Cliquez pour sélectionner une image depuis votre ordinateur."
-      local_tip_with_attachments: "Cliquez pour sélectionner un fichier depuis votre ordinateur."
+      local_tip: "Cliquez pour sélectionner une image depuis votre ordinateur (extensions autorisées : {{authorized_extensions}})."
+      local_tip_with_attachments: "Cliquez pour sélectionner un fichier depuis votre ordinateur (extensions autorisées : {{authorized_extensions}})."
       upload_title: "Envoyer l'image"
       upload_title_with_attachments: "Envoyer le fichier"
       uploading: "Fichier en cours d'envoi..."
@@ -743,7 +753,8 @@ fr:
         create: "Désolé, il y a eu une erreur lors de la publication de votre message. Merci de réessayer."
         edit: "Désolé, il y a eu une erreur lors de l'édition de votre message. Merci de réessayer."
         upload: "Désolé, il y a eu une erreur lors de l'envoi du fichier. Merci de réessayer."
-        upload_too_large: "Désolé, le fichier que vous êtes en train d'envoyer est trop grand (maximum {{max_size_kb}}Kb). Merci de le redimensionner et de réessayer."
+        image_too_large: "Désolé, l'image que vous êtes en train d'envoyer est trop grande (taille maximum de {{max_size_kb}} Ko). Merci de le redimensionner et de réessayer."
+        attachment_too_large: "Désolé, le fichier que vous êtes en train d'envoyer est trop grand (taille maximum de {{max_size_kb}} Ko)."
         too_many_uploads: "Désolé, vous ne pouvez envoyer qu'un seul fichier à la fois."
         upload_not_authorized: "Désole, le fichier que vous êtes en train d'uploader n'est pas autorisé (extensions autorisées : {{authorized_extensions}})."
         image_upload_not_allowed_for_new_user: "Désolé, les nouveaux utilisateurs ne peuvent pas uploader d'image."

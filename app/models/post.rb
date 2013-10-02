@@ -1,7 +1,5 @@
 require_dependency 'jobs'
 require_dependency 'pretty_text'
-require_dependency 'local_store'
-require_dependency 's3_store'
 require_dependency 'rate_limiter'
 require_dependency 'post_revisor'
 require_dependency 'enum'
@@ -335,6 +333,21 @@ class Post < ActiveRecord::Base
 
   def self.private_messages_count_per_day(since_days_ago, topic_subtype)
     private_posts.with_topic_subtype(topic_subtype).where('posts.created_at > ?', since_days_ago.days.ago).group('date(posts.created_at)').order('date(posts.created_at)').count
+  end
+
+
+  def reply_history
+    post_ids = Post.exec_sql("WITH RECURSIVE breadcrumb(id, reply_to_post_number) AS (
+                              SELECT p.id, p.reply_to_post_number FROM posts AS p
+                                WHERE p.id = :post_id
+                              UNION
+                                 SELECT p.id, p.reply_to_post_number FROM posts AS p, breadcrumb
+                                   WHERE breadcrumb.reply_to_post_number = p.post_number
+                                     AND p.topic_id = :topic_id
+                            ) SELECT id from breadcrumb ORDER by id", post_id: id, topic_id: topic_id).to_a
+
+    post_ids.map! {|r| r['id'].to_i }.reject! {|post_id| post_id == id}
+    Post.where(id: post_ids).includes(:user, :topic).order(:id).to_a
   end
 
   private

@@ -1,15 +1,17 @@
+//= require_tree ./discourse/ember
+
 // The rest of the externals
 //= require_tree ./external
 
 //= require ./discourse/helpers/i18n_helpers
+//= require ./discourse/mixins/ajax
 //= require ./discourse
-
-//= require ./locales/date_locales.js
 
 // Pagedown customizations
 //= require ./pagedown_custom.js
 
 // Stuff we need to load first
+//= require ./discourse/mixins/scrolling
 //= require_tree ./discourse/mixins
 //= require ./discourse/components/computed
 //= require ./discourse/views/view
@@ -26,6 +28,8 @@
 //= require ./discourse/routes/discourse_route
 //= require ./discourse/routes/discourse_restricted_user_route
 
+//= require ./discourse/dialects/dialect
+//= require_tree ./discourse/dialects
 //= require_tree ./discourse/controllers
 //= require_tree ./discourse/components
 //= require_tree ./discourse/models

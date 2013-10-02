@@ -40,10 +40,9 @@ if rails4?
 end
 
 if rails4?
-  gem 'rails', '4.0.0'
+  gem 'rails', :git => 'git://github.com/rails/rails.git', :branch => '4-0-stable'
   gem 'redis-rails', :git => 'git://github.com/SamSaffron/redis-store.git'
   gem 'rails-observers'
-  gem 'protected_attributes'
   gem 'actionpack-action_caching'
   gem 'seed-fu' , github: 'mbleigh/seed-fu'
 else
@@ -60,11 +59,10 @@ else
   gem 'active_attr'
 end
 
-gem 'redis'
 gem 'hiredis'
-gem 'em-redis'
+gem 'redis', :require => ["redis", "redis/connection/hiredis"]
 
-gem 'active_model_serializers', git: 'https://github.com/rails-api/active_model_serializers.git'
+gem 'active_model_serializers'
 
 # we had issues with latest, stick to the rev till we figure this out
 # PR that makes it all hang together welcome
@@ -82,7 +80,7 @@ gem 'simple_handlebars_rails', path: 'vendor/gems/simple_handlebars_rails'
 
 gem 'redcarpet', require: false
 gem 'airbrake', '3.1.2', require: false # errbit is broken with 3.1.3 for now
-gem 'clockwork', require: false
+gem 'sidetiq', '>= 0.3.6'
 gem 'eventmachine'
 gem 'fast_xs'
 gem 'fast_xor', git: 'https://github.com/CodeMonkeySteve/fast_xor.git'
@@ -106,6 +104,7 @@ gem 'openid-redis-store'
 gem 'omniauth-facebook'
 gem 'omniauth-twitter'
 gem 'omniauth-github'
+gem 'omniauth-oauth2', require: false
 gem 'omniauth-browserid', git: 'https://github.com/callahad/omniauth-browserid.git', branch: 'observer_api'
 gem 'omniauth-cas'
 gem 'oj'
@@ -124,7 +123,7 @@ gem 'slim'  # required for sidekiq-web
 gem 'therubyracer', require: 'v8'
 gem 'httparty'
 gem 'thin', require: false
-gem 'diffy', require: false
+gem 'diffy', '>= 3.0', require: false
 gem 'highline', require: false
 
 gem 'puma'
@@ -148,7 +147,8 @@ gem 'discourse_pervasive_banner', path: 'vendor/gems/discourse_pervasive_banner'
 group :assets do
   gem 'sass'
   gem 'sass-rails'
-  gem 'turbo-sprockets-rails3'
+  # Sam: disabling for now, having issues with our jenkins build
+  # gem 'turbo-sprockets-rails3'
   gem 'uglifier'
 end
 
@@ -158,12 +158,15 @@ group :test do
 end
 
 group :test, :development do
+  gem 'mock_redis'
   gem 'listen', require: false
   gem 'certified', require: false
-  gem 'fabrication', require: false
+  if rails4?
+    gem 'fabrication', github: 'paulelliott/fabrication', require: false
+  else
+    gem 'fabrication', require: false
+  end
   gem 'qunit-rails'
-  gem 'guard-rspec', require: false
-  gem 'guard-spork', require: false
   gem 'mocha', require: false
   gem 'rb-fsevent', require: RUBY_PLATFORM =~ /darwin/i ? 'rb-fsevent' : false
   gem 'rb-inotify', '~> 0.9', require: RUBY_PLATFORM =~ /linux/i ? 'rb-inotify' : false
@@ -176,6 +179,7 @@ group :test, :development do
   gem 'rspec-given'
   gem 'pry-rails'
   gem 'pry-nav'
+  gem 'spork-rails', :github => 'sporkrb/spork-rails'
 end
 
 group :development do
@@ -199,7 +203,7 @@ gem 'lru_redux'
 # IMPORTANT: mini profiler monkey patches, so it better be required last
 #  If you want to amend mini profiler to do the monkey patches in the railstie
 #  we are open to it. by deferring require to the initializer we can configure disourse installs without it
-gem 'rack-mini-profiler', '0.1.27', require: false  # require: false #, git: 'git://github.com/SamSaffron/MiniProfiler'
+gem 'rack-mini-profiler', '0.1.29', require: false  # require: false #, git: 'git://github.com/SamSaffron/MiniProfiler'
 
 # used for caching, optional
 # redis-rack-cache is missing a sane expiry policy, it hogs redis

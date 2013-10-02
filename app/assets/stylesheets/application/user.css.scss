@@ -61,7 +61,7 @@
 
 #user-info {
   width: 240px;
-  margin-right: 30px;
+  margin-right: 20px;
   float: left;
   .summary {
     height: 50px;
@@ -186,8 +186,8 @@
     padding: 6px;
     @include border-radius-all(4px);
     float: left;
-    width: 946px;
-    # height: 57px;
+    width: 936px;
+    #height: 57px;
     margin-left: 150px;
     background-color: white;
     @include box-shadow((0 1px 2px rgba($black, 0.07), inset 0 -4px 4px -4px rgba($black, 0.14)));
@@ -219,12 +219,12 @@
   }
   @include medium-width {
     .about-me {
-      width: 831px;
+      width: 821px;
     }
   }
   @include small-width {
     .about-me {
-      width: 786px;
+      width: 776px;
     }
   }
 }
@@ -237,65 +237,64 @@
   }
 }
 
-#user-stream-bottom {
-  margin-bottom: 50px;
-  clear: both;
-}
-
-#user-stream {
+#user-activity {
   width: 840px;
   float: left;
-  .excerpt {
-    margin: 5px 0px;
-    font-size: 13px;
-    word-wrap: break-word;
-    color: lighten($black, 30%);
-  }
-  .item.moderator-action {
-    background-color: #eef0ff;
-  }
-  .item.deleted {
-    opacity: 0.8;
-    background-color: #ffcece;
-  }
-  .item.hidden {
-    display: block;
-    opacity: 0.4;
-  }
-  .item {
-    padding: 10px 8px;
-    background-color: white;
-    border: 1px solid #b9b9b9;
-    margin-bottom: 10px;
-    @include border-radius-all(4px);
-    @include box-shadow((0 1px 2px rgba($black, 0.07), inset 0 -4px 4px -4px rgba($black, 0.14)));
-  }
-  .type {
-    color: lighten($black, 40%);
-  }
-  span.name {
-    color: lighten($black, 40%);
-  }
-  .time {
-    display: block;
-    float: right;
-    color: silver;
-    margin-right: 8px;
-    font-size: 11px;
-  }
-  .avatar-link {
-    float: left;
-    margin-right: 10px;
-  }
-  .title {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 14px;
+  margin-bottom: 50px;
+
+  .user-stream {
+    .excerpt {
+      margin: 5px 0px;
+      font-size: 13px;
+      word-wrap: break-word;
+      color: lighten($black, 30%);
+    }
+    .item.moderator-action {
+      background-color: #eef0ff;
+    }
+    .item.deleted {
+      opacity: 0.8;
+      background-color: #ffcece;
+    }
+    .item.hidden {
+      display: block;
+      opacity: 0.4;
+    }
+    .item {
+      padding: 10px 8px;
+      background-color: white;
+      border: 1px solid #b9b9b9;
+      margin-bottom: 10px;
+      @include border-radius-all(4px);
+      @include box-shadow((0 1px 2px rgba($black, 0.07), inset 0 -4px 4px -4px rgba($black, 0.14)));
+    }
+    .type {
+      color: lighten($black, 40%);
+    }
+    span.name {
+      color: lighten($black, 40%);
+    }
+    .time {
+      display: block;
+      float: right;
+      color: silver;
+      margin-right: 8px;
+      font-size: 11px;
+    }
+    .avatar-link {
+      float: left;
+      margin-right: 10px;
+    }
+    .title {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
   }
 }
 
 // styling of bottom section
-#user-stream .child-actions {
+.user-stream .child-actions {
   margin-top: 8px;
   .avatar-link {
     float: none;
@@ -315,12 +314,27 @@
 }
 
 @include medium-width {
-  #user-stream {
+  #user-activity {
     width: 725px;
   }
 }
 @include small-width {
-  #user-stream {
+  #user-activity {
     width: 680px;
+  }
+}
+
+.avatar-selector {
+  label {
+    display: inline-block;
+    margin-right: 10px;
+  }
+  #avatar-input {
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  .avatar {
+    margin: 5px 10px 5px 0;
   }
 }

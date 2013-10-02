@@ -46,18 +46,12 @@ class Guardian
 
   # Can the user edit the obj
   def can_edit?(obj)
-    if obj && authenticated?
-      edit_method = method_name_for :edit, obj
-      return (edit_method ? send(edit_method, obj) : true)
-    end
+    can_do?(:edit, obj)
   end
 
   # Can we delete the object
   def can_delete?(obj)
-    if obj && authenticated?
-      delete_method = method_name_for :delete, obj
-      return (delete_method ? send(delete_method, obj) : true)
-    end
+    can_do?(:delete, obj)
   end
 
   def can_moderate?(obj)
@@ -150,8 +144,8 @@ class Guardian
     user && is_staff?
   end
 
-  def can_delete_user?(user_to_delete)
-    can_administer?(user_to_delete) && user_to_delete.post_count <= 0
+  def can_delete_user?(user)
+    user && is_staff? && !user.admin? && user.created_at > SiteSetting.delete_user_max_age.to_i.days.ago
   end
 
   # Can we see who acted on a post in a particular way?
@@ -203,7 +197,7 @@ class Guardian
   end
 
   def can_delete_all_posts?(user)
-    is_staff? && user.created_at >= 7.days.ago
+    is_staff? && user && !user.admin? && user.created_at >= SiteSetting.delete_user_max_age.days.ago && user.post_count <= SiteSetting.delete_all_posts_max.to_i
   end
 
   def can_remove_allowed_users?(topic)
@@ -276,6 +270,10 @@ class Guardian
 
   def can_edit_topic?(topic)
     !topic.archived && (is_staff? || is_my_own?(topic))
+  end
+
+  def can_edit_username?(user)
+    is_staff? || (is_me?(user) && user.created_at > SiteSetting.username_change_period.days.ago)
   end
 
   # Deleting Methods
@@ -423,4 +421,12 @@ class Guardian
     method_name = :"can_#{action}_#{obj.class.name.underscore}?"
     return method_name if respond_to?(method_name)
   end
+
+  def can_do?(action, obj)
+    if obj && authenticated?
+      action_method = method_name_for action, obj
+      return (action_method ? send(action_method, obj) : true)
+    end
+  end
+
 end

@@ -15,19 +15,37 @@ class Users::OmniauthCallbacksController < ApplicationController
   # need to be able to call this
   skip_before_filter :check_xhr
 
-  # must be done, cause we may trigger a POST
+  # this is the only spot where we allow CSRF, our openid / oauth redirect
+  # will not have a CSRF token, however the payload is all validated so its safe
   skip_before_filter :verify_authenticity_token, only: :complete
 
   def complete
-    # Make sure we support that provider
     provider = params[:provider]
-    raise Discourse::InvalidAccess.new unless self.class.types.keys.map(&:to_s).include?(provider)
 
-    # Check if the provider is enabled
-    raise Discourse::InvalidAccess.new("provider is not enabled") unless SiteSetting.send("enable_#{provider}_logins?")
+    # If we are a plugin, then try to login with it
+    found = false
+    Discourse.auth_providers.each do |p|
+      if p.name == provider && p.type == :open_id
+        create_or_sign_on_user_using_openid request.env["omniauth.auth"]
+        found = true
+        break
+      elsif p.name == provider && p.type == :oauth2
+        create_or_sign_on_user_using_oauth2 request.env["omniauth.auth"]
+        found = true
+        break
+      end
+    end
 
-    # Call the appropriate logic
-    send("create_or_sign_on_user_using_#{provider}", request.env["omniauth.auth"])
+    unless found
+      # Make sure we support that provider
+      raise Discourse::InvalidAccess.new unless self.class.types.keys.map(&:to_s).include?(provider)
+
+      # Check if the provider is enabled
+      raise Discourse::InvalidAccess.new("provider is not enabled") unless SiteSetting.send("enable_#{provider}_logins?")
+
+      # Call the appropriate logic
+      send("create_or_sign_on_user_using_#{provider}", request.env["omniauth.auth"])
+    end
 
     @data[:awaiting_approval] = true if invite_only?
 
@@ -180,6 +198,58 @@ class Users::OmniauthCallbacksController < ApplicationController
 
   end
 
+  def create_or_sign_on_user_using_oauth2(auth_token)
+    oauth2_provider = auth_token[:provider]
+    oauth2_uid = auth_token[:uid]
+    data = auth_token[:info]
+    email = data[:email]
+    name = data[:name]
+
+    oauth2_user_info = Oauth2UserInfo.where(uid: oauth2_uid, provider: oauth2_provider).first
+
+    if oauth2_user_info.blank? && user = User.find_by_email(email)
+      # TODO is only safe if we trust our oauth2 provider to return an email
+      # legitimately owned by our user
+      oauth2_user_info = Oauth2UserInfo.create(uid: oauth2_uid,
+                                               provider: oauth2_provider,
+                                               name: name,
+                                               email: email,
+                                               user: user)
+    end
+
+    authenticated = oauth2_user_info.present?
+
+    if authenticated
+      user = oauth2_user_info.user
+
+      # If we have to approve users
+      if Guardian.new(user).can_access_forum?
+        log_on_user(user)
+        @data = {authenticated: true}
+      else
+        @data = {awaiting_approval: true}
+      end
+    else
+      @data = {
+        email: email,
+        name: User.suggest_name(name),
+        username: UserNameSuggester.suggest(email),
+        email_valid: true ,
+        auth_provider: oauth2_provider
+      }
+
+      session[:authentication] = {
+        oauth2: {
+          provider: oauth2_provider,
+          uid: oauth2_uid,
+        },
+        name: name,
+        email: @data[:email],
+        email_valid: @data[:email_valid]
+      }
+    end
+  end
+
 
   def create_or_sign_on_user_using_openid(auth_token)
 
@@ -199,6 +269,8 @@ class Users::OmniauthCallbacksController < ApplicationController
 
     if user_open_id.blank? && user = User.find_by_email(email)
       # we trust so do an email lookup
+      # TODO some openid providers may not be trust worthy, allow for that
+      #  for now we are good (google, yahoo are trust worthy)
       user_open_id = UserOpenId.create(url: identity_url , user_id: user.id, email: email, active: true)
     end
 
@@ -247,18 +319,32 @@ class Users::OmniauthCallbacksController < ApplicationController
 
     data = auth_token[:info]
     screen_name = data["nickname"]
+    email = data["email"]
     github_user_id = auth_token["uid"]
 
     session[:authentication] = {
       github_user_id: github_user_id,
-      github_screen_name: screen_name
+      github_screen_name: screen_name,
+      email: email,
+      email_valid: true
     }
 
     user_info = GithubUserInfo.where(github_user_id: github_user_id).first
 
+    if !user_info && user = User.find_by_email(email)
+      # we trust so do an email lookup
+      user_info = GithubUserInfo.create(
+          user_id: user.id,
+          screen_name: screen_name,
+          github_user_id: github_user_id
+      )
+    end
+
     @data = {
       username: screen_name,
-      auth_provider: "Github"
+      auth_provider: "Github",
+      email: email,
+      email_valid: true
     }
 
     process_user_info(user_info, screen_name)

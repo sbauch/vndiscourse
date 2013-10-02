@@ -137,14 +137,14 @@ describe Admin::UsersController do
       end
 
       it "upgrades the user's trust level" do
-        AdminLogger.any_instance.expects(:log_trust_level_change).with(@another_user, 2).once
+        StaffActionLogger.any_instance.expects(:log_trust_level_change).with(@another_user, @another_user.trust_level, 2).once
         xhr :put, :trust_level, user_id: @another_user.id, level: 2
         @another_user.reload
         @another_user.trust_level.should == 2
       end
 
       it "raises an error when demoting a user below their current trust level" do
-        AdminLogger.any_instance.expects(:log_trust_level_change).with(@another_user, TrustLevel.levels[:newuser]).never
+        StaffActionLogger.any_instance.expects(:log_trust_level_change).never
         @another_user.topics_entered = SiteSetting.basic_requires_topics_entered + 1
         @another_user.posts_read_count = SiteSetting.basic_requires_read_posts + 1
         @another_user.time_read = SiteSetting.basic_requires_time_spent_mins * 60
@@ -196,6 +196,57 @@ describe Admin::UsersController do
       end
     end
 
+    context '.reject_bulk' do
+      let(:reject_me)     { Fabricate(:user) }
+      let(:reject_me_too) { Fabricate(:user) }
+
+      it 'does nothing without users' do
+        UserDestroyer.any_instance.expects(:destroy).never
+        xhr :delete, :reject_bulk
+      end
+
+      it "won't delete users if not allowed" do
+        Guardian.any_instance.stubs(:can_delete_user?).returns(false)
+        UserDestroyer.any_instance.expects(:destroy).never
+        xhr :delete, :reject_bulk, users: [reject_me.id]
+      end
+
+      it "reports successes" do
+        Guardian.any_instance.stubs(:can_delete_user?).returns(true)
+        UserDestroyer.any_instance.stubs(:destroy).returns(true)
+        xhr :delete, :reject_bulk, users: [reject_me.id, reject_me_too.id]
+        response.should be_success
+        json = ::JSON.parse(response.body)
+        json['success'].to_i.should == 2
+        json['failed'].to_i.should == 0
+      end
+
+      context 'failures' do
+        before do
+          Guardian.any_instance.stubs(:can_delete_user?).returns(true)
+        end
+
+        it 'can handle some successes and some failures' do
+          UserDestroyer.any_instance.stubs(:destroy).with(reject_me, anything).returns(false)
+          UserDestroyer.any_instance.stubs(:destroy).with(reject_me_too, anything).returns(true)
+          xhr :delete, :reject_bulk, users: [reject_me.id, reject_me_too.id]
+          response.should be_success
+          json = ::JSON.parse(response.body)
+          json['success'].to_i.should == 1
+          json['failed'].to_i.should == 1
+        end
+
+        it 'reports failure due to a user still having posts' do
+          UserDestroyer.any_instance.expects(:destroy).with(reject_me, anything).raises(UserDestroyer::PostsExistError)
+          xhr :delete, :reject_bulk, users: [reject_me.id]
+          response.should be_success
+          json = ::JSON.parse(response.body)
+          json['success'].to_i.should == 0
+          json['failed'].to_i.should == 1
+        end
+      end
+    end
+
     context '.destroy' do
       before do
         @delete_me = Fabricate(:user)
@@ -216,6 +267,13 @@ describe Admin::UsersController do
         Fabricate(:post, user: @delete_me)
         xhr :delete, :destroy, id: @delete_me.id
         response.should be_forbidden
+      end
+
+      it "doesn't return an error if the user has posts and delete_posts == true" do
+        Fabricate(:post, user: @delete_me)
+        UserDestroyer.any_instance.expects(:destroy).with(@delete_me, has_entry('delete_posts' => true)).returns(true)
+        xhr :delete, :destroy, id: @delete_me.id, delete_posts: true
+        response.should be_success
       end
 
       it "deletes the user record" do

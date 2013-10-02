@@ -40,7 +40,7 @@ Discourse.PreferencesView = Discourse.View.extend({
 		
 		afterRender: function(){
 			console.log('after render');
-  		$('chzn').chosen();
+  		// $('chzn').chosen();
 		}
 
 });

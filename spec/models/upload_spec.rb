@@ -27,6 +27,7 @@ describe Upload do
   end
 
   let(:image_sha1) { Digest::SHA1.file(image.tempfile).hexdigest }
+  let(:image_filesize) { File.size(image.tempfile) }
 
   let(:attachment) do
     ActionDispatch::Http::UploadedFile.new({
@@ -35,24 +36,18 @@ describe Upload do
     })
   end
 
+  let(:attachment_filesize) { File.size(attachment.tempfile) }
+
   context ".create_thumbnail!" do
 
     it "does not create a thumbnail when disabled" do
       SiteSetting.stubs(:create_thumbnails?).returns(false)
-      SiteSetting.expects(:enable_s3_uploads?).never
-      upload.create_thumbnail!
-    end
-
-    it "does not create a thumbnail when using S3" do
-      SiteSetting.expects(:create_thumbnails?).returns(true)
-      SiteSetting.expects(:enable_s3_uploads?).returns(true)
-      upload.expects(:has_thumbnail?).never
+      OptimizedImage.expects(:create_for).never
       upload.create_thumbnail!
     end
 
     it "does not create another thumbnail" do
       SiteSetting.expects(:create_thumbnails?).returns(true)
-      SiteSetting.expects(:enable_s3_uploads?).returns(false)
       upload.expects(:has_thumbnail?).returns(true)
       OptimizedImage.expects(:create_for).never
       upload.create_thumbnail!
@@ -62,7 +57,6 @@ describe Upload do
       upload = Fabricate(:upload)
       thumbnail = Fabricate(:optimized_image, upload: upload)
       SiteSetting.expects(:create_thumbnails?).returns(true)
-      SiteSetting.expects(:enable_s3_uploads?).returns(false)
       upload.expects(:has_thumbnail?).returns(false)
       OptimizedImage.expects(:create_for).returns(thumbnail)
       upload.create_thumbnail!
@@ -77,7 +71,7 @@ describe Upload do
     it "does not create another upload if it already exists" do
       Upload.expects(:where).with(sha1: image_sha1).returns([upload])
       Upload.expects(:create!).never
-      Upload.create_for(user_id, image).should == upload
+      Upload.create_for(user_id, image, image_filesize).should == upload
     end
 
     it "computes width & height for images" do
@@ -85,24 +79,26 @@ describe Upload do
       FastImage.any_instance.expects(:size).returns([100, 200])
       ImageSizer.expects(:resize)
       ActionDispatch::Http::UploadedFile.any_instance.expects(:rewind)
-      Upload.create_for(user_id, image)
+      Upload.create_for(user_id, image, image_filesize)
     end
 
     it "does not create an upload when there is an error with FastImage" do
       SiteSetting.expects(:authorized_image?).returns(true)
       Upload.expects(:create!).never
-      expect { Upload.create_for(user_id, attachment) }.to raise_error(FastImage::UnknownImageType)
+      expect { Upload.create_for(user_id, attachment, attachment_filesize) }.to raise_error(FastImage::UnknownImageType)
     end
 
     it "does not compute width & height for non-image" do
       SiteSetting.expects(:authorized_image?).returns(false)
       FastImage.any_instance.expects(:size).never
-      Upload.create_for(user_id, image)
+      Upload.create_for(user_id, image, image_filesize)
     end
 
     it "saves proper information" do
-      Upload.expects(:store_file).returns(url)
-      upload = Upload.create_for(user_id, image)
+      store = {}
+      Discourse.expects(:store).returns(store)
+      store.expects(:store_upload).returns(url)
+      upload = Upload.create_for(user_id, image, image_filesize)
       upload.user_id.should == user_id
       upload.original_filename.should == image.original_filename
       upload.filesize.should == File.size(image.tempfile)
@@ -110,66 +106,6 @@ describe Upload do
       upload.width.should == 244
       upload.height.should == 66
       upload.url.should == url
-    end
-
-  end
-
-  context ".store_file" do
-
-    it "store files on s3 when enabled" do
-      SiteSetting.expects(:enable_s3_uploads?).returns(true)
-      LocalStore.expects(:store_file).never
-      S3Store.expects(:store_file)
-      Upload.store_file(image, image_sha1, 1)
-    end
-
-    it "store files locally by default" do
-      S3Store.expects(:store_file).never
-      LocalStore.expects(:store_file)
-      Upload.store_file(image, image_sha1, 1)
-    end
-
-  end
-
-  context ".remove_file" do
-
-    it "remove files on s3 when enabled" do
-      SiteSetting.expects(:enable_s3_uploads?).returns(true)
-      LocalStore.expects(:remove_file).never
-      S3Store.expects(:remove_file)
-      Upload.remove_file(upload.url)
-    end
-
-    it "remove files locally by default" do
-      S3Store.expects(:remove_file).never
-      LocalStore.expects(:remove_file)
-      Upload.remove_file(upload.url)
-    end
-
-  end
-
-  context ".has_been_uploaded?" do
-
-    it "identifies internal or relatives urls" do
-      Discourse.expects(:base_url_no_prefix).returns("http://discuss.site.com")
-      Upload.has_been_uploaded?("http://discuss.site.com/uploads/default/42/0123456789ABCDEF.jpg").should == true
-      Upload.has_been_uploaded?("/uploads/default/42/0123456789ABCDEF.jpg").should == true
-    end
-
-    it "identifies internal urls when using a CDN" do
-      Rails.configuration.action_controller.expects(:asset_host).returns("http://my.cdn.com").twice
-      Upload.has_been_uploaded?("http://my.cdn.com/uploads/default/42/0123456789ABCDEF.jpg").should == true
-    end
-
-    it "identifies S3 uploads" do
-      SiteSetting.stubs(:enable_s3_uploads).returns(true)
-      SiteSetting.stubs(:s3_upload_bucket).returns("Bucket")
-      Upload.has_been_uploaded?("//bucket.s3.amazonaws.com/1337.png").should == true
-    end
-
-    it "identifies external urls" do
-      Upload.has_been_uploaded?("http://domain.com/uploads/default/42/0123456789ABCDEF.jpg").should == false
-      Upload.has_been_uploaded?("//s3.amazonaws.com/Bucket/1337.png").should == false
     end
 
   end

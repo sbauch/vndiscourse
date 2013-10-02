@@ -33,11 +33,13 @@ class User < ActiveRecord::Base
   has_many :user_visits
   has_many :invites
   has_many :topic_links
+  has_many :uploads
 
   has_one :facebook_user_info, dependent: :destroy
   has_one :twitter_user_info, dependent: :destroy
   has_one :github_user_info, dependent: :destroy
   has_one :cas_user_info, dependent: :destroy
+  has_one :oauth2_user_info, dependent: :destroy
   belongs_to :approved_by, class_name: 'User'
 
   has_many :group_users
@@ -48,11 +50,12 @@ class User < ActiveRecord::Base
   
   serialize :teams_hash, Hash
 
+  belongs_to :uploaded_avatar, class_name: 'Upload', dependent: :destroy
+
   validates_presence_of :username
-  validates_presence_of :email
-  validates_uniqueness_of :email
   validate :username_validator
-  validate :email_validator, if: :email_changed?
+  validates :email, presence: true, uniqueness: true
+  validates :email, email: true, if: :email_changed?
   validate :password_validator
 
   before_save :cook
@@ -280,7 +283,8 @@ class User < ActiveRecord::Base
   end
 
   def saw_notification_id(notification_id)
-    User.where(["seen_notification_id < ?", notification_id]).update_all ["seen_notification_id = ?", notification_id]
+    User.where(["id = ? and seen_notification_id < ?", id, notification_id])
+        .update_all ["seen_notification_id = ?", notification_id]
   end
 
   def saw_alert_id(alert_id)
@@ -370,46 +374,65 @@ class User < ActiveRecord::Base
       user = User.find_by_email(email)
       avatar = user.custom_avatar_url 
       return avatar + '?s={size}' unless avatar.nil?
-    end     
+    end 
+  end      
 
+  def self.gravatar_template(email)
     email_hash = self.email_hash(email)
-    # robohash was possibly causing caching issues
-    # robohash = CGI.escape("http://robohash.org/size_") << "{size}x{size}" << CGI.escape("/#{email_hash}.png")
-    "https://www.gravatar.com/avatar/#{email_hash}.png?s={size}&r=pg&d=identicon"
+    "//www.gravatar.com/avatar/#{email_hash}.png?s={size}&r=pg&d=identicon"
   end
 
   # Don't pass this up to the client - it's meant for server side use
-  # The only spot this is now used is for self oneboxes in open graph data
+  # This is used in
+  #   - self oneboxes in open graph data
+  #   - emails
   def small_avatar_url
-    "https://www.gravatar.com/avatar/#{email_hash}.png?s=60&r=pg&d=identicon"
+    template = avatar_template
+    template.gsub("{size}", "45")
   end
 
-  # return null for local avatars, a template for gravatar
   def avatar_template
-    User.avatar_template(email)
+    if SiteSetting.allow_uploaded_avatars? && use_uploaded_avatar
+      # the avatars might take a while to generate
+      # so return the url of the original image in the meantime
+      uploaded_avatar_template.present? ? uploaded_avatar_template : uploaded_avatar.try(:url)
+    else
+      User.gravatar_template(email)
+    end
   end
-
 
   # Updates the denormalized view counts for all users
   def self.update_view_counts
+
+    # NOTE: we only update the counts for users we have seen in the last hour
+    #  this avoids a very expensive query that may run on the entire user base
+    #  we also ensure we only touch the table if data changes
+
     # Update denormalized topics_entered
-    exec_sql "UPDATE users SET topics_entered = x.c
+    exec_sql "UPDATE users SET topics_entered = X.c
              FROM
             (SELECT v.user_id,
                     COUNT(DISTINCT parent_id) AS c
              FROM views AS v
              WHERE parent_type = 'Topic'
              GROUP BY v.user_id) AS X
-            WHERE x.user_id = users.id"
+            WHERE
+                    X.user_id = users.id AND
+                    X.c <> topics_entered AND
+                    users.last_seen_at > :seen_at
+    ", seen_at: 1.hour.ago
 
     # Update denormalzied posts_read_count
-    exec_sql "UPDATE users SET posts_read_count = x.c
+    exec_sql "UPDATE users SET posts_read_count = X.c
               FROM
               (SELECT pt.user_id,
                       COUNT(*) AS c
                FROM post_timings AS pt
                GROUP BY pt.user_id) AS X
-               WHERE x.user_id = users.id"
+               WHERE X.user_id = users.id AND
+                     X.c <> posts_read_count AND
+                     users.last_seen_at > :seen_at
+    ", seen_at: 1.hour.ago
   end
 
   # The following count methods are somewhat slow - definitely don't use them in a loop.
@@ -517,14 +540,14 @@ class User < ActiveRecord::Base
     end
   end
 
-  MAX_TIME_READ_DIFF = 100
+  # MAX_TIME_READ_DIFF = 100
   # attempt to add total read time to user based on previous time this was called
   def update_time_read!
     last_seen_key = "user-last-seen:#{id}"
     last_seen = $redis.get(last_seen_key)
     if last_seen.present?
       diff = (Time.now.to_f - last_seen.to_f).round
-      if diff > 0 && diff < MAX_TIME_READ_DIFF
+      if diff > 0 && diff < 100
         User.where(id: id, time_read: time_read).update_all ["time_read = time_read + ?", diff]
       end
     end
@@ -583,6 +606,9 @@ class User < ActiveRecord::Base
     end
   end
 
+  def has_uploaded_avatar
+    uploaded_avatar.present?
+  end
 
   protected
 
@@ -605,7 +631,6 @@ class User < ActiveRecord::Base
                             auto_track_topics_after_msecs, TopicUser.notification_levels[:regular], TopicUser.notification_levels[:tracking]])
     end
   end
-
 
   def create_email_token
     email_tokens.create(email: email)
@@ -642,37 +667,19 @@ class User < ActiveRecord::Base
     end
   end
 
-  def email_validator
-    if (setting = SiteSetting.email_domains_whitelist).present?
-      unless email_in_restriction_setting?(setting)
-        errors.add(:email, I18n.t(:'user.email.not_allowed'))
-      end
-    elsif (setting = SiteSetting.email_domains_blacklist).present?
-      if email_in_restriction_setting?(setting)
-        errors.add(:email, I18n.t(:'user.email.not_allowed'))
-      end
-    end
-  end
-
-  def email_in_restriction_setting?(setting)
-    domains = setting.gsub('.', '\.')
-    regexp = Regexp.new("@(#{domains})", true)
-    self.email =~ regexp
-  end
-
   def password_validator
     if (@raw_password && @raw_password.length < 6) || (@password_required && !@raw_password)
       errors.add(:password, "must be 6 letters or longer")
     end
   end
 
-    def send_approval_email
-      Jobs.enqueue(:user_email,
-        type: :signup_after_approval,
-        user_id: id,
-        email_token: email_tokens.first.token
-      )
-    end
+  def send_approval_email
+    Jobs.enqueue(:user_email,
+      type: :signup_after_approval,
+      user_id: id,
+      email_token: email_tokens.first.token
+    )
+  end
 
   private
 
@@ -742,6 +749,9 @@ end
 #  blocked                       :boolean          default(FALSE)
 #  dynamic_favicon               :boolean          default(FALSE), not null
 #  title                         :string(255)
+#  use_uploaded_avatar           :boolean          default(FALSE)
+#  uploaded_avatar_template      :string(255)
+#  uploaded_avatar_id            :integer
 #
 # Indexes
 #

@@ -8,20 +8,11 @@
 **/
 Discourse.SearchResultsTypeView = Ember.CollectionView.extend({
   tagName: 'ul',
-  itemViewClass: Ember.View.extend({
+  itemViewClass: Discourse.GroupedView.extend({
     tagName: 'li',
-    classNameBindings: ['selectedClass'],
-
-    templateName: function() {
-      return "search/" + (this.get('parentView.type')) + "_result";
-    }.property('parentView.type'),
-
-    // Is this row currently selected by the keyboard?
-    selectedClass: function() {
-      if (this.get('content.index') === this.get('controller.selectedIndex')) return 'selected';
-      return null;
-    }.property('controller.selectedIndex')
-
+    classNameBindings: ['selected'],
+    templateName: Discourse.computed.fmt('parentView.type', "search/%@_result"),
+    selected: Discourse.computed.propertyEqual('content.index', 'controller.selectedIndex')
   })
 });
 

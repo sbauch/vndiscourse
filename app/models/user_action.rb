@@ -90,8 +90,10 @@ SELECT
   a.user_id AS target_user_id, au.name AS target_name, au.username AS target_username,
   coalesce(p.post_number, 1) post_number,
   p.reply_to_post_number,
-  pu.email ,pu.username, pu.name, pu.id user_id,
+  pu.email, pu.username, pu.name, pu.id user_id,
+  pu.use_uploaded_avatar, pu.uploaded_avatar_template, pu.uploaded_avatar_id,
   u.email acting_email, u.username acting_username, u.name acting_name, u.id acting_user_id,
+  u.use_uploaded_avatar acting_use_uploaded_avatar, u.uploaded_avatar_template acting_uploaded_avatar_template, u.uploaded_avatar_id acting_uploaded_avatar_id,
   coalesce(p.cooked, p2.cooked) cooked,
   CASE WHEN coalesce(p.deleted_at, p2.deleted_at, t.deleted_at) IS NULL THEN false ELSE true END deleted,
   p.hidden,
@@ -138,8 +140,10 @@ SELECT
   :user_id AS target_user_id, au.name AS target_name, au.username AS target_username,
   coalesce(p.post_number, 1) post_number,
   p.reply_to_post_number,
-  pu.email ,pu.username, pu.name, pu.id user_id,
+  pu.email, pu.username, pu.name, pu.id user_id,
+  pu.use_uploaded_avatar, pu.uploaded_avatar_template, pu.uploaded_avatar_id,
   pu.email acting_email, pu.username acting_username, pu.name acting_name, pu.id acting_user_id,
+  pu.use_uploaded_avatar acting_use_uploaded_avatar, pu.uploaded_avatar_template acting_uploaded_avatar_template, pu.uploaded_avatar_id acting_uploaded_avatar_id,
   p.cooked,
   CASE WHEN coalesce(p.deleted_at, t.deleted_at) IS NULL THEN false ELSE true END deleted,
   p.hidden,
@@ -167,6 +171,8 @@ ORDER BY p.created_at desc
     require_parameters(hash, *required_parameters)
     transaction(requires_new: true) do
       begin
+
+        # TODO there are conditions when this is called and user_id was already rolled back and is invalid.
 
         # protect against dupes, for some reason this is failing in some cases
         action = self.where(hash.select{|k,v| required_parameters.include?(k)}).first
@@ -248,8 +254,35 @@ SQL
     builder.exec
   end
 
+  def self.synchronize_favorites
+    exec_sql("
+    DELETE FROM user_actions ua
+    WHERE action_type = :star
+      AND NOT EXISTS (
+        SELECT 1 FROM topic_users tu
+        WHERE
+              tu.user_id = ua.user_id AND
+              tu.topic_id = ua.target_topic_id AND
+              starred
+      )", star: UserAction::STAR)
+
+    exec_sql("INSERT INTO user_actions
+             (action_type, user_id, target_topic_id, target_post_id, acting_user_id, created_at, updated_at)
+             SELECT :star, tu.user_id, tu.topic_id, -1, tu.user_id, tu.starred_at, tu.starred_at
+             FROM topic_users tu
+             WHERE starred AND NOT EXISTS(
+              SELECT 1 FROM user_actions ua
+              WHERE tu.user_id = ua.user_id AND
+                    tu.topic_id = ua.target_topic_id AND
+                    ua.action_type = :star
+             )
+             ", star: UserAction::STAR)
+
+  end
+
   def self.ensure_consistency!
     self.synchronize_target_topic_ids
+    self.synchronize_favorites
   end
 
   protected

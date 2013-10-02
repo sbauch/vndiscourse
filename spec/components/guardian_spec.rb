@@ -628,7 +628,7 @@ describe Guardian do
       Guardian.new(nil).can_see_flags?(post).should be_false
     end
 
-    it "allow regular uses to see flags" do
+    it "allow regular users to see flags" do
       Guardian.new(user).can_see_flags?(post).should be_false
     end
 
@@ -990,7 +990,7 @@ describe Guardian do
 
   end
 
-  context "can_delete_user?" do
+  describe "can_delete_user?" do
     it "is false without a logged in user" do
       Guardian.new(nil).can_delete_user?(user).should be_false
     end
@@ -1003,19 +1003,85 @@ describe Guardian do
       Guardian.new(user).can_delete_user?(coding_horror).should be_false
     end
 
-    it "is false for moderators" do
-      Guardian.new(moderator).can_delete_user?(coding_horror).should be_false
+    shared_examples "can_delete_user examples" do
+      let(:deletable_user) { Fabricate.build(:user, created_at: 5.minutes.ago) }
+
+      it "is true if user is not an admin and is not too old" do
+        Guardian.new(actor).can_delete_user?(deletable_user).should be_true
+      end
+
+      it "is false if user is an admin" do
+        Guardian.new(actor).can_delete_user?(another_admin).should be_false
+      end
+
+      it "is false if user is too old" do
+        SiteSetting.stubs(:delete_user_max_age).returns(7)
+        Guardian.new(actor).can_delete_user?(Fabricate(:user, created_at: 8.days.ago)).should be_false
+      end
+    end
+
+    context "for moderators" do
+      let(:actor) { moderator }
+      include_examples "can_delete_user examples"
     end
 
     context "for admins" do
-      it "is false if user has posts" do
-        Fabricate(:post, user: user)
-        Guardian.new(admin).can_delete_user?(user).should be_false
+      let(:actor) { admin }
+      include_examples "can_delete_user examples"
+    end
+  end
+
+  describe "can_delete_all_posts?" do
+    it "is false without a logged in user" do
+      Guardian.new(nil).can_delete_all_posts?(user).should be_false
+    end
+
+    it "is false without a user to look at" do
+      Guardian.new(admin).can_delete_all_posts?(nil).should be_false
+    end
+
+    it "is false for regular users" do
+      Guardian.new(user).can_delete_all_posts?(coding_horror).should be_false
+    end
+
+    shared_examples "can_delete_all_posts examples" do
+      it "is true if user is newer than delete_user_max_age days old" do
+        SiteSetting.expects(:delete_user_max_age).returns(10)
+        Guardian.new(actor).can_delete_all_posts?(Fabricate.build(:user, created_at: 9.days.ago)).should be_true
       end
 
-      it "is true if user has no posts" do
-        Guardian.new(admin).can_delete_user?(user).should be_true
+      it "is false if user is older than delete_user_max_age days old" do
+        SiteSetting.expects(:delete_user_max_age).returns(10)
+        Guardian.new(actor).can_delete_all_posts?(Fabricate.build(:user, created_at: 11.days.ago)).should be_false
       end
+
+      it "is false if user is an admin" do
+        Guardian.new(actor).can_delete_all_posts?(admin).should be_false
+      end
+
+      it "is true if number of posts is small" do
+        u = Fabricate.build(:user, created_at: 1.day.ago)
+        u.stubs(:post_count).returns(1)
+        SiteSetting.stubs(:delete_all_posts_max).returns(10)
+        Guardian.new(actor).can_delete_all_posts?(u).should be_true
+      end
+
+      it "is false if number of posts is not small" do
+        u = Fabricate.build(:user, created_at: 1.day.ago)
+        u.stubs(:post_count).returns(11)
+        SiteSetting.stubs(:delete_all_posts_max).returns(10)
+        Guardian.new(actor).can_delete_all_posts?(u).should be_false
+      end
+    end
+
+    context "for moderators" do
+      let(:actor) { moderator }
+      include_examples "can_delete_all_posts examples"
+    end
+
+    context "for admins" do
+      let(:actor) { admin }
+      include_examples "can_delete_all_posts examples"
     end
   end
 
@@ -1058,6 +1124,49 @@ describe Guardian do
 
     it 'is true for admins' do
       Guardian.new(admin).can_change_trust_level?(user).should be_true
+    end
+  end
+
+  describe "can_edit_username?" do
+    it "is false without a logged in user" do
+      Guardian.new(nil).can_edit_username?(build(:user, created_at: 1.minute.ago)).should be_false
+    end
+
+    it "is false for regular users to edit another user's username" do
+      Guardian.new(build(:user)).can_edit_username?(build(:user, created_at: 1.minute.ago)).should be_false
+    end
+
+    shared_examples "staff can always change usernames" do
+      it "is true for moderators" do
+        Guardian.new(moderator).can_edit_username?(user).should be_true
+      end
+
+      it "is true for admins" do
+        Guardian.new(admin).can_edit_username?(user).should be_true
+      end
+    end
+
+    context 'for a new user' do
+      let(:target_user) { build(:user, created_at: 1.minute.ago) }
+      include_examples "staff can always change usernames"
+
+      it "is true for the user to change his own username" do
+        Guardian.new(target_user).can_edit_username?(target_user).should be_true
+      end
+    end
+
+    context 'for an old user' do
+      before do
+        SiteSetting.stubs(:username_change_period).returns(3)
+      end
+
+      let(:target_user) { build(:user, created_at: 4.days.ago) }
+
+      include_examples "staff can always change usernames"
+
+      it "is false for the user to change his own username" do
+        Guardian.new(target_user).can_edit_username?(target_user).should be_false
+      end
     end
   end
 

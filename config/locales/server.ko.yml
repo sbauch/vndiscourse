@@ -78,7 +78,7 @@ ko:
 
       Keep in mind as you compose your reply:
 
-      - Does your reply improve the conversation in some way, however small?
+      - Does your reply improve the conversation in some way?
 
       - Be kind to your fellow community members.
 
@@ -365,7 +365,6 @@ ko:
     rails_env_warning: "Your server is running in %{env} mode."
     host_names_warning: "Your config/database.yml file is using the default localhost hostname. Update it to use your site's hostname."
     gc_warning: 'Your server is using default ruby garbage collection parameters, which will not give you the best performance. Read this topic on performance tuning: <a href="http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126">Tuning Ruby and Rails for Discourse</a>.'
-    clockwork_warning: 'Clockwork is not running. Ensure that a clockwork process is always running so that important jobs can be scheduled. <a href="https://github.com/tomykaira/clockwork">Learn about clockwork here</a>.'
     sidekiq_warning: 'Sidekiq is not running. Many tasks, like sending emails, are executed asynchronously by sidekiq. Please ensure at least one sidekiq process is running. <a href="https://github.com/mperham/sidekiq">Learn about Sidekiq here</a>.'
     queue_size_warning: 'The number of queued jobs is %{queue_size}, which is high. This could indicate a problem with the Sidekiq process(es), or you may need to add more Sidekiq workers.'
     memory_warning: 'Your server is running with less than 1 GB of total memory. At least 1 GB of memory is recommended.'
@@ -856,7 +855,7 @@ ko:
         Please visit this link to respond: %{base_url}%{url}
 
     user_posted:
-      subject_template: "[%{site_name}] %{username} posted in '%{topic_title}'"
+      subject_template: "[%{site_name}] %{subject_prefix}%{username} posted in '%{topic_title}'"
       text_body_template: |
         %{username} posted in '%{topic_title}' on %{site_name}:
 
@@ -874,17 +873,6 @@ ko:
       unsubscribe: "This summary email is sent as a courtesy notification from %{site_link} when we haven't seen you in a while.\nIf you'd like to turn it off or change your email preferences, %{unsubscribe_link}."
       click_here: "click here"
       from: "%{site_name} digest"
-
-    private_message:
-      subject_template: "[%{site_name}] %{subject_prefix}%{topic_title}"
-      text_body_template: |
-        %{private_message_from} just sent you a private message
-
-        ---
-        %{message}
-
-        ---
-        Please visit this link to respond: %{base_url}%{url}
 
     forgot_password:
       subject_template: "[%{site_name}] Password reset"
@@ -932,7 +920,7 @@ ko:
   deleted: 'deleted'
 
   upload:
-    image:
+    images:
       fetch_failure: "Sorry, there has been an error while fetching the image."
       unknown_image_type: "Sorry, but the file you tried to upload doesn't appear to be an image."
       size_not_found: "Sorry, but we couldn't determine the size of the image. Maybe your image is corrupted?"

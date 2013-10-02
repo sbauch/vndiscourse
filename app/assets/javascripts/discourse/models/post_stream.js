@@ -270,22 +270,26 @@ Discourse.PostStream = Em.Object.extend({
     @returns {Ember.Deferred} a promise that's resolved when the posts have been added.
   **/
   appendMore: function() {
-    var postStream = this,
-        rejectedPromise = Ember.Deferred.create(function(p) { p.reject(); });
+    var postStream = this;
 
     // Make sure we can append more posts
-    if (!postStream.get('canAppendMore')) { return rejectedPromise; }
+    if (!postStream.get('canAppendMore')) { return Ember.RSVP.reject(); }
 
     var postIds = postStream.get('nextWindow');
-    if (Ember.isEmpty(postIds)) { return rejectedPromise; }
+    if (Ember.isEmpty(postIds)) { return Ember.RSVP.reject(); }
 
     postStream.set('loadingBelow', true);
+
+    var stopLoading = function() {
+      postStream.set('loadingBelow', false);
+    };
+
     return postStream.findPostsByIds(postIds).then(function(posts) {
       posts.forEach(function(p) {
         postStream.appendPost(p);
       });
-      postStream.set('loadingBelow', false);
-    });
+      stopLoading();
+    }, stopLoading);
   },
 
   /**
@@ -453,6 +457,26 @@ Discourse.PostStream = Em.Object.extend({
       this.get('stream').addObject(postId);
       if (lastPostLoaded) { this.appendMore(); }
     }
+  },
+
+  /**
+    Returns the "thread" of posts in the history of a post.
+
+    @method findReplyHistory
+    @param {Discourse.Post} post the post whose history we want
+    @returns {Array} the posts in the history.
+  **/
+  findReplyHistory: function(post) {
+    var postStream = this,
+        url = "/posts/" + post.get('id') + "/reply-history.json";
+
+    return Discourse.ajax(url).then(function(result) {
+      return result.map(function (p) {
+        return postStream.storePost(Discourse.Post.create(p));
+      });
+    }).then(function (replyHistory) {
+      post.set('replyHistory', replyHistory);
+    });
   },
 
   /**

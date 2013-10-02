@@ -15,7 +15,11 @@ class CurrentUserSerializer < BasicUserSerializer
              :dynamic_favicon,
              :trust_level,
              :can_edit,
-             :team_hash
+             :team_hash,
+             :use_uploaded_avatar,
+             :has_uploaded_avatar,
+             :gravatar_template,
+             :uploaded_avatar_template
 
   def include_site_flagged_posts_count?
     object.staff?
@@ -44,6 +48,10 @@ class CurrentUserSerializer < BasicUserSerializer
   
   def can_edit
     true
+  end
+
+  def gravatar_template
+    User.gravatar_template(object.email)
   end
 
 end

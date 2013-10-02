@@ -9,14 +9,12 @@
 //= require ../../app/assets/javascripts/discourse/components/probes.js
 
 // Externals we need to load first
-//= require ../../app/assets/javascripts/external/jquery-1.9.1.js
+//= require ../../app/assets/javascripts/external_development/jquery-2.0.3.js
 //= require ../../app/assets/javascripts/external/jquery.ui.widget.js
 //= require ../../app/assets/javascripts/external/handlebars.js
 //= require ../../app/assets/javascripts/external_development/ember.js
-//= require ../../app/assets/javascripts/external_development/group-helper.js
 
 //= require ../../app/assets/javascripts/locales/i18n
-//= require ../../app/assets/javascripts/locales/date_locales.js
 //= require ../../app/assets/javascripts/discourse/helpers/i18n_helpers
 //= require ../../app/assets/javascripts/locales/en
 
@@ -53,7 +51,7 @@ sinon.config = {
   useFakeServer: false
 };
 
-window.assetPath = function() { return null };
+window.assetPath = function() { return null; };
 
 var oldAjax = $.ajax;
 $.ajax = function() {
@@ -82,5 +80,5 @@ QUnit.testStart(function() {
   Discourse.SiteSettings = jQuery.extend(true, {}, Discourse.SiteSettingsOriginal);
   Discourse.BaseUri = "/";
   Discourse.BaseUrl = "";
-})
+});
 

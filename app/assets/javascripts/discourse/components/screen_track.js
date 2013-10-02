@@ -14,6 +14,14 @@ Discourse.ScreenTrack = Ember.Object.extend({
   },
 
   start: function(topicId) {
+    var currentTopicId = this.get('topicId');
+    if (currentTopicId && (currentTopicId !== topicId)) {
+      this.tick();
+      this.flush();
+    }
+
+    this.reset();
+
     // Create an interval timer if we don't have one.
     if (!this.get('interval')) {
       var screenTrack = this;
@@ -22,15 +30,11 @@ Discourse.ScreenTrack = Ember.Object.extend({
       }, 1000));
     }
 
-    var currentTopicId = this.get('topicId');
-    if (currentTopicId && (currentTopicId !== topicId)) {
-      this.flush();
-      this.reset();
-    }
     this.set('topicId', topicId);
   },
 
   stop: function() {
+    this.tick();
     this.flush();
     this.reset();
     this.set('topicId', null);
@@ -60,7 +64,6 @@ Discourse.ScreenTrack = Ember.Object.extend({
     this.set('timings', {});
     this.set('totalTimings', {});
     this.set('topicTime', 0);
-    this.set('cancelled', false);
   },
 
   scrolled: function() {
@@ -77,6 +80,7 @@ Discourse.ScreenTrack = Ember.Object.extend({
 
     // Update our total timings
     var totalTimings = this.get('totalTimings');
+
     _.each(this.get('timings'), function(timing,key) {
       if (!totalTimings[timing.postNumber])
         totalTimings[timing.postNumber] = 0;
@@ -94,13 +98,12 @@ Discourse.ScreenTrack = Ember.Object.extend({
       highestSeen = Math.max(highestSeen, parseInt(postNumber, 10));
     });
 
-    var highestSeenByTopic = Discourse.get('highestSeenByTopic');
+    var highestSeenByTopic = Discourse.Session.currentProp('highestSeenByTopic');
     if ((highestSeenByTopic[topicId] || 0) < highestSeen) {
       highestSeenByTopic[topicId] = highestSeen;
       Discourse.TopicTrackingState.current().updateSeen(topicId, highestSeen);
     }
     if (!$.isEmptyObject(newTimings)) {
-
       Discourse.ajax('/topics/timings', {
         data: {
           timings: newTimings,
@@ -162,23 +165,13 @@ Discourse.ScreenTrack = Ember.Object.extend({
 });
 
 
-Discourse.ScreenTrack.reopenClass({
+Discourse.ScreenTrack.reopenClass(Discourse.Singleton, {
 
   // Don't send events if we haven't scrolled in a long time
   PAUSE_UNLESS_SCROLLED: 1000 * 60 * 3,
 
   // After 6 minutes stop tracking read position on post
-  MAX_TRACKING_TIME: 1000 * 60 * 6,
-
-
-  /**
-    Returns a Screen Tracking singleton
-  **/
-  instance: function() {
-    if (this.screenTrack) { return this.screenTrack; }
-    this.screenTrack = Discourse.ScreenTrack.create();
-    return this.screenTrack;
-  }
+  MAX_TRACKING_TIME: 1000 * 60 * 6
 
 });
 

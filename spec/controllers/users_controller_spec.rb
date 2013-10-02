@@ -521,8 +521,8 @@ describe UsersController do
         lambda { xhr :put, :username, username: user.username }.should raise_error(ActionController::ParameterMissing)
       end
 
-      it 'raises an error when you don\'t have permission to change the user' do
-        Guardian.any_instance.expects(:can_edit?).with(user).returns(false)
+      it 'raises an error when you don\'t have permission to change the username' do
+        Guardian.any_instance.expects(:can_edit_username?).with(user).returns(false)
         xhr :put, :username, username: user.username, new_username: new_username
         response.should be_forbidden
       end
@@ -801,6 +801,15 @@ describe UsersController do
           xhr :get, :check_username, username: 'HanSolo'
         end
         include_examples 'when username is unavailable locally'
+      end
+
+      context "an admin changing it for someone else" do
+        let!(:user) { Fabricate(:user, username: 'hansolo') }
+        before do
+          log_in_user(Fabricate(:admin))
+          xhr :get, :check_username, username: 'HanSolo', for_user_id: user.id
+        end
+        include_examples 'when username is available everywhere'
       end
     end
   end

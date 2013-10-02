@@ -354,7 +354,6 @@ pt_BR:
     rails_env_warning: "Seu servidor está rodando no modo %{env}."
     host_names_warning: "O arquivo config/database.yml está usando hostname padrão localhost. Modifique para usar o hostname do seu site."
     gc_warning: 'Seu servidor está rodando a coleta de lixo do ruby com os parâmetros padrão (default ruby garbage collection parameters), os quais não irão propiciar a melhor performance. Leia este tópico sobre ajuste de performance: <a href="http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126" target="_blank">Tuning Ruby and Rails for Discourse</a>.'
-    clockwork_warning: 'Clockwork não está em execução. Certifique-se que o processo clockwork esteja sempre em execução para que tarefas importantes seja agendadas. <a href="https://github.com/tomykaira/clockwork" target="_blank">Aprenda sobre clockwork aqui</a>.'
     sidekiq_warning: 'Sidekiq não está em execução. Muitas tarefas, como envio de emails, são executadas de forma assíncrona pelo sidekiq. Por favor certifique-se de que ao menos um processo sidekiq esteja execução. <a href="https://github.com/mperham/sidekiq" target="_blank">Aprenda sobre Sidekiq aqui</a>.'
     queue_size_warning: 'O número de tarefas agendadas é %{queue_size}, o que é alto. Isto pode indicar um problema com o(s) processo(s) Sidekiq, ou você pode estar precisando de mais Sidekiq workers.'
     memory_warning: 'Seu servidor está rodando com menos de 1 GB de memória total. Pelo menos 1 GB é quantidade de memória recomendada.'
@@ -467,7 +466,7 @@ pt_BR:
     ga_tracking_code: "Código de rastreamento do Google Analytics, veja: http://google.com/analytics"
     ga_domain_name: "Nome de domínio no Google Analytics, exemplo: meusite.com; see http://google.com/analytics"
     enable_escaped_fragments: "Ativa solução alternativa que ajuda os mecanismos de busca antigos a indexarem o seu site. ALERTA: apenas ative se você realmente precisa disto."
-    enable_noscript_support: "Ativar suporte a tag &lt;noscipt&gt;"
+    enable_noscript_support: "Ativar suporte a tag &lt;noscript&gt;"
     top_menu: "A ordem dos items no menu de cima. Exemplo latest|hot|read|favorited|unread|new|posted|categories"
     post_menu: "A ordem dos items no menu da postagem."
     share_links: "Determine quais ítens aparecerem no diálogo de compartilhar, e em que ordem. Por exemplo: twitter|facebook|google+|email"
@@ -865,7 +864,7 @@ pt_BR:
         ---
         %{respond_instructions}
     user_posted:
-      subject_template: "[%{site_name}] nova postagem no tópico '%{topic_title}'"
+      subject_template: "[%{site_name}] %{subject_prefix}nova postagem no tópico '%{topic_title}'"
       text_body_template: |
         %{username} postou no tópico '%{topic_title}' de %{site_name}:
 
@@ -883,16 +882,7 @@ pt_BR:
       click_here: "clique aqui"
       from: "resumo de %{site_name}"
       read_more: "Leia Mais"
-    private_message:
-      subject_template: "[%{site_name}] %{subject_prefix}%{topic_title}"
-      text_body_template: |
-        %{private_message_from} enviou uma mensagem particular para você
 
-        ---
-        %{message}
-
-        ---
-        %{respond_instructions}
     forgot_password:
       subject_template: "[%{site_name}] Redefinição de senha"
       text_body_template: |
@@ -955,7 +945,7 @@ pt_BR:
   upload:
     unauthorized: "Desculpe-nos, o arquivo que você está tentando enviar não é autorizado (extensões autorizadas: %{authorized_extensions})."
     pasted_image_filename: "Imagem colada"
-    image:
+    images:
       fetch_failure: "Desculpe, houve um erro ao transferir a imagem."
       unknown_image_type: "Desculpe, mas o arquivo que você tentou enviar não parece ser uma imagem."
       size_not_found: "Desculpe, mas não conseguimos determinar o tamanho da imagem. É possível que seu arquivo de imagem esteja corrompido?"

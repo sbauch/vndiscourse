@@ -78,6 +78,11 @@ Discourse.Topic = Discourse.Model.extend({
     return this.urlForPostNumber(this.get('last_read_post_number'));
   }.property('url', 'last_read_post_number'),
 
+  lastUnreadUrl: function() {
+    var postNumber = Math.min(this.get('last_read_post_number') + 1, this.get('highest_post_number'));
+    return this.urlForPostNumber(postNumber);
+  }.property('url', 'last_read_post_number', 'highest_post_number'),
+
   lastPostUrl: function() {
     return this.urlForPostNumber(this.get('highest_post_number'));
   }.property('url', 'highest_post_number'),
@@ -86,8 +91,9 @@ Discourse.Topic = Discourse.Model.extend({
   // tells us if we are still asynchronously flushing our "recently read" data.
   // So take what the browser has seen into consideration.
   displayNewPosts: function() {
-    var delta, highestSeen, result;
-    if (highestSeen = Discourse.get('highestSeenByTopic')[this.get('id')]) {
+    var delta, result;
+    var highestSeen = Discourse.Session.currentProp('highestSeenByTopic')[this.get('id')];
+    if (highestSeen) {
       delta = highestSeen - this.get('last_read_post_number');
       if (delta > 0) {
         result = this.get('new_posts') - delta;
@@ -130,7 +136,7 @@ Discourse.Topic = Discourse.Model.extend({
   }.property('views'),
 
   archetypeObject: function() {
-    return Discourse.Site.instance().get('archetypes').findProperty('id', this.get('archetype'));
+    return Discourse.Site.currentProp('archetypes').findProperty('id', this.get('archetype'));
   }.property('archetype'),
   isPrivateMessage: Em.computed.equal('archetype', 'private_message'),
 

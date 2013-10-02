@@ -8,6 +8,10 @@
 **/
 Discourse.Post = Discourse.Model.extend({
 
+  init: function() {
+    this.set('replyHistory', []);
+  },
+
   shareUrl: function() {
     var user = Discourse.User.current();
     var userSuffix = user ? '?u=' + user.get('username_lower') : '';
@@ -25,6 +29,7 @@ Discourse.Post = Discourse.Model.extend({
   // Posts can show up as deleted if the topic is deleted
   deletedViaTopic: Em.computed.and('firstPost', 'topic.deleted_at'),
   deleted: Em.computed.or('deleted_at', 'deletedViaTopic'),
+  notDeleted: Em.computed.not('deleted'),
 
   postDeletedBy: function() {
     if (this.get('firstPost')) { return this.get('topic.deleted_by'); }
@@ -120,7 +125,7 @@ Discourse.Post = Discourse.Model.extend({
 
   flagsAvailable: function() {
     var post = this,
-        flags = Discourse.Site.instance().get('flagTypes').filter(function(item) {
+        flags = Discourse.Site.currentProp('flagTypes').filter(function(item) {
       return post.get("actionByName." + (item.get('name_key')) + ".can_act");
     });
     return flags;
@@ -150,7 +155,7 @@ Discourse.Post = Discourse.Model.extend({
       }).then(function(result) {
         // If we received a category update, update it
         self.set('version', result.post.version);
-        if (result.category) Discourse.Site.instance().updateCategory(result.category);
+        if (result.category) Discourse.Site.current().updateCategory(result.category);
         if (complete) complete(Discourse.Post.create(result.post));
       }, function(result) {
         // Post failed to update
@@ -234,7 +239,7 @@ Discourse.Post = Discourse.Model.extend({
       });
     } else {
       this.setProperties({
-        cooked: Discourse.Markdown.cook(I18n.t("post.deleted_by_author")),
+        cooked: Discourse.Markdown.cook(I18n.t("post.deleted_by_author", {count: Discourse.SiteSettings.delete_removed_posts_after})),
         can_delete: false,
         version: this.get('version') + 1,
         can_recover: true,
@@ -290,7 +295,7 @@ Discourse.Post = Discourse.Model.extend({
       _.each(obj.actions_summary,function(a) {
         var actionSummary;
         a.post = post;
-        a.actionType = Discourse.Site.instance().postActionTypeById(a.id);
+        a.actionType = Discourse.Site.current().postActionTypeById(a.id);
         actionSummary = Discourse.ActionSummary.create(a);
         post.get('actions_summary').pushObject(actionSummary);
         lookup.set(a.actionType.get('name_key'), actionSummary);
@@ -338,7 +343,11 @@ Discourse.Post = Discourse.Model.extend({
     topic = this.get('topic');
     return !topic.isReplyDirectlyBelow(this);
 
-  }.property('reply_count')
+  }.property('reply_count'),
+
+  canViewEditHistory: function() {
+    return (Discourse.SiteSettings.edit_history_visible_to_public || (Discourse.User.current() && Discourse.User.current().get('staff')));
+  }.property()
 
 });
 
@@ -349,7 +358,7 @@ Discourse.Post.reopenClass({
       var lookup = Em.Object.create();
       result.actions_summary = result.actions_summary.map(function(a) {
         a.post = result;
-        a.actionType = Discourse.Site.instance().postActionTypeById(a.id);
+        a.actionType = Discourse.Site.current().postActionTypeById(a.id);
         var actionSummary = Discourse.ActionSummary.create(a);
         lookup.set(a.actionType.get('name_key'), actionSummary);
         return actionSummary;
@@ -385,16 +394,10 @@ Discourse.Post.reopenClass({
     });
   },
 
-  loadByPostNumber: function(topicId, postId) {
-    return Discourse.ajax("/posts/by_number/" + topicId + "/" + postId + ".json").then(function (result) {
-      return Discourse.Post.create(result);
-    });
-  },
-
   loadQuote: function(postId) {
     return Discourse.ajax("/posts/" + postId + ".json").then(function(result) {
       var post = Discourse.Post.create(result);
-      return Discourse.BBCode.buildQuoteBBCode(post, post.get('raw'));
+      return Discourse.Quote.build(post, post.get('raw'));
     });
   },
 

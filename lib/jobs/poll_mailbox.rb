@@ -5,8 +5,8 @@ require 'net/pop'
 require_dependency 'email/receiver'
 
 module Jobs
-  class PollMailbox < Jobs::Base
-
+  class PollMailbox < Jobs::Scheduled
+    recurrence { minutely }
     sidekiq_options retry: false
 
     def execute(args)
@@ -23,8 +23,9 @@ module Jobs
                       SiteSetting.pop3s_polling_password) do |pop|
         unless pop.mails.empty?
           pop.each do |mail|
-            Email::Receiver.new(mail.pop).process
-            mail.delete
+            if Email::Receiver.new(mail.pop).process == Email::Receiver.results[:processed]
+              mail.delete
+            end
           end
         end
       end

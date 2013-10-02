@@ -9,6 +9,7 @@ class UserSerializer < BasicUserSerializer
              :created_at,
              :website,
              :can_edit,
+             :can_edit_username,
              :stats,
              :can_send_private_message_to_user,
              :bio_excerpt,
@@ -23,7 +24,8 @@ class UserSerializer < BasicUserSerializer
              :admin,
              :title,
              :teams,
-             :team_hash
+             :team_hash,
+             :all_teams
 
   has_one :invited_by, embed: :object, serializer: BasicUserSerializer
   
@@ -34,7 +36,11 @@ class UserSerializer < BasicUserSerializer
       @return_array << {:id => k, :name => v}
     end
     @return_array
-  end  
+  end
+  
+  def all_teams
+    Team.all
+  end    
 
   def self.private_attributes(*attrs)
     attributes *attrs
@@ -84,6 +90,10 @@ class UserSerializer < BasicUserSerializer
 
   def can_edit
     scope.can_edit?(object)
+  end
+
+  def can_edit_username
+    scope.can_edit_username?(object)
   end
 
   def stats

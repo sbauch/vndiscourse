@@ -378,7 +378,6 @@ zh_CN:
     rails_env_warning: "你的服务器运行在 %{env} 模式。"
     host_names_warning: "你的 config/database.yml 文件使用的是缺省的 localhost 主机名。请更改成你的站点主机名。"
     gc_warning: '你的服务器使用的是缺省的 ruby 垃圾回收参数，这个配置无法提供最高性能。请阅读此性能调优文档：<a href="http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126">Tuning Ruby and Rails for Discourse</a>。'
-    clockwork_warning: '发条装置（Clockwork）并未运行。请确保运行一个 clockwork 进程，这样一些重要的工作能够被安排执行。<a href="https://github.com/tomykaira/clockwork">了解发条装置（clockwork）</a>。'
     sidekiq_warning: 'Sidekiq 不在运行。很多任务，例如发送电子邮件，是异步的被 sidekiq 调度执行的。请确保至少运行一个 sidekiq 进程。<a href="https://github.com/mperham/sidekiq">了解 Sidekiq</a>。'
     queue_size_warning: '队列中的任务数为%{queue_size}，任务较多。这可能因为Sidekiq进程出问题导致，或者需要更多的Sidekiq进程。'
     memory_warning: '你的服务器环境内存少于 1GB，我们建议至少要有 1GB 内存'
@@ -857,7 +856,7 @@ zh_CN:
         请访问 %{base_url}%{url} 来回复。
 
     user_posted:
-      subject_template: "[%{site_name}] %{username} 在 '%{topic_title}' 主题发表了帖子"
+      subject_template: "[%{site_name}] %{subject_prefix}%{username} 在 '%{topic_title}' 主题发表了帖子"
       text_body_template: |
         %{username} 在 %{site_name} 的 '%{topic_title}' 主题中发表了帖子：
 
@@ -875,17 +874,6 @@ zh_CN:
       unsubscribe: "这封来自 %{site_link} 的汇总邮件是当我们有一段时间没有见到你之后，作为一个礼貌的通知发送给你的。\n如果你希望关闭它或者修改你的邮件设置，请访问 %{unsubscribe_link}。"
       click_here: "点击此处"
       from: "%{site_name} 摘要"
-
-    private_message:
-      subject_template: "[%{site_name}] %{subject_prefix}%{topic_title}"
-      text_body_template: |
-        %{private_message_from} 刚刚发送了一条私信给你
-
-        ---
-        %{message}
-
-        ---
-        请访问 %{base_url}%{url} 来回复。
 
     forgot_password:
       subject_template: "[%{site_name}] 密码重置"
@@ -934,7 +922,7 @@ zh_CN:
 
   upload:
     pasted_image_filename: ""
-    image:
+    images:
       fetch_failure: "抱歉，获取图片時发生错误。"
       unknown_image_type: "抱歉，你上传的文件似乎不是一张图片。"
       size_not_found: "抱歉，我们无法获取图片大小，请检查你的图片是否已损坏。"
