@@ -19,8 +19,6 @@ class TopicViewSerializer < ApplicationSerializer
      :has_best_of,
      :archetype,
      :slug,
-     :location,
-     :auto_close_at,
      :category_id,
      :deleted_at]
   end
@@ -31,24 +29,10 @@ class TopicViewSerializer < ApplicationSerializer
              :starred,
              :posted,
              :pinned,
-             :user_rsvp_status,
-             :event_menu,
-             :starts_at,
-             :ends_at,
              :details,
              :highest_post_number,
              :last_read_post_number,
              :deleted_by
-
-  # has_one :created_by, serializer: BasicUserSerializer, embed: :objects
-  # has_one :last_poster, serializer: BasicUserSerializer, embed: :objects
-  # has_many :allowed_users, serializer: BasicUserSerializer, embed: :objects
-  # has_many :allowed_groups, serializer: BasicGroupSerializer, embed: :objects
-  # 
-  # has_many :links, serializer: TopicLinkSerializer, embed: :objects
-  # has_many :participants, serializer: TopicPostCountSerializer, embed: :objects
-  # has_many :suggested_topics, serializer: SuggestedTopicSerializer, embed: :objects
-
 
   # Define a delegator for each attribute of the topic we want
   attributes *topic_attributes
@@ -65,8 +49,8 @@ class TopicViewSerializer < ApplicationSerializer
       created_by: BasicUserSerializer.new(object.topic.user, scope: scope, root: false),
       last_poster: BasicUserSerializer.new(object.topic.last_poster, scope: scope, root: false)
     }
-    
-      if object.topic.allowed_users.present?
+
+    if object.topic.allowed_users.present?
       result[:allowed_users] = object.topic.allowed_users.map do |user|
         BasicUserSerializer.new(user, scope: scope, root: false)
       end
@@ -111,45 +95,6 @@ class TopicViewSerializer < ApplicationSerializer
     result[:can_create_post] = true if scope.can_create?(Post, object.topic)
     result[:can_reply_as_new_topic] = true if scope.can_reply_as_new_topic?(object.topic)
     result
-  end
-  
-  def starts_at
-    return nil if object.topic.archetype != 'event'
-    object.topic.starts_at.utc.iso8601.gsub("-","").gsub(":","")
-  end
-  
-  def ends_at
-    return nil if object.topic.archetype != 'event'
-    object.topic.ends_at.utc.iso8601.gsub("-","").gsub(":","")  
-  end
-  
-  def user_rsvp_status
-    begin
-      options[:scope].user.attendance_status(object.topic)
-    rescue 
-      raise Discourse::NotLoggedIn.new
-    end  
-  end
-  
-  def post_creator
-    return true if options[:scope].user.admin 
-    object.topic.user == options[:scope].user ? true : false
-  end
-  
-  def event_menu
-    if object.topic.archetype == 'event'
-      if options[:scope].user.admin || (object.topic.user == options[:scope].user)
-        return true
-      end
-    end
-  end
-    
-  def draft
-    object.draft
-  end
-
-  def include_allowed_users?
-    object.topic.private_message?
   end
 
   def draft
