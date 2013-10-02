@@ -271,8 +271,10 @@ class UsersController < ApplicationController
   def custom_avatar_upload
     user = fetch_user_from_params
     file = params[:file] || params[:files].first
-    upload = Upload.create_for(user.id, file)
+    upload = Upload.create_for(user.id, file, file.tempfile.size)
+    p user.custom_avatar_url
     user.update_attribute(:custom_avatar_url, upload.url)
+    p user.custom_avatar_url
     render_serialized(upload, UploadSerializer, root: false)
   end
 
