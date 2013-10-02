@@ -371,7 +371,11 @@ class User < ActiveRecord::Base
 
   def avatar_template
     if SiteSetting.custom_avatars?
-      avatar = custom_avatar_url 
+      if custom_avatar_url?
+        avatar = custom_avatar_url 
+      else
+        avatar = User.gravatar_template(email)
+      end  
       return avatar + '?s={size}' unless avatar.nil?
     end 
   end      
