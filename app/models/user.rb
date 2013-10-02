@@ -369,7 +369,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.avatar_template(email)
+  def avatar_template(email)
     if SiteSetting.custom_avatars?
       user = User.find_by_email(email)
       avatar = user.custom_avatar_url 
@@ -391,15 +391,15 @@ class User < ActiveRecord::Base
     template.gsub("{size}", "45")
   end
 
-  def avatar_template
-    if SiteSetting.allow_uploaded_avatars? && use_uploaded_avatar
-      # the avatars might take a while to generate
-      # so return the url of the original image in the meantime
-      uploaded_avatar_template.present? ? uploaded_avatar_template : uploaded_avatar.try(:url)
-    else
-      User.gravatar_template(email)
-    end
-  end
+  # def avatar_template
+  #   if SiteSetting.allow_uploaded_avatars? && use_uploaded_avatar
+  #     # the avatars might take a while to generate
+  #     # so return the url of the original image in the meantime
+  #     uploaded_avatar_template.present? ? uploaded_avatar_template : uploaded_avatar.try(:url)
+  #   else
+  #     User.gravatar_template(email)
+  #   end
+  # end
 
   # Updates the denormalized view counts for all users
   def self.update_view_counts
