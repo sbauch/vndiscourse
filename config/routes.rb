@@ -286,5 +286,6 @@ Discourse::Application.routes.draw do
   root to: "categories#index", constraints: HomePageConstraint.new("categories"), :as => "categories_index"
   
   post '/teams/new' => 'teams#create' 
+  post 'teams/update' => 'teams#update'
   
 end
