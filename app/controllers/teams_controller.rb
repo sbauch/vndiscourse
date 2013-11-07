@@ -10,7 +10,7 @@ class TeamsController < ApplicationController
   end  
   
   def update
-    team = Team.find(:name => params[:old_name])
+    team = Team.where(:name => params[:old_name])
     team.update_attribute(:name, params[:team][:name])
     if team.save
       format.json { render json: {}, status: :ok }
@@ -20,5 +20,9 @@ class TeamsController < ApplicationController
     
   end
   
-  
+  def destroy
+    team = Team.find(:name => params[:name])
+    team.destroy
+    format.json { render json: {}, status: :ok }
+  end
 end

@@ -287,5 +287,6 @@ Discourse::Application.routes.draw do
   
   post '/teams/new' => 'teams#create' 
   put 'teams/update' => 'teams#update'
+  post 'teams/destroy' => 'teams#destroy'
   
 end
