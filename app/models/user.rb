@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
 
   has_one :user_search_data
   
-  serialize :teams_hash, Hash
+  serialize :team_hash, Hash
 
   belongs_to :uploaded_avatar, class_name: 'Upload', dependent: :destroy
 

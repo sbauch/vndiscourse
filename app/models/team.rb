@@ -6,8 +6,10 @@ class Team < ActiveRecord::Base
   
   def remove_from_user_teams
     User.all.each do |u|
-      u.teams_hash = u.teams_hash.delete_if{|id,name| id == self.id}
-      u.teams = u.teams_hash.collect{|k,v| v }.to_sentence
+      teams = u.team_hash
+      team_hash = teams.delete_if{|id,name| id == 113}
+      u.team_hash = team_hash
+      u.teams = u.team_hash.collect{|k,v| v }.to_sentence
       u.save
     end    
   end  
