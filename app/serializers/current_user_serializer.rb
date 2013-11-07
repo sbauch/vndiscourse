@@ -40,7 +40,7 @@ class CurrentUserSerializer < BasicUserSerializer
   def team_hash
     @return_array = []
     # hash = YAML.load(object.team_hash)
-    hash.each do |k,v|
+    object.team_hash.each do |k,v|
       @return_array << {:id => k, :name => v}
     end
     @return_array
