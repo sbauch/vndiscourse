@@ -36,6 +36,10 @@ end
 
 gem 'seed-fu' , github: 'SamSaffron/seed-fu'
 
+group :production do
+  gem 'rails_12factor'
+end
+
 if rails4?
   gem 'rails'
   gem 'redis-rails', :git => 'git://github.com/SamSaffron/redis-store.git'
