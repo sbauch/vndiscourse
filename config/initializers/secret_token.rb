@@ -1,3 +1,14 @@
+# We have had lots of config issues with SECRET_TOKEN to avoid this mess we are moving it to redis
+#  if you feel strongly that it does not belong there use ENV['SECRET_TOKEN']
+#
+token = ENV['SECRET_TOKEN']
+unless token
+  token = $redis.get('SECRET_TOKEN')
+  unless token && token.length == 128
+    token = SecureRandom.hex(64)
+    $redis.set('SECRET_TOKEN',token)
+  end
+end
 
 # Definitely change this when you deploy to production. Ours is replaced by jenkins.
 # This token is used to secure sessions, we don't mind shipping with one to ease test and debug,

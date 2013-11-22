@@ -12,6 +12,7 @@ class PostRevisor
     return false if not should_revise?
 
     @post.acting_user = @user
+    @post.updated_by = @user
     revise_post
     update_category_description
     post_process_post
@@ -38,9 +39,9 @@ class PostRevisor
   end
 
   def should_create_new_version?
-    (@post.last_editor_id != @user.id) or
-      ((get_revised_at - @post.last_version_at) > SiteSetting.ninja_edit_window.to_i) or
-      @opts[:force_new_version] == true
+    @post.last_editor_id != @user.id ||
+    get_revised_at - @post.last_version_at > SiteSetting.ninja_edit_window.to_i ||
+    @opts[:force_new_version] == true
   end
 
   def revise_and_create_new_version
@@ -69,6 +70,7 @@ class PostRevisor
     @post.raw = @new_raw
     @post.updated_by = @user
     @post.last_editor_id = @user.id
+    @post.edit_reason = @opts[:edit_reason] if @opts[:edit_reason]
 
     if @post.hidden && @post.hidden_reason_id == Post.hidden_reasons[:flag_threshold_reached]
       @post.hidden = false

@@ -163,10 +163,10 @@ describe PostsController do
 
       let!(:poster) { log_in(:moderator) }
       let!(:post1) { Fabricate(:post, user: poster, post_number: 2) }
-      let!(:post2) { Fabricate(:post, topic_id: post1.topic_id, user: poster, post_number: 3) }
+      let!(:post2) { Fabricate(:post, topic_id: post1.topic_id, user: poster, post_number: 3, reply_to_post_number: post1.post_number) }
 
       it "raises invalid parameters no post_ids" do
-	lambda { xhr :delete, :destroy_many }.should raise_error(ActionController::ParameterMissing)
+        lambda { xhr :delete, :destroy_many }.should raise_error(ActionController::ParameterMissing)
       end
 
       it "raises invalid parameters with missing ids" do
@@ -180,13 +180,26 @@ describe PostsController do
       end
 
       it "deletes the post" do
-        Post.any_instance.expects(:destroy).twice
+        PostDestroyer.any_instance.expects(:destroy).twice
         xhr :delete, :destroy_many, post_ids: [post1.id, post2.id]
       end
 
       it "updates the highest read data for the forum" do
-        Topic.expects(:reset_highest)
+        Topic.expects(:reset_highest).twice
         xhr :delete, :destroy_many, post_ids: [post1.id, post2.id]
+      end
+
+      describe "can delete replies" do
+
+        before do
+          PostReply.create(post_id: post1.id, reply_id: post2.id)
+        end
+
+        it "deletes the post and the reply to it" do
+          PostDestroyer.any_instance.expects(:destroy).twice
+          xhr :delete, :destroy_many, post_ids: [post1.id], reply_post_ids: [post1.id]
+        end
+
       end
 
     end
@@ -204,9 +217,11 @@ describe PostsController do
 
       let(:post) { Fabricate(:post, user: log_in) }
       let(:update_params) do
-        {id: post.id,
-         post: {raw: 'edited body'},
-         image_sizes: {'http://image.com/image.jpg' => {'width' => 123, 'height' => 456}}}
+        {
+          id: post.id,
+          post: { raw: 'edited body', edit_reason: 'typo' },
+          image_sizes: { 'http://image.com/image.jpg' => {'width' => 123, 'height' => 456} },
+        }
       end
 
       it 'passes the image sizes through' do
@@ -214,11 +229,16 @@ describe PostsController do
         xhr :put, :update, update_params
       end
 
+      it 'passes the edit reason through' do
+        Post.any_instance.expects(:edit_reason=)
+        xhr :put, :update, update_params
+      end
+
       it "raises an error when the post parameter is missing" do
         update_params.delete(:post)
         lambda {
           xhr :put, :update, update_params
-	}.should raise_error(ActionController::ParameterMissing)
+        }.should raise_error(ActionController::ParameterMissing)
       end
 
       it "raises an error when the user doesn't have permission to see the post" do
@@ -228,7 +248,7 @@ describe PostsController do
       end
 
       it "calls revise with valid parameters" do
-        PostRevisor.any_instance.expects(:revise!).with(post.user, 'edited body')
+        PostRevisor.any_instance.expects(:revise!).with(post.user, 'edited body', edit_reason: 'typo')
         xhr :put, :update, update_params
       end
 
@@ -380,8 +400,8 @@ describe PostsController do
         end
 
         it "passes image_sizes through" do
-          PostCreator.expects(:new).with(user, has_entries('image_sizes' => 'test')).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', image_sizes: 'test'}
+          PostCreator.expects(:new).with(user, has_entries('image_sizes' => {'width' => '100', 'height' => '200'})).returns(post_creator)
+          xhr :post, :create, {raw: 'hello', image_sizes: {width: '100', height: '200'}}
         end
 
         it "passes meta_data through" do

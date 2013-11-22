@@ -43,30 +43,22 @@ describe Upload do
     it "does not create a thumbnail when disabled" do
       SiteSetting.stubs(:create_thumbnails?).returns(false)
       OptimizedImage.expects(:create_for).never
-      upload.create_thumbnail!
-    end
-
-    it "does not create another thumbnail" do
-      SiteSetting.expects(:create_thumbnails?).returns(true)
-      upload.expects(:has_thumbnail?).returns(true)
-      OptimizedImage.expects(:create_for).never
-      upload.create_thumbnail!
+      upload.create_thumbnail!(100, 100)
     end
 
     it "creates a thumbnail" do
       upload = Fabricate(:upload)
       thumbnail = Fabricate(:optimized_image, upload: upload)
       SiteSetting.expects(:create_thumbnails?).returns(true)
-      upload.expects(:has_thumbnail?).returns(false)
       OptimizedImage.expects(:create_for).returns(thumbnail)
-      upload.create_thumbnail!
+      upload.create_thumbnail!(100, 100)
       upload.reload
       upload.optimized_images.count.should == 1
     end
 
   end
 
-  context ".create_for" do
+  context "#create_for" do
 
     it "does not create another upload if it already exists" do
       Upload.expects(:where).with(sha1: image_sha1).returns([upload])

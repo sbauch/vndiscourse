@@ -41,10 +41,9 @@ describe PostAction do
     describe 'notify_moderators' do
       before do
         PostAction.stubs(:create)
-        PostAction.expects(:target_moderators).returns("moderators")
       end
 
-      it "sends an email to all moderators if selected" do
+      it "creates a pm if selected" do
         post = build(:post, id: 1000)
         PostCreator.any_instance.expects(:create).returns(post)
         PostAction.act(build(:user), build(:post), PostActionType.types[:notify_moderators], message: "this is my special message");
@@ -214,7 +213,7 @@ describe PostAction do
       u1 = Fabricate(:evil_trout)
       PostAction.act(u1, post, PostActionType.types[:spam])
       PostAction.remove_act(u1, post, PostActionType.types[:spam])
-      lambda { PostAction.act(u1, post, PostActionType.types[:off_topic]) }.should_not raise_error(PostAction::AlreadyActed)
+      lambda { PostAction.act(u1, post, PostActionType.types[:off_topic]) }.should_not raise_error()
     end
 
     it 'should update counts when you clear flags' do

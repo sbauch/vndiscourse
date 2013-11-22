@@ -1,5 +1,5 @@
 class Team < ActiveRecord::Base
-  attr_accessible :name
+  # attr_accessible :name
   
   before_destroy :remove_from_user_teams
   

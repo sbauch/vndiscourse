@@ -7,7 +7,9 @@
 Discourse.Route.buildRoutes(function() {
   this.resource('admin', { path: '/admin' }, function() {
     this.route('dashboard', { path: '/' });
-    this.route('site_settings', { path: '/site_settings' });
+    this.resource('adminSiteSettings', { path: '/site_settings' }, function() {
+      this.resource('adminSiteSettingsCategory', { path: 'category/:category_id'} );
+    });
 
 
     this.resource('adminSiteContents', { path: '/site_contents' }, function() {
@@ -33,6 +35,7 @@ Discourse.Route.buildRoutes(function() {
     this.resource('adminLogs', { path: '/logs' }, function() {
       this.route('staffActionLogs', { path: '/staff_action_logs' });
       this.route('screenedEmails', { path: '/screened_emails' });
+      this.route('screenedIpAddresses', { path: '/screened_ip_addresses' });
       this.route('screenedUrls', { path: '/screened_urls' });
     });
 
@@ -41,7 +44,7 @@ Discourse.Route.buildRoutes(function() {
     this.resource('adminUsers', { path: '/users' }, function() {
       this.resource('adminUser', { path: '/:username' });
       this.resource('adminUsersList', { path: '/list' }, function() {
-        _.each(['active', 'new', 'pending', 'admins', 'moderators', 'blocked', 'banned',
+        _.each(['active', 'new', 'pending', 'admins', 'moderators', 'blocked', 'suspended',
                 'newuser', 'basic', 'regular', 'leaders', 'elders'], function(x) {
           this.route(x, { path: '/' + x });
         }, this);

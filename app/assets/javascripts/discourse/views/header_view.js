@@ -20,6 +20,19 @@ Discourse.HeaderView = Discourse.View.extend({
         $ul = $target.closest('ul'),
         $html = $('html');
 
+    // we need to ensure we are rendered,
+    //  this optimises the speed of the initial render
+    var render = $target.data('render');
+    if(render){
+      if(!this.get(render)){
+        this.set(render, true);
+        Em.run.next(this, function(){
+          this.showDropdown($target);
+        });
+        return;
+      }
+    }
+
     var hideDropdown = function() {
       $dropdown.fadeOut('fast');
       $li.removeClass('active');
@@ -27,7 +40,7 @@ Discourse.HeaderView = Discourse.View.extend({
       return $html.off('click.d-dropdown');
     };
 
-    // if a dropdown is active and the user clics on it, close it
+    // if a dropdown is active and the user clicks on it, close it
     if($li.hasClass('active')) { return hideDropdown(); }
     // otherwhise, mark it as active
     $li.addClass('active');
@@ -48,19 +61,12 @@ Discourse.HeaderView = Discourse.View.extend({
     return false;
   },
 
+  showDropdownBySelector: function(selector) {
+    this.showDropdown($(selector));
+  },
+
   showNotifications: function() {
-
-    var headerView = this;
-    Discourse.ajax('/notifications').then(function(result) {
-      headerView.set('notifications', result.map(function(n) {
-        return Discourse.Notification.create(n);
-      }));
-
-      // We've seen all the notifications now
-      Discourse.User.current().set('unread_notifications', 0);
-      headerView.showDropdown($('#user-notifications'));
-    });
-    return false;
+    this.get("controller").send("showNotifications", this);
   },
 
   examineDockHeader: function() {
@@ -92,32 +98,6 @@ Discourse.HeaderView = Discourse.View.extend({
 
   },
 
-  /**
-    Display the correct logo in the header, showing a custom small icon if it exists.
-    In case the logo_url setting is empty, shows the site title as the logo.
-    @property logoHTML
-  **/
-  logoHTML: function() {
-    var result = "<div class='title'><a href='" + Discourse.getURL("/") + "'>";
-    if (this.get('controller.showExtraInfo')) {
-      var logoSmall = Discourse.SiteSettings.logo_small_url;
-      if (logoSmall && logoSmall.length > 1) {
-        result += "<img class='logo-small' src='" + logoSmall + "' width='33' height='33'>";
-      } else {
-        result += "<i class='icon-home'></i>";
-      }
-    } else {
-      var logo = Discourse.SiteSettings.logo_url;
-      if(logo && logo.length > 1) {
-        result += "<img class='logo-big' src=\"" + logo + "\" alt=\"" + Discourse.SiteSettings.title + "\" id='site-logo'>";
-      } else {
-        result += "<h2 class='text-logo' id='site-text-logo'>" + Discourse.SiteSettings.title + "</h2>";
-      }
-    }
-    result += "</a></div>";
-    return new Handlebars.SafeString(result);
-  }.property('controller.showExtraInfo'),
-
   willDestroyElement: function() {
     $(window).unbind('scroll.discourse-dock');
     $(document).unbind('touchmove.discourse-dock');
@@ -132,7 +112,8 @@ Discourse.HeaderView = Discourse.View.extend({
       return headerView.showDropdown($(e.currentTarget));
     });
     this.$('a.unread-private-messages, a.unread-notifications, a[data-notifications]').on('click.notifications', function(e) {
-      return headerView.showNotifications(e);
+      headerView.showNotifications(e);
+      return false;
     });
     $(window).bind('scroll.discourse-dock', function() {
       headerView.examineDockHeader();

@@ -26,7 +26,7 @@ module Email
       return Email::Receiver.results[:unprocessable] if @body.blank?
 
       # Then run the github EmailReplyParser on it in case we didn't catch it
-      @body = EmailReplyParser.read(@body).visible_text
+      @body = EmailReplyParser.read(@body).visible_text.force_encoding('UTF-8')
 
       discourse_email_parser
 
@@ -72,6 +72,13 @@ module Email
       end
 
       @body = @message.body.to_s.strip
+
+      # Certain trigger phrases that means we didn't parse correctly
+      @body = nil if @body =~ /Content\-Type\:/ ||
+                     @body =~ /multipart\/alternative/ ||
+                     @body =~ /text\/plain/
+
+      @body
     end
 
     def scrub_html(html)
@@ -93,6 +100,7 @@ module Email
       email_year = lines.each_with_index do |l, idx|
         break if l =~ /\A\s*\-{3,80}\s*\z/ ||
                  l =~ Regexp.new("\\A\\s*" + I18n.t('user_notifications.previous_discussion') + "\\s*\\Z") ||
+                 (l =~ /via #{SiteSetting.title}(.*)\:$/) ||
                  # This one might be controversial but so many reply lines have years, times and end with a colon.
                  # Let's try it and see how well it works.
                  (l =~ /\d{4}/ && l =~ /\d:\d\d/ && l =~ /\:$/)

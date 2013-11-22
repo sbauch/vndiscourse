@@ -40,6 +40,16 @@ stripped from my reply?")
     end
   end
 
+  describe "it ignores messages it can't parse due to containing weird terms" do
+    let(:attachment) { File.read("#{Rails.root}/spec/fixtures/emails/attachment.eml") }
+    let(:receiver) { Email::Receiver.new(attachment) }
+
+    it "processes correctly" do
+      expect(receiver.process).to eq(Email::Receiver.results[:unprocessable])
+      expect(receiver.body).to be_blank
+    end
+  end
+
   describe "it supports a dutch reply" do
     let(:dutch) { File.read("#{Rails.root}/spec/fixtures/emails/dutch.eml") }
     let(:receiver) { Email::Receiver.new(dutch) }
@@ -47,6 +57,27 @@ stripped from my reply?")
     it "processes correctly" do
       receiver.process
       expect(receiver.body).to eq("Dit is een antwoord in het Nederlands.")
+    end
+  end
+
+  describe "It supports a non english reply" do
+    let(:hebrew) { File.read("#{Rails.root}/spec/fixtures/emails/hebrew.eml") }
+    let(:receiver) { Email::Receiver.new(hebrew) }
+
+    it "processes correctly" do
+      I18n.expects(:t).with('user_notifications.previous_discussion').returns('כלטוב')
+      receiver.process
+      expect(receiver.body).to eq("שלום")
+    end
+  end
+
+  describe "via" do
+    let(:wrote) { File.read("#{Rails.root}/spec/fixtures/emails/via_line.eml") }
+    let(:receiver) { Email::Receiver.new(wrote) }
+
+    it "removes via lines if we know them" do
+      receiver.process
+      expect(receiver.body).to eq("Hello this email has content!")
     end
   end
 

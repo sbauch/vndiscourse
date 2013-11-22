@@ -82,7 +82,7 @@ class PostsController < ApplicationController
     end
 
     revisor = PostRevisor.new(post)
-    if revisor.revise!(current_user, params[:post][:raw])
+    if revisor.revise!(current_user, params[:post][:raw], edit_reason: params[:post][:edit_reason])
       TopicLink.extract_from(post)
     end
 
@@ -150,7 +150,7 @@ class PostsController < ApplicationController
 
     params.require(:post_ids)
 
-    posts = Post.where(id: params[:post_ids])
+    posts = Post.where(id: post_ids_including_replies)
     raise Discourse::InvalidParameters.new(:post_ids) if posts.blank?
 
     # Make sure we can delete the posts
@@ -158,8 +158,7 @@ class PostsController < ApplicationController
 
     Post.transaction do
       topic_id = posts.first.topic_id
-      posts.each {|p| p.destroy }
-      Topic.reset_highest(topic_id)
+      posts.each {|p| PostDestroyer.new(current_user, p).destroy }
     end
 
     render nothing: true
@@ -175,11 +174,6 @@ class PostsController < ApplicationController
   def replies
     post = find_post_from_params
     render_serialized(post.replies, PostSerializer)
-  end
-
-  # Returns the "you're creating a post education"
-  def education_text
-
   end
 
   def bookmark
@@ -234,7 +228,6 @@ class PostsController < ApplicationController
         :category,
         :target_usernames,
         :reply_to_post_number,
-        :image_sizes,
         :auto_close_days,
         :attendee_limit,
         :starts_at,
@@ -254,6 +247,7 @@ class PostsController < ApplicationController
 
       params.require(:raw)
       params.permit(*permitted).tap do |whitelisted|
+          whitelisted[:image_sizes] = params[:image_sizes]
           # TODO this does not feel right, we should name what meta_data is allowed
           whitelisted[:meta_data] = params[:meta_data]
       end

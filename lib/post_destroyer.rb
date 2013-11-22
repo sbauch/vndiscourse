@@ -98,6 +98,15 @@ class PostDestroyer
       Notification.delete_all topic_id: @post.topic_id, post_number: @post.post_number
 
       @post.topic.trash!(@user) if @post.topic and @post.post_number == 1
+
+      if @post.topic && @post.topic.category && @post.id == @post.topic.category.latest_post_id
+        @post.topic.category.update_latest
+      end
+
+      if @post.post_number == 1 && @post.topic && @post.topic.category && @post.topic_id == @post.topic.category.latest_topic_id
+        @post.topic.category.update_latest
+      end
+
     end
   end
 
@@ -114,6 +123,7 @@ class PostDestroyer
   def user_recovered
     Post.transaction do
       @post.update_column(:user_deleted, false)
+      @post.skip_unique_check = true
       @post.revise(@user, @post.versions.last.modifications["raw"][0], force_new_version: true)
       @post.update_flagged_posts_count
     end

@@ -206,8 +206,7 @@ pt:
     unmute: Reativar
     last_post: Último post
 
-    best_of:
-      title: "Melhor De"
+    summary:
       description: "Há <b>{{count}}</b> posts neste tópico. Isso é muito! Gostarias de poupar tempo alterando a vista para mostrar apenas os posts com mais interações e respostas?"
       button: 'Alterar para a vista "Melhor De"'
 
@@ -302,10 +301,8 @@ pt:
     upload_selector:
       from_my_computer: "Do meu dispositivo"
       from_the_web: "Da internet"
-      add_title: "Adicionar Imagem"
       remote_tip: "insere o endereço de uma imagem no formato http://example.com/image.jpg"
       local_tip: "clica para selecionar uma imagem no teu dispositivo."
-      upload_title: "Enviar"
       uploading: "A enviar imagem"
 
     search:
@@ -332,7 +329,6 @@ pt:
       footer: "Não há mais tópicos neste categoria. <a href=\"/categories\">Procurar todas as categorias</a> ou <a href=\"/\">ver tópicos populares</a>"
 
     topic:
-      create_in: 'Criar Tópico sobre {{categoryName}}'
       create: 'Criar Tópico'
       create_long: 'Criar um novo Tópico'
       private_message: 'Começar uma nova conversa privada'
@@ -434,7 +430,7 @@ pt:
 
       filters:
         user: "Estás a ver apenas os posts de um utilizador especifico."
-        best_of: "Estás a ver apenas os posts em 'Melhor De'."
+        summary: "Estás a ver apenas os posts em 'Melhor De'."
         cancel: "Mostrar todos os posts neste tópico outra vez."
 
       move_selected:
@@ -540,7 +536,7 @@ pt:
         more: "{{n}} em falta..."
         left: "{{n}} restantes"
 
-    topic_summary:
+    topic_map:
       title: "Sumário do Tópico"
       links_shown: "mostrar todos os {{totalLinks}} links..."
 
@@ -562,7 +558,7 @@ pt:
     views_long: "este tópico foi visto {{number}} vezes"
     activity: "Atividade"
     likes: "Gostos"
-    top_contributors: "Participantes"
+    users: "Participantes"
     category_title: "Categoria"
 
     categories_list: "Lista de Categorias"
@@ -685,13 +681,13 @@ pt:
           other: "aprovar utilizadores ({{count}})"
 
       user:
-        ban_failed: "Algo correu mal ao banir este utilizador {{error}}"
-        unban_failed: "Algo não correu bem ao desbanir este utilizador {{error}}"
-        ban_duration: "Por quanto tempo gostarias de banir a pessoa? (dias)"
+        suspend_failed: "Algo correu mal ao banir este utilizador {{error}}"
+        unsuspend_failed: "Algo não correu bem ao desbanir este utilizador {{error}}"
+        suspend_duration: "Por quanto tempo gostarias de banir a pessoa? (dias)"
         delete_all_posts: "Apagar todos os posts"
-        ban: "Banir"
-        unban: "Desbanir"
-        banned: "Banido?"
+        suspend: "Banir"
+        unsuspend: "Desbanir"
+        suspended: "Banido?"
         moderator: "Moderador?"
         admin: "Admin?"
         show_admin_profile: "Admin"

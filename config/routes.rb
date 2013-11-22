@@ -12,7 +12,6 @@ USERNAME_ROUTE_FORMAT = /[A-Za-z0-9\_]+/ unless defined? USERNAME_ROUTE_FORMAT
 Discourse::Application.routes.draw do
 
   get "tags/search"
-  match "/404", to: "exceptions#not_found"
   match "/404", to: "exceptions#not_found", via: [:get, :post]
 
   mount Sidekiq::Web => '/sidekiq', constraints: AdminConstraint.new
@@ -23,7 +22,11 @@ Discourse::Application.routes.draw do
   namespace :admin, constraints: StaffConstraint.new do
     get '' => 'admin#index'
 
-    resources :site_settings, constraints: AdminConstraint.new
+    resources :site_settings, constraints: AdminConstraint.new do
+      collection do
+        get 'category/:id' => 'site_settings#index'
+      end
+    end
 
     get 'reports/:type' => 'reports#show'
 
@@ -40,11 +43,13 @@ Discourse::Application.routes.draw do
         put 'approve-bulk' => 'users#approve_bulk'
         delete 'reject-bulk' => 'users#reject_bulk'
       end
-      put 'ban'
+      put 'suspend'
       put 'delete_all_posts'
-      put 'unban'
+      put 'unsuspend'
       put 'revoke_admin', constraints: AdminConstraint.new
       put 'grant_admin', constraints: AdminConstraint.new
+      post 'generate_api_key', constraints: AdminConstraint.new
+      delete 'revoke_api_key', constraints: AdminConstraint.new
       put 'revoke_moderation', constraints: AdminConstraint.new
       put 'grant_moderation', constraints: AdminConstraint.new
       put 'approve'
@@ -67,9 +72,10 @@ Discourse::Application.routes.draw do
     end
 
     scope '/logs' do
-      resources :staff_action_logs, only: [:index]
-      resources :screened_emails,   only: [:index]
-      resources :screened_urls,     only: [:index]
+      resources :staff_action_logs,     only: [:index]
+      resources :screened_emails,       only: [:index]
+      resources :screened_ip_addresses, only: [:index, :create, :update, :destroy]
+      resources :screened_urls,         only: [:index]
     end
 
     get 'customize' => 'site_customizations#index', constraints: AdminConstraint.new
@@ -90,10 +96,12 @@ Discourse::Application.routes.draw do
     end
     resources :api, only: [:index], constraints: AdminConstraint.new do
       collection do
-        post 'generate_key'
+        post 'key' => 'api#create_master_key'
+        put 'key' => 'api#regenerate_key'
+        delete 'key' => 'api#revoke_key'
       end
     end
-  end
+  end # admin namespace
 
   get 'email_preferences' => 'email#preferences_redirect', :as => 'email_preferences_redirect'
   get 'email/unsubscribe/:key' => 'email#unsubscribe', as: 'email_unsubscribe'
@@ -107,6 +115,7 @@ Discourse::Application.routes.draw do
   end
 
   get 'session/csrf' => 'session#csrf'
+  get 'composer-messages' => 'composer_messages#index'
 
   resources :users, except: [:show, :update] do
     collection do
@@ -143,18 +152,17 @@ Discourse::Application.routes.draw do
   get 'users/:username/preferences/about-me' => 'users#preferences', constraints: {username: USERNAME_ROUTE_FORMAT}
   get 'users/:username/preferences/username' => 'users#preferences', constraints: {username: USERNAME_ROUTE_FORMAT}
   put 'users/:username/preferences/username' => 'users#username', constraints: {username: USERNAME_ROUTE_FORMAT}
-  # LEGACY ROUTE
-  get 'users/:username/avatar(/:size)' => 'users#avatar', constraints: {username: USERNAME_ROUTE_FORMAT}
-  get 'users/:username/preferences/avatar' => 'users#preferences', constraints: {username: USERNAME_ROUTE_FORMAT}
-  put 'users/:username/preferences/avatar/toggle' => 'users#toggle_avatar', constraints: {username: USERNAME_ROUTE_FORMAT}
+  get 'users/:username/avatar(/:size)' => 'users#avatar', constraints: {username: USERNAME_ROUTE_FORMAT} # LEGACY ROUTE
   post 'users/:username/preferences/avatar' => 'users#upload_avatar', constraints: {username: USERNAME_ROUTE_FORMAT}
+  put 'users/:username/preferences/avatar/toggle' => 'users#toggle_avatar', constraints: {username: USERNAME_ROUTE_FORMAT}
   get 'users/:username/invited' => 'users#invited', constraints: {username: USERNAME_ROUTE_FORMAT}
   get 'users/:username/send_activation_email' => 'users#send_activation_email', constraints: {username: USERNAME_ROUTE_FORMAT}
   post 'users/:username/custom_avatar' => 'users#custom_avatar_upload', constraints: {username: USERNAME_ROUTE_FORMAT}
   get 'users/:username/activity' => 'users#show', constraints: {username: USERNAME_ROUTE_FORMAT}
   get 'users/:username/activity/:filter' => 'users#show', constraints: {username: USERNAME_ROUTE_FORMAT}
 
-  resources :uploads
+  get 'uploads/:site/:id/:sha.:extension' => 'uploads#show', constraints: {site: /\w+/, id: /\d+/, sha: /[a-z0-9]{15,16}/i, extension: /\w{2,}/}
+  post 'uploads' => 'uploads#create'
 
   get 'posts/by_number/:topic_id/:post_number' => 'posts#by_number'
   get 'posts/:id/reply-history' => 'posts#reply_history'
@@ -193,10 +201,10 @@ Discourse::Application.routes.draw do
     end
   end
   resources :user_actions
-  resources :education
 
   resources :categories, :except => :show
   get 'category/:id/show' => 'categories#show'
+  post 'category/:category_id/move' => 'categories#move', as: 'category_move'
 
   get 'category/:category.rss' => 'list#category_feed', format: :rss, as: 'category_feed'
   get 'category/:category' => 'list#category', as: 'category_list'
@@ -207,13 +215,20 @@ Discourse::Application.routes.draw do
   get 'popular/more' => 'list#popular_redirect'
 
   [:latest, :hot].each do |filter|
-    get "#{filter}.rss" => "list##{filter}_feed", format: :rss, as: "#{filter}_feed", filter: filter
+    get "#{filter}.rss" => "list##{filter}_feed", format: :rss
   end
 
   [:latest, :hot, :favorited, :read, :posted, :unread, :new].each do |filter|
     get "#{filter}" => "list##{filter}"
     get "#{filter}/more" => "list##{filter}"
+
+    get "category/:category/l/#{filter}" => "list##{filter}"
+    get "category/:category/l/#{filter}/more" => "list##{filter}"
+    get "category/:parent_category/:category/l/#{filter}" => "list##{filter}"
+    get "category/:parent_category/:category/l/#{filter}/more" => "list##{filter}"
   end
+
+  get 'category/:parent_category/:category' => 'list#category', as: 'category_list_parent'
 
   get 'search' => 'search#query'
 
@@ -225,13 +240,16 @@ Discourse::Application.routes.draw do
   post 'topics/timings'
   get 'topics/similar_to'
   get 'topics/created-by/:username' => 'list#topics_by', as: 'topics_by', constraints: {username: USERNAME_ROUTE_FORMAT}
+  get 'topics/private-messages/:username' => 'list#private_messages', as: 'topics_private_messages', constraints: {username: USERNAME_ROUTE_FORMAT}
+  get 'topics/private-messages-sent/:username' => 'list#private_messages_sent', as: 'topics_private_messages_sent', constraints: {username: USERNAME_ROUTE_FORMAT}
+  get 'topics/private-messages-unread/:username' => 'list#private_messages_unread', as: 'topics_private_messages_unread', constraints: {username: USERNAME_ROUTE_FORMAT}
 
   # Topic routes
   get 't/:slug/:topic_id/wordpress' => 'topics#wordpress', constraints: {topic_id: /\d+/}
   get 't/:slug/:topic_id/moderator-liked' => 'topics#moderator_liked', constraints: {topic_id: /\d+/}
   get 't/:topic_id/wordpress' => 'topics#wordpress', constraints: {topic_id: /\d+/}
-  get 't/:slug/:topic_id/best_of' => 'topics#show', defaults: {best_of: true}, constraints: {topic_id: /\d+/, post_number: /\d+/}
-  get 't/:topic_id/best_of' => 'topics#show', constraints: {topic_id: /\d+/, post_number: /\d+/}
+  get 't/:slug/:topic_id/summary' => 'topics#show', defaults: {summary: true}, constraints: {topic_id: /\d+/, post_number: /\d+/}
+  get 't/:topic_id/summary' => 'topics#show', constraints: {topic_id: /\d+/, post_number: /\d+/}
   put 't/:slug/:topic_id' => 'topics#update', constraints: {topic_id: /\d+/}
   put 't/:slug/:topic_id/star' => 'topics#star', constraints: {topic_id: /\d+/}
   put 't/:topic_id/star' => 'topics#star', constraints: {topic_id: /\d+/}

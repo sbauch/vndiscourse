@@ -25,10 +25,11 @@ Discourse = Ember.Application.createWithMixins(Discourse.Ajax, {
     if (u[u.length-1] === '/') {
       u = u.substring(0, u.length-1);
     }
+    if (url.indexOf(u) !== -1) return url;
     return u + url;
   },
 
-  resolver: Discourse.Resolver,
+  Resolver: Discourse.Resolver,
 
   titleChanged: function() {
     var title = "";
@@ -105,19 +106,20 @@ Discourse = Ember.Application.createWithMixins(Discourse.Ajax, {
     $('#main').on('click.discourse', 'a', function(e) {
       if (e.isDefaultPrevented() || e.shiftKey || e.metaKey || e.ctrlKey) { return; }
 
-      var $currentTarget = $(e.currentTarget);
-      var href = $currentTarget.attr('href');
-      if (!href) { return; }
-      if (href === '#') { return; }
-      if ($currentTarget.attr('target')) { return; }
-      if ($currentTarget.data('auto-route')) { return; }
+      var $currentTarget = $(e.currentTarget),
+          href = $currentTarget.attr('href');
 
-      // If it's an ember #linkTo skip it
-      if ($currentTarget.hasClass('ember-view')) { return; }
-
-      if ($currentTarget.hasClass('lightbox')) { return; }
-      if (href.indexOf("mailto:") === 0) { return; }
-      if (href.match(/^http[s]?:\/\//i) && !href.match(new RegExp("^http:\\/\\/" + window.location.hostname, "i"))) { return; }
+      if (!href ||
+          href === '#' ||
+          $currentTarget.attr('target') ||
+          $currentTarget.data('ember-action') ||
+          $currentTarget.data('auto-route') ||
+          $currentTarget.hasClass('ember-view') ||
+          $currentTarget.hasClass('lightbox') ||
+          href.indexOf("mailto:") === 0 ||
+          (href.match(/^http[s]?:\/\//i) && !href.match(new RegExp("^http:\\/\\/" + window.location.hostname, "i")))) {
+         return;
+      }
 
       e.preventDefault();
       Discourse.URL.routeTo(href);
@@ -132,18 +134,18 @@ Discourse = Ember.Application.createWithMixins(Discourse.Ajax, {
     });
 
     // Add a CSRF token to all AJAX requests
-    var csrfToken = $('meta[name=csrf-token]').attr('content');
+    Discourse.csrfToken = $('meta[name=csrf-token]').attr('content');
 
     $.ajaxPrefilter(function(options, originalOptions, xhr) {
       if (!options.crossDomain) {
-        // This may be delay set
-        csrfToken = csrfToken || $('meta[name=csrf-token]').attr('content');
-        xhr.setRequestHeader('X-CSRF-Token', csrfToken);
+        xhr.setRequestHeader('X-CSRF-Token', Discourse.csrfToken);
       }
     });
 
     bootbox.animate(false);
     bootbox.backdrop(true); // clicking outside a bootbox modal closes it
+
+    Discourse.Mobile.init();
 
     setInterval(function(){
       Discourse.Formatter.updateRelativeAge($('.relative-date'));
@@ -188,6 +190,8 @@ Discourse = Ember.Application.createWithMixins(Discourse.Ajax, {
       var bus = Discourse.MessageBus;
       bus.callbackInterval = Discourse.SiteSettings.polling_interval;
       bus.enableLongPolling = true;
+      bus.baseUrl = Discourse.getURL("/");
+
       if (user.admin || user.moderator) {
         bus.subscribe("/flagged_counts", function(data) {
           user.set('site_flagged_posts_count', data.total);
@@ -217,13 +221,23 @@ Discourse = Ember.Application.createWithMixins(Discourse.Ajax, {
   },
 
   /**
+    Add an initializer hook for after the Discourse Application starts up.
+
+    @method addInitializer
+    @param {Function} init the initializer to add.
+  **/
+  addInitializer: function(init) {
+    Discourse.initializers = Discourse.initializers || [];
+    Discourse.initializers.push(init);
+  },
+
+  /**
     Start up the Discourse application.
 
     @method start
   **/
   start: function() {
     Discourse.bindDOMEvents();
-    Discourse.SiteSettings = PreloadStore.get('siteSettings');
     Discourse.MessageBus.alwaysLongPoll = Discourse.Environment === "development";
     Discourse.MessageBus.start();
     Discourse.KeyValueStore.init("discourse_", Discourse.MessageBus);
@@ -231,9 +245,17 @@ Discourse = Ember.Application.createWithMixins(Discourse.Ajax, {
     // Developer specific functions
     Discourse.Development.observeLiveChanges();
     Discourse.subscribeUserToNotifications();
+
+    if (Discourse.initializers) {
+      var self = this;
+      Em.run.next(function() {
+        Discourse.initializers.forEach(function (init) {
+          init.call(self);
+        });
+      });
+    }
   }
 
 });
 
 Discourse.Router = Discourse.Router.reopen({ location: 'discourse_location' });
-

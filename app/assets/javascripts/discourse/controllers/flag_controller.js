@@ -13,10 +13,6 @@ Discourse.FlagController = Discourse.ObjectController.extend(Discourse.ModalFunc
     this.set('selected', null);
   },
 
-  changePostActionType: function(action) {
-    this.set('selected', action);
-  },
-
   submitEnabled: function() {
     var selected = this.get('selected');
     if (!selected) return false;
@@ -46,23 +42,31 @@ Discourse.FlagController = Discourse.ObjectController.extend(Discourse.ModalFunc
     }
   }.property('selected.is_custom_flag'),
 
-  takeAction: function() {
-    this.createFlag({takeAction: true});
-    this.set('hidden', true);
-  },
+  actions: {
+    takeAction: function() {
+      this.send('createFlag', {takeAction: true});
+      this.set('hidden', true);
+    },
 
-  createFlag: function(opts) {
-    var flagController = this;
-    var postAction = this.get('actionByName.' + this.get('selected.name_key'));
-    var params = this.get('selected.is_custom_flag') ? {message: this.get('message')} : {};
+    createFlag: function(opts) {
+      var self = this;
+      var postAction = this.get('actionByName.' + this.get('selected.name_key'));
+      var params = this.get('selected.is_custom_flag') ? {message: this.get('message')} : {};
 
-    if (opts) params = $.extend(params, opts);
+      if (opts) params = $.extend(params, opts);
 
-    postAction.act(params).then(function() {
-      flagController.send('closeModal');
-    }, function(errors) {
-      flagController.displayErrors(errors);
-    });
+      this.send('hideModal');
+      postAction.act(params).then(function() {
+        self.send('closeModal');
+      }, function(errors) {
+        self.send('showModal');
+        self.displayErrors(errors);
+      });
+    },
+
+    changePostActionType: function(action) {
+      this.set('selected', action);
+    }
   },
 
   canDeleteSpammer: function() {

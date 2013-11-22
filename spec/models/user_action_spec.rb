@@ -123,12 +123,12 @@ describe UserAction do
       it 'should result in correct data assignment' do
         @liker_action.should_not be_nil
         @likee_action.should_not be_nil
-        likee.reload.likes_received.should == 1
-        liker.reload.likes_given.should == 1
+        likee.user_stat.reload.likes_received.should == 1
+        liker.user_stat.reload.likes_given.should == 1
 
         PostAction.remove_act(liker, post, PostActionType.types[:like])
-        likee.reload.likes_received.should == 0
-        liker.reload.likes_given.should == 0
+        likee.user_stat.reload.likes_received.should == 0
+        liker.user_stat.reload.likes_given.should == 0
       end
 
     end
@@ -210,7 +210,6 @@ describe UserAction do
     end
   end
 
-
   describe 'private messages' do
 
     let(:user) do
@@ -243,22 +242,6 @@ describe UserAction do
                         )
     end
 
-    it 'should collapse the inbox correctly' do
-
-      stream = UserAction.private_message_stream(UserAction::GOT_PRIVATE_MESSAGE, user_id: target_user.id, guardian: Guardian.new(target_user))
-      # inbox should collapse this initial and reply message into one item
-      stream.count.should == 1
-
-
-      # outbox should also collapse
-      stream = UserAction.private_message_stream(UserAction::NEW_PRIVATE_MESSAGE, user_id: user.id, guardian: Guardian.new(user))
-      stream.count.should == 1
-
-      # anon should see nothing
-      stream = UserAction.private_message_stream(UserAction::NEW_PRIVATE_MESSAGE, user_id: user.id, guardian: Guardian.new(nil))
-      stream.count.should == 0
-
-    end
   end
 
   describe 'synchronize_favorites' do

@@ -3,7 +3,24 @@ require_dependency 'version'
 
 module DiscourseHub
 
-  class NicknameUnavailable < RuntimeError; end
+  class NicknameUnavailable < RuntimeError
+    def initialize(nickname)
+      @nickname = nickname
+    end
+
+    def response_message
+      {
+        success: false,
+        message: I18n.t(
+          "login.errors",
+          errors:I18n.t(
+            "login.not_available", suggestion: UserNameSuggester.suggest(@nickname)
+          )
+        )
+      }
+    end
+
+  end
 
   def self.nickname_available?(nickname)
     json = get('/users/nickname_available', {nickname: nickname})
@@ -15,12 +32,17 @@ module DiscourseHub
     [json['match'], json['available'] || false, json['suggestion']]
   end
 
+  def self.nickname_for_email(email)
+    json = get('/users/nickname_match', {email: email})
+    json['suggestion']
+  end
+
   def self.register_nickname(nickname, email)
     json = post('/users', {nickname: nickname, email: email})
     if json.has_key?('success')
       true
     else
-      raise NicknameUnavailable  # TODO: report ALL the errors
+      raise NicknameUnavailable.new(nickname)  # TODO: report ALL the errors
     end
   end
 
@@ -34,7 +56,7 @@ module DiscourseHub
     if json.has_key?('success')
       true
     else
-      raise NicknameUnavailable  # TODO: report ALL the errors
+      raise NicknameUnavailable.new(new_nickname)  # TODO: report ALL the errors
     end
   end
 
@@ -43,6 +65,7 @@ module DiscourseHub
     get('/version_check', {
       installed_version: Discourse::VERSION::STRING,
       forum_title: SiteSetting.title,
+      forum_description: SiteSetting.site_description,
       forum_url: Discourse.base_url,
       contact_email: SiteSetting.contact_email,
       topic_count: Topic.listable_topics.count,
@@ -82,7 +105,7 @@ module DiscourseHub
     if Rails.env == 'production'
       'http://api.discourse.org/api'
     else
-      'http://local.hub:3000/api'
+      ENV['HUB_BASE_URL'] || 'http://local.hub:3000/api'
     end
   end
 
@@ -92,5 +115,17 @@ module DiscourseHub
 
   def self.accepts
     [:json, 'application/vnd.discoursehub.v1']
+  end
+
+  def self.nickname_operation
+    if SiteSetting.call_discourse_hub?
+      begin
+        yield
+      rescue DiscourseHub::NicknameUnavailable
+        false
+      rescue => e
+        Rails.logger.error e.message + "\n" + e.backtrace.join("\n")
+      end
+    end
   end
 end

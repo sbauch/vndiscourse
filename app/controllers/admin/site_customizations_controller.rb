@@ -1,5 +1,7 @@
 class Admin::SiteCustomizationsController < Admin::AdminController
 
+  before_filter :enable_customization
+
   def index
     @site_customizations = SiteCustomization.all
 
@@ -49,11 +51,15 @@ class Admin::SiteCustomizationsController < Admin::AdminController
   private
 
     def site_customization_params
-      params.require(:site_customization).permit(:name, :stylesheet, :header, :position, :enabled, :key, :override_default_style, :stylesheet_baked)
+      params.require(:site_customization).permit(:name, :stylesheet, :header, :mobile_stylesheet, :mobile_header, :position, :enabled, :key, :override_default_style, :stylesheet_baked)
     end
 
     def log_site_customization_change(old_record, new_params)
       StaffActionLogger.new(current_user).log_site_customization_change(old_record, new_params)
+    end
+
+    def enable_customization
+      session[:disable_customization] = false
     end
 
 end

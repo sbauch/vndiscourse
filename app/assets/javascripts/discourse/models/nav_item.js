@@ -1,7 +1,7 @@
 /**
   A data model representing a navigation item on the list views
 
-  @class InviteList
+  @class NavItem
   @extends Discourse.Model
   @namespace Discourse
   @module Discourse
@@ -33,18 +33,35 @@ Discourse.NavItem = Discourse.Model.extend({
 
   // href from this item
   href: function() {
+    return Discourse.getURL("/") + this.get('filterMode');
+  }.property('filterMode'),
+
+  // href from this item
+  filterMode: function() {
     var name = this.get('name');
+		// sb custom to force always go to directory
+		if (name == 'directory'){
+			return 'directory'
+		}
+
     if( name.split('/')[0] === 'category' ) {
-      return Discourse.getURL("/") + 'category/' + this.get('categorySlug');
+      return 'category/' + this.get('categorySlug');
     } else {
-      return Discourse.getURL("/") + name.replace(' ', '-');
+      var mode = "",
+      category = this.get("category");
+
+      if(category){
+        mode += "category/";
+        mode += Discourse.Category.slugFor(this.get('category')) + "/l/";
+      }
+      return mode + name.replace(' ', '-');
     }
   }.property('name'),
 
   count: function() {
     var state = this.get('topicTrackingState');
     if (state) {
-      return state.lookupCount(this.get('name'));
+      return state.lookupCount(this.get('name'), this.get('category'));
     }
   }.property('topicTrackingState.messageCount'),
 
@@ -73,7 +90,8 @@ Discourse.NavItem.reopenClass({
     opts = {
       name: name,
       hasIcon: name === "unread" || name === "favorited",
-      filters: split.splice(1)
+      filters: split.splice(1),
+      category: opts.category
     };
 
     return Discourse.NavItem.create(opts);

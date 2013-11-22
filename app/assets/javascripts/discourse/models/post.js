@@ -30,6 +30,12 @@ Discourse.Post = Discourse.Model.extend({
   deletedViaTopic: Em.computed.and('firstPost', 'topic.deleted_at'),
   deleted: Em.computed.or('deleted_at', 'deletedViaTopic'),
   notDeleted: Em.computed.not('deleted'),
+  userDeleted: Em.computed.empty('user_id'),
+
+  showName: function() {
+    var name = this.get('name');
+    return name && (name !== this.get('username'))  && Discourse.SiteSettings.display_name_on_posts;
+  }.property('name', 'username'),
 
   postDeletedBy: function() {
     if (this.get('firstPost')) { return this.get('topic.deleted_by'); }
@@ -149,7 +155,7 @@ Discourse.Post = Discourse.Model.extend({
       return Discourse.ajax("/posts/" + (this.get('id')), {
         type: 'PUT',
         data: {
-          post: { raw: this.get('raw') },
+          post: { raw: this.get('raw'), edit_reason: this.get('editReason') },
           image_sizes: this.get('imageSizes')
         }
       }).then(function(result) {
@@ -224,17 +230,18 @@ Discourse.Post = Discourse.Model.extend({
   },
 
   /**
-    Deletes a post
+    Changes the state of the post to be deleted. Does not call the server, that should be
+    done elsewhere.
 
-    @method destroy
-    @param {Discourse.User} deleted_by The user deleting the post
+    @method setDeletedState
+    @param {Discourse.User} deletedBy The user deleting the post
   **/
-  destroy: function(deleted_by) {
+  setDeletedState: function(deletedBy) {
     // Moderators can delete posts. Regular users can only trigger a deleted at message.
-    if (deleted_by.get('staff')) {
+    if (deletedBy.get('staff')) {
       this.setProperties({
         deleted_at: new Date(),
-        deleted_by: deleted_by,
+        deleted_by: deletedBy,
         can_delete: false
       });
     } else {
@@ -247,7 +254,16 @@ Discourse.Post = Discourse.Model.extend({
         user_deleted: true
       });
     }
+  },
 
+  /**
+    Deletes a post
+
+    @method destroy
+    @param {Discourse.User} deletedBy The user deleting the post
+  **/
+  destroy: function(deletedBy) {
+    this.setDeletedState(deletedBy);
     return Discourse.ajax("/posts/" + (this.get('id')), { type: 'DELETE' });
   },
 
@@ -327,8 +343,7 @@ Discourse.Post = Discourse.Model.extend({
 
   // Whether to show replies directly below
   showRepliesBelow: function() {
-    var reply_count, topic;
-    reply_count = this.get('reply_count');
+    var reply_count = this.get('reply_count');
 
     // We don't show replies if there aren't any
     if (reply_count === 0) return false;
@@ -340,13 +355,15 @@ Discourse.Post = Discourse.Model.extend({
     if (reply_count > 1) return true;
 
     // If we have *exactly* one reply, we have to consider if it's directly below us
-    topic = this.get('topic');
+    var topic = this.get('topic');
     return !topic.isReplyDirectlyBelow(this);
 
   }.property('reply_count'),
 
   canViewEditHistory: function() {
-    return (Discourse.SiteSettings.edit_history_visible_to_public || (Discourse.User.current() && Discourse.User.current().get('staff')));
+    return (Discourse.SiteSettings.edit_history_visible_to_public ||
+            (Discourse.User.current() &&
+              (Discourse.User.current().get('staff') || Discourse.User.current().get('id') === this.get('user_id'))));
   }.property()
 
 });
@@ -368,7 +385,7 @@ Discourse.Post.reopenClass({
   },
 
   create: function(obj) {
-    var result = this._super(obj);
+    var result = this._super.apply(this, arguments);
     this.createActionSummary(result);
     if (obj && obj.reply_to_user) {
       result.set('reply_to_user', Discourse.User.create(obj.reply_to_user));
@@ -379,11 +396,12 @@ Discourse.Post.reopenClass({
     return result;
   },
 
-  deleteMany: function(posts) {
+  deleteMany: function(selectedPosts, selectedReplies) {
     return Discourse.ajax("/posts/destroy_many", {
       type: 'DELETE',
       data: {
-        post_ids: posts.map(function(p) { return p.get('id'); })
+        post_ids: selectedPosts.map(function(p) { return p.get('id'); }),
+        reply_post_ids: selectedReplies.map(function(p) { return p.get('id'); })
       }
     });
   },

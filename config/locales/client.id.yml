@@ -162,7 +162,7 @@ id:
         user: "Invited User"
         none: "{{username}} hasn't invited any users to the site."
         redeemed: "Redeemed Invites"
-        redeemed_at: "Redeemed At"
+        redeemed_at: "Redeemed"
         pending: "Pending Invites"
         topics_entered: "Topics Entered"
         posts_read_count: "Posts Read"
@@ -206,10 +206,9 @@ id:
     unmute: Unmute
     last_post: Last post
 
-    best_of:
-      title: "Best Of"
-      description: "There are <b>{{count}}</b> posts in this topic. That's a lot! Would you like to save time by showing only the best posts?"
-      button: 'Switch to "Best Of" view'
+    summary:
+      description: "There are <b>{{count}}</b> posts in this topic. That's a lot! Would you like to save time by showing only the most relevant posts?"
+      button: 'Switch to "Summary" view'
 
     private_message_info:
       title: "Private Message"
@@ -217,7 +216,7 @@ id:
 
     email: 'Email'
     username: 'Username'
-    last_seen: 'Last Seen'
+    last_seen: 'Seen'
     created: 'Created'
     trust_level: 'Trust Level'
 
@@ -312,10 +311,8 @@ id:
       title: "Insert Image"
       from_my_computer: "From My Device"
       from_the_web: "From The Web"
-      add_title: "Add Image"
       remote_tip: "enter address of an image in the form http://example.com/image.jpg"
       local_tip: "click to select an image from your device."
-      upload_title: "Upload"
       uploading: "Uploading image"
 
     search:
@@ -351,7 +348,6 @@ id:
         category: "There are no more {{category}} topics."
 
     topic:
-      create_in: 'Create {{categoryName}} Topic'
       create: 'Create Topic'
       create_long: 'Create a new Topic'
       private_message: 'Start a private message'
@@ -457,7 +453,7 @@ id:
         title: 'Invite Friends to Reply'
         action: 'Email Invite'
         help: 'send invitations to friends so they can reply to this topic with a single click'
-        email: "We'll send your friend a brief email allowing them to reply to this topic by clicking a link."
+        email: "We'll send your friend a brief email allowing them to immediately reply to this topic by clicking a link, no login required."
         email_placeholder: 'email address'
         success: "Thanks! We mailed out an invitation to <b>{{email}}</b>. We'll let you know when they redeem your invitation. Check the invitations tab on your user page to keep track of who you've invited."
         error: "Sorry we couldn't invite that person. Perhaps they are already a user?"
@@ -466,12 +462,12 @@ id:
 
       filters:
         user: "You're viewing only posts by specific user(s)."
-        best_of: "You're viewing only the 'Best Of' posts."
+        summary: "You're viewing only the 'Summary' posts."
         cancel: "Show all posts in this topic again."
 
       move_selected:
         title: "Move Selected Posts"
-        topic_name: "New Topic Name:"
+        topic_name: "New Topic Name"
         error: "Sorry, there was an error moving those posts."
         instructions:
           one: "You are about to create a new topic and populate it with the post you've selected."
@@ -575,7 +571,7 @@ id:
         more: "{{n}} to go..."
         left: "{{n}} remaining"
 
-    topic_summary:
+    topic_map:
       title: "Topic Summary"
       links_shown: "show all {{totalLinks}} links..."
 
@@ -597,7 +593,7 @@ id:
     views_long: "this topic has been viewed {{number}} times"
     activity: "Activity"
     likes: "Likes"
-    top_contributors: "Participants"
+    users: "Users"
     category_title: "Category"
     history: "History"
 
@@ -729,13 +725,13 @@ id:
           other: "approve users ({{count}})"
 
       user:
-        ban_failed: "Something went wrong banning this user {{error}}"
-        unban_failed: "Something went wrong unbanning this user {{error}}"
-        ban_duration: "How long would you like to ban the user for? (days)"
+        suspend_failed: "Something went wrong banning this user {{error}}"
+        unsuspend_failed: "Something went wrong unbanning this user {{error}}"
+        suspend_duration: "How long would you like to ban the user for? (days)"
         delete_all_posts: "Delete all posts"
-        ban: "Ban"
-        unban: "Unban"
-        banned: "Banned?"
+        suspend: "Ban"
+        unsuspend: "Unban"
+        suspended: "Banned?"
         moderator: "Moderator?"
         admin: "Admin?"
         show_admin_profile: "Admin"

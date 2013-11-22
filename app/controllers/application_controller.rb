@@ -1,13 +1,12 @@
 require 'current_user'
-require 'canonical_url'
+require_dependency 'canonical_url'
 require_dependency 'discourse'
 require_dependency 'custom_renderer'
-require 'archetype'
+require_dependency 'archetype'
 require_dependency 'rate_limiter'
 
 class ApplicationController < ActionController::Base
   include CurrentUser
-
   include CanonicalURL::ControllerExtensions
 
   serialization_scope :guardian
@@ -22,11 +21,13 @@ class ApplicationController < ActionController::Base
     unless is_api?
       super
       clear_current_user
-      raise Discourse::CSRF
+      render text: "['BAD CSRF']", status: 403
     end
   end
 
+  before_filter :set_mobile_view
   before_filter :inject_preview_style
+  before_filter :disable_customization
   before_filter :block_if_maintenance_mode
   before_filter :authorize_mini_profiler
   before_filter :store_incoming_links
@@ -38,8 +39,10 @@ class ApplicationController < ActionController::Base
   before_filter :redirect_to_login_if_required
 
   rescue_from Exception do |exception|
-    unless [ ActiveRecord::RecordNotFound, ActionController::RoutingError,
-             ActionController::UnknownController, AbstractController::ActionNotFound].include? exception.class
+    unless [ActiveRecord::RecordNotFound,
+            ActionController::RoutingError,
+            ActionController::UnknownController,
+            AbstractController::ActionNotFound].include? exception.class
       begin
         ErrorLog.report_async!(exception, self, request, current_user)
       rescue
@@ -119,10 +122,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def set_mobile_view
+    session[:mobile_view] = params[:mobile_view] if params.has_key?(:mobile_view)
+  end
 
   def inject_preview_style
     style = request['preview-style']
     session[:preview_style] = style if style
+  end
+
+  def disable_customization
+    session[:disable_customization] = params[:customization] == "0" if params.has_key?(:customization)
   end
 
   def guardian
@@ -132,7 +142,7 @@ class ApplicationController < ActionController::Base
   def serialize_data(obj, serializer, opts={})
     # If it's an array, apply the serializer as an each_serializer to the elements
     serializer_opts = {scope: guardian}.merge!(opts)
-    if obj.is_a?(Array)
+    if obj.is_a?(Array) or obj.is_a?(ActiveRecord::Associations::CollectionProxy)
       serializer_opts[:each_serializer] = serializer
       ActiveModel::ArraySerializer.new(obj, serializer_opts).as_json
     else
@@ -153,34 +163,14 @@ class ApplicationController < ActionController::Base
   end
 
   def can_cache_content?
-    # Don't cache unless we're in production mode
-    return false unless Rails.env.production? || Rails.env == "profile"
-
-    # Don't cache logged in users
-    return false if current_user.present?
-
-    true
+    !current_user.present?
   end
 
   # Our custom cache method
   def discourse_expires_in(time_length)
     return unless can_cache_content?
-    expires_in time_length, public: true
+    Middleware::AnonymousCache.anon_cache(request.env, 1.minute)
   end
-
-  # Helper method - if no logged in user (anonymous), use Rails' conditional GET
-  # support. Should be very fast behind a cache.
-  def anonymous_etag(*args)
-    if can_cache_content?
-      yield if stale?(*args)
-
-      # Add a one minute expiry
-      expires_in 1.minute, public: true
-    else
-      yield
-    end
-  end
-
 
   def fetch_user_from_params
     username_lower = params[:username].downcase
@@ -193,6 +183,16 @@ class ApplicationController < ActionController::Base
     user
   end
 
+  def post_ids_including_replies
+    post_ids = params[:post_ids].map {|p| p.to_i}
+    if params[:reply_post_ids]
+      post_ids << PostReply.where(post_id: params[:reply_post_ids].map {|p| p.to_i}).pluck(:reply_id)
+      post_ids.flatten!
+      post_ids.uniq!
+    end
+    post_ids
+  end
+
   private
 
     def preload_anonymous_data
@@ -201,7 +201,7 @@ class ApplicationController < ActionController::Base
     end
 
     def preload_current_user_data
-      store_preloaded("currentUser", MultiJson.dump(CurrentUserSerializer.new(current_user, root: false)))
+      store_preloaded("currentUser", MultiJson.dump(CurrentUserSerializer.new(current_user, scope: guardian, root: false)))
       serializer = ActiveModel::ArraySerializer.new(TopicTrackingState.report([current_user.id]), each_serializer: TopicTrackingStateSerializer)
       store_preloaded("topicTrackingStates", MultiJson.dump(serializer))
     end
@@ -276,8 +276,8 @@ class ApplicationController < ActionController::Base
     end
 
     def build_not_found_page(status=404, layout=false)
-      @top_viewed = TopicQuery.top_viewed(10)
-      @recent = TopicQuery.recent(10)
+      @top_viewed = Topic.top_viewed(10)
+      @recent = Topic.recent(10)
       @slug =  params[:slug].class == String ? params[:slug] : ''
       @slug =  (params[:id].class == String ? params[:id] : '') if @slug.blank?
       @slug.gsub!('-',' ')
@@ -287,7 +287,7 @@ class ApplicationController < ActionController::Base
   protected
 
     def api_key_valid?
-      request["api_key"] && SiteSetting.api_key_valid?(request["api_key"])
+      request["api_key"] && ApiKey.where(key: request["api_key"]).exists?
     end
 
     # returns an array of integers given a param key

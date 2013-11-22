@@ -33,7 +33,7 @@ Discourse.AdminLogsStaffActionLogsRoute = Discourse.Route.extend({
     return controller.show();
   },
 
-  events: {
+  actions: {
     showDetailsModal: function(logRecord) {
       Discourse.Route.showModal(this, 'admin_staff_action_log_details', logRecord);
       this.controllerFor('modal').set('modalClass', 'log-details-modal');
@@ -68,6 +68,24 @@ Discourse.AdminLogsScreenedEmailsRoute = Discourse.Route.extend({
 
   setupController: function() {
     return this.controllerFor('adminLogsScreenedEmails').show();
+  }
+});
+
+/**
+  The route that lists screened IP addresses.
+
+  @class AdminLogsScreenedIpAddresses
+  @extends Discourse.Route
+  @namespace Discourse
+  @module Discourse
+**/
+Discourse.AdminLogsScreenedIpAddressesRoute = Discourse.Route.extend({
+  renderTemplate: function() {
+    this.render('admin/templates/logs/screened_ip_addresses', {into: 'adminLogs'});
+  },
+
+  setupController: function() {
+    return this.controllerFor('adminLogsScreenedIpAddresses').show();
   }
 });
 

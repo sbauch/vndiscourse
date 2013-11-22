@@ -91,25 +91,50 @@ Discourse.PreferencesController = Discourse.ObjectController.extend({
     return this.get('saving') ? I18n.t('saving') : I18n.t('save');
   }.property('saving'),
 
-  changePassword: function() {
-    var preferencesController = this;
-    if (!this.get('passwordProgress')) {
-      this.set('passwordProgress', I18n.t("user.change_password.in_progress"));
-      return this.get('model').changePassword().then(function() {
-        // password changed
-        preferencesController.setProperties({
-          changePasswordProgress: false,
-          passwordProgress: I18n.t("user.change_password.success")
-        });
+  actions: {
+    save: function() {
+      var self = this;
+      this.set('saving', true);
+      this.set('saved', false);
+
+      // Cook the bio for preview
+      var model = this.get('model');
+      return model.save().then(function() {
+        // model was saved
+        self.set('saving', false);
+        if (Discourse.User.currentProp('id') === model.get('id')) {
+          Discourse.User.currentProp('name', model.get('name'));
+        }
+        self.set('bio_cooked', Discourse.Markdown.cook(self.get('bio_raw')));
+        self.set('saved', true);
       }, function() {
-        // password failed to change
-        preferencesController.setProperties({
-          changePasswordProgress: false,
-          passwordProgress: I18n.t("user.change_password.error")
-        });
+        // model failed to save
+        self.set('saving', false);
+        alert(I18n.t('generic_error'));
       });
+    },
+
+    changePassword: function() {
+      var self = this;
+      if (!this.get('passwordProgress')) {
+        this.set('passwordProgress', I18n.t("user.change_password.in_progress"));
+        return this.get('model').changePassword().then(function() {
+          // password changed
+          self.setProperties({
+            changePasswordProgress: false,
+            passwordProgress: I18n.t("user.change_password.success")
+          });
+        }, function() {
+          // password failed to change
+          self.setProperties({
+            changePasswordProgress: false,
+            passwordProgress: I18n.t("user.change_password.error")
+          });
+        });
+      }
     }
   }
+
 });
 
 

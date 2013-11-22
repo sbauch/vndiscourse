@@ -17,23 +17,24 @@ module Oneboxer
 
       # Figure out what kind of onebox to show based on the URL
       case route[:controller]
-      when 'users'
-        user = User.where(username_lower: route[:username].downcase).first
-        return nil unless user
+      # when 'users'
+      #   user = User.where(username_lower: route[:username].downcase).first
+      #   return nil unless user
 
-        return @url unless Guardian.new.can_see?(user)
+      #   return @url unless Guardian.new.can_see?(user)
 
-        args.merge! avatar: PrettyText.avatar_img(user.avatar_template, 'tiny'), username: user.username
-        args[:bio] = user.bio_cooked if user.bio_cooked.present?
+      #   args.merge! avatar: PrettyText.avatar_img(user.avatar_template, 'tiny'), username: user.username
+      #   args[:bio] = user.bio_cooked if user.bio_cooked.present?
 
-        @template = 'user'
+      #   @template = 'user'
       when 'topics'
+
+        linked = "<a href='#{@url}'>#{@url}</a>"
         if route[:post_number].present? && route[:post_number].to_i > 1
           # Post Link
           post = Post.where(topic_id: route[:topic_id], post_number: route[:post_number].to_i).first
-          return nil unless post
-
-          return @url unless Guardian.new.can_see?(post)
+          return linked unless post
+          return linked unless Guardian.new.can_see?(post)
 
           topic = post.topic
           slug = Slug.for(topic.title)
@@ -50,9 +51,8 @@ module Oneboxer
         else
           # Topic Link
           topic = Topic.where(id: route[:topic_id].to_i).includes(:user).first
-          return nil unless topic
-
-          return @url unless Guardian.new.can_see?(topic)
+          return linked unless topic
+          return linked unless Guardian.new.can_see?(topic)
 
           post = topic.posts.first
 

@@ -28,9 +28,8 @@ describe StaffActionLogger do
       expect { logger.log_user_deletion(1) }.to raise_error(Discourse::InvalidParameters)
     end
 
-    it 'creates a new StaffActionLog record' do
-      expect { log_user_deletion }.to change { StaffActionLog.count }.by(1)
-      StaffActionLog.last.target_user_id.should == deleted_user.id
+    it 'creates a new UserHistory record' do
+      expect { log_user_deletion }.to change { UserHistory.count }.by(1)
     end
   end
 
@@ -56,9 +55,9 @@ describe StaffActionLogger do
       expect { logger.log_trust_level_change(user, old_trust_level, max_level + 1) }.to raise_error(Discourse::InvalidParameters)
     end
 
-    it 'creates a new StaffActionLog record' do
-      expect { log_trust_level_change }.to change { StaffActionLog.count }.by(1)
-      StaffActionLog.last.details.should include "new trust level: #{new_trust_level}"
+    it 'creates a new UserHistory record' do
+      expect { log_trust_level_change }.to change { UserHistory.count }.by(1)
+      UserHistory.last.details.should include "new trust level: #{new_trust_level}"
     end
   end
 
@@ -69,8 +68,8 @@ describe StaffActionLogger do
       expect { logger.log_site_setting_change('abc', '1', '2') }.to raise_error(Discourse::InvalidParameters)
     end
 
-    it "creates a new StaffActionLog record" do
-      expect { logger.log_site_setting_change('title', 'Discourse', 'My Site') }.to change { StaffActionLog.count }.by(1)
+    it "creates a new UserHistory record" do
+      expect { logger.log_site_setting_change('title', 'Discourse', 'My Site') }.to change { UserHistory.count }.by(1)
     end
   end
 
@@ -106,7 +105,7 @@ describe StaffActionLogger do
       expect { logger.log_site_customization_destroy(nil) }.to raise_error(Discourse::InvalidParameters)
     end
 
-    it "creates a new StaffActionLog record" do
+    it "creates a new UserHistory record" do
       site_customization = SiteCustomization.new(name: 'Banana', stylesheet: "body {color: yellow;}", header: "h1 {color: brown;}")
       log_record = logger.log_site_customization_destroy(site_customization)
       log_record.previous_value.should be_present
@@ -114,6 +113,41 @@ describe StaffActionLogger do
       json = ::JSON.parse(log_record.previous_value)
       json['stylesheet'].should == site_customization.stylesheet
       json['header'].should == site_customization.header
+    end
+  end
+
+  describe "log_user_suspend" do
+    let(:user) { Fabricate(:user, suspended_at: 10.minutes.ago, suspended_till: 1.day.from_now) }
+
+    it "raises an error when arguments are missing" do
+      expect { logger.log_user_suspend(nil, nil) }.to raise_error(Discourse::InvalidParameters)
+      expect { logger.log_user_suspend(nil, "He was bad.") }.to raise_error(Discourse::InvalidParameters)
+    end
+
+    it "reason arg is optional" do
+      expect { logger.log_user_suspend(user, nil) }.to_not raise_error
+    end
+
+    it "creates a new UserHistory record" do
+      reason = "He was a big meanie."
+      log_record = logger.log_user_suspend(user, reason)
+      log_record.should be_valid
+      log_record.details.should == reason
+      log_record.target_user.should == user
+    end
+  end
+
+  describe "log_user_unsuspend" do
+    let(:user) { Fabricate(:user, suspended_at: 1.day.ago, suspended_till: 7.days.from_now) }
+
+    it "raises an error when argument is missing" do
+      expect { logger.log_user_unsuspend(nil) }.to raise_error(Discourse::InvalidParameters)
+    end
+
+    it "creates a new UserHistory record" do
+      log_record = logger.log_user_unsuspend(user)
+      log_record.should be_valid
+      log_record.target_user.should == user
     end
   end
 end

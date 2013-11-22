@@ -1,12 +1,13 @@
 class PostSerializer < BasicPostSerializer
 
   # To pass in additional information we might need
-  attr_accessor :topic_slug
-  attr_accessor :topic_view
-  attr_accessor :parent_post
-  attr_accessor :add_raw
-  attr_accessor :single_post_link_counts
-  attr_accessor :draft_sequence
+  attr_accessor :topic_slug,
+                :topic_view,
+                :parent_post,
+                :add_raw,
+                :single_post_link_counts,
+                :draft_sequence,
+                :post_actions
 
   attributes :post_number,
              :post_type,
@@ -42,15 +43,16 @@ class PostSerializer < BasicPostSerializer
              :trust_level,
              :deleted_at,
              :deleted_by,
-             :user_deleted
+             :user_deleted,
+             :edit_reason
 
 
   def moderator?
-    object.user.moderator?
+    object.user.try(:moderator?) || false
   end
 
   def staff?
-    object.user.staff?
+    object.user.try(:staff?) || false
   end
 
   def yours
@@ -70,7 +72,7 @@ class PostSerializer < BasicPostSerializer
   end
 
   def display_username
-    object.user.name
+    object.user.try(:name)
   end
 
   def link_counts
@@ -101,17 +103,16 @@ class PostSerializer < BasicPostSerializer
   end
 
   def user_title
-    object.user.title
+    object.user.try(:title)
   end
 
   def trust_level
-    object.user.trust_level
+    object.user.try(:trust_level)
   end
 
   def reply_to_user
     {
       username: object.reply_to_user.username,
-      name: object.reply_to_user.name,
       avatar_template: object.reply_to_user.avatar_template
     }
   end
@@ -152,8 +153,8 @@ class PostSerializer < BasicPostSerializer
         action_summary[:can_undo] = scope.can_delete?(post_actions[id])
       end
 
-      # anonymize flags
-      if !scope.is_staff? && PostActionType.flag_types.values.include?(id)
+      # only show public data
+      unless scope.is_staff? || PostActionType.public_types.values.include?(id)
         action_summary[:count] = action_summary[:acted] ? 1 : 0
       end
 
@@ -191,6 +192,10 @@ class PostSerializer < BasicPostSerializer
 
   def include_bookmarked?
     post_actions.present? && post_actions.keys.include?(PostActionType.types[:bookmark])
+  end
+
+  def include_display_username?
+    SiteSetting.enable_names?
   end
 
   private

@@ -1,3 +1,5 @@
+{{view Discourse.HtmlView key="top"}}
+
 {{#if postStream.loaded}}
 
   {{#if postStream.firstPostLoaded}}
@@ -10,13 +12,14 @@
           {{/if}}
 
           {{#if editingTopic}}
-            {{textField id='edit-title' value=newTitle}}
             {{categoryChooser valueAttribute="id" value=newCategoryId source=category_id}}
+            {{textField id='edit-title' value=newTitle}}
 
             <button class='btn btn-primary btn-small' {{action finishedEditingTopic}}><i class='icon-ok'></i></button>
             <button class='btn btn-small' {{action cancelEditingTopic}}><i class='icon-remove'></i></button>
           {{else}}
             <h1>
+              {{boundCategoryLink category}}
               {{#if details.loaded}}
                 {{topicStatus topic=model}}
                 <a href='{{unbound url}}'>
@@ -27,7 +30,7 @@
                   {{/if}}
                 </a>
               {{/if}}
-              {{boundCategoryLink category}}
+
 
               {{#if details.can_edit}}
                 <a href='#' {{action editTopic}} class='edit-topic' title='{{i18n edit}}'><i class="icon-pencil"></i></a>
@@ -83,7 +86,7 @@
               <div id='suggested-topics'>
                 <h3>{{i18n suggested_topics.title}}</h3>
                 <div class='topics'>
-                  {{basicTopicList topics=details.suggested_topics}}
+                  {{basic-topic-list topics=details.suggested_topics}}
                 </div>
                 <br/>
                 <h3>{{{view.browseMoreMessage}}}</h3>
@@ -126,10 +129,18 @@
 </div>
 
 {{render share}}
-{{render quoteButton}}
+{{render posterExpansion}}
+
+{{#if currentUser.enable_quoting}}
+  {{render quoteButton}}
+{{/if}}
+
 {{#if currentUser.staff}}
   {{render topicAdminMenu content}}
 {{/if}}
+
 {{#if event_menu}}
   {{render eventHostMenu content}}
 {{/if}}
+
+{{view Discourse.HtmlView key="bottom"}}

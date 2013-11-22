@@ -18,8 +18,8 @@ class CurrentUserSerializer < BasicUserSerializer
              :team_hash,
              :use_uploaded_avatar,
              :has_uploaded_avatar,
-             :gravatar_template,
-             :uploaded_avatar_template
+             :uploaded_avatar_template,
+             :can_invite_to_forum
 
   def include_site_flagged_posts_count?
     object.staff?
@@ -30,7 +30,7 @@ class CurrentUserSerializer < BasicUserSerializer
   end
 
   def reply_count
-    object.topic_reply_count
+    object.user_stat.topic_reply_count
   end
 
   def site_flagged_posts_count
@@ -50,8 +50,12 @@ class CurrentUserSerializer < BasicUserSerializer
     true
   end
 
-  def gravatar_template
-    User.gravatar_template(object.email)
+  def can_invite_to_forum
+    true
+  end
+
+  def include_can_invite_to_forum?
+    scope.can_invite_to_forum?
   end
 
 end

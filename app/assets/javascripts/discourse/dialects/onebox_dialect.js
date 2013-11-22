@@ -49,22 +49,31 @@ Discourse.Dialect.on("parseNode", function(event) {
     return;
   }
 
+  // We don't onebox mentions
+  if (node[1]['class'] === 'mention') { return; }
+
   // Don't onebox links within a list
   for (var i=0; i<path.length; i++) {
     if (path[i][0] === 'li') { return; }
   }
 
+  // If the link has a different label text than the link itself, don't onebox it.
+  var label = node[node.length-1];
+  if (label !== node[1]['href']) { return; }
+
   if (isOnOneLine(node, parent)) {
+
     node[1]['class'] = 'onebox';
     node[1].target = '_blank';
 
     if (Discourse && Discourse.Onebox) {
       var contents = Discourse.Onebox.lookupCache(node[1].href);
       if (contents) {
-        node[0] = 'raw';
+        node[0] = '__RAW';
         node[1] = contents;
         node.length = 2;
       }
     }
   }
 });
+

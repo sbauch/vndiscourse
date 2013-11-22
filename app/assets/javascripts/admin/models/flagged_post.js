@@ -38,7 +38,8 @@ Discourse.FlaggedPost = Discourse.Post.extend({
         r.push({
           user: _this.userLookup[action.user_id],
           message: action.message,
-          permalink: action.permalink
+          permalink: action.permalink,
+          bySystemUser: (action.user_id === -1 ? true : false)
         });
       }
     });
@@ -66,7 +67,7 @@ Discourse.FlaggedPost = Discourse.Post.extend({
   }.property('flaggedForSpam'),
 
   deletePost: function() {
-    if (this.get('post_number') === '1') {
+    if (this.get('post_number') === 1) {
       return Discourse.ajax('/t/' + this.topic_id, { type: 'DELETE', cache: false });
     } else {
       return Discourse.ajax('/posts/' + this.id, { type: 'DELETE', cache: false });

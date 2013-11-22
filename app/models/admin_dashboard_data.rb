@@ -22,6 +22,7 @@ class AdminDashboardData
 
   def problems
     [ rails_env_check,
+      ruby_version_check,
       host_names_check,
       gc_checks,
       sidekiq_check || queue_size_check,
@@ -36,9 +37,12 @@ class AdminDashboardData
       contact_email_check,
       send_consumer_email_check,
       title_check,
+      site_description_check,
       access_password_removal,
-      system_username_check,
-      notification_email_check ].compact
+      site_contact_username_check,
+      notification_email_check,
+      enforce_global_nicknames_check
+    ].compact
   end
 
   def self.fetch_stats
@@ -62,7 +66,7 @@ class AdminDashboardData
       reports: REPORTS.map { |type| Report.find(type).as_json },
       admins: User.admins.count,
       moderators: User.moderators.count,
-      banned: User.banned.count,
+      suspended: User.suspended.count,
       blocked: User.blocked.count,
       top_referrers: IncomingLinksReport.find('top_referrers').as_json,
       top_traffic_sources: IncomingLinksReport.find('top_traffic_sources').as_json,
@@ -144,18 +148,29 @@ class AdminDashboardData
     I18n.t('dashboard.title_nag') if SiteSetting.title == SiteSetting.defaults[:title]
   end
 
+  def site_description_check
+    I18n.t('dashboard.site_description_missing') if !SiteSetting.site_description.present?
+  end
+
   def send_consumer_email_check
     I18n.t('dashboard.consumer_email_warning') if Rails.env == 'production' and ActionMailer::Base.smtp_settings[:address] =~ /gmail\.com|live\.com|yahoo\.com/
   end
 
-  def system_username_check
-    I18n.t('dashboard.system_username_warning') if SiteSetting.system_username.blank?
+  def site_contact_username_check
+    I18n.t('dashboard.site_contact_username_warning') if SiteSetting.site_contact_username.blank?
   end
 
   def notification_email_check
     I18n.t('dashboard.notification_email_warning') if SiteSetting.notification_email.blank?
   end
 
+  def ruby_version_check
+    I18n.t('dashboard.ruby_version_warning') if RUBY_VERSION == '2.0.0' and RUBY_PATCHLEVEL < 247
+  end
+
+  def enforce_global_nicknames_check
+    I18n.t('dashboard.enforce_global_nicknames_warning') if SiteSetting.enforce_global_nicknames and !SiteSetting.discourse_org_access_key.present?
+  end
 
   # TODO: generalize this method of putting i18n keys with expiry in redis
   #       that should be reported on the admin dashboard:

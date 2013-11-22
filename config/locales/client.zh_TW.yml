@@ -332,8 +332,7 @@ zh_TW:
     unmute: 解除防打擾
     last_post: 最後一帖
 
-    best_of:
-      title: "優秀"
+    summary:
       enabled_description: 你現在正在浏覽本主題的“優秀”視圖。
       description: "此主題中有 <b>{{count}}</b> 個帖子，是不是有點多哦！你願意切換到只顯示最多交互和回複的帖子視圖麽？"
       enable: '切換到“優秀”視圖'
@@ -477,12 +476,8 @@ zh_TW:
       title: "插入圖片"
       from_my_computer: "來自我的設備"
       from_the_web: "來自網絡"
-      add_title: "添加圖片"
-      remote_title: "網絡圖片"
       remote_tip: "輸入圖片網絡，格式爲：http://example.com/image.jpg"
-      local_title: "本地圖片"
       local_tip: "點擊從你的設備中選擇一張圖片。"
-      upload_title: "上傳"
       uploading: "上傳圖片中"
 
     search:
@@ -531,7 +526,6 @@ zh_TW:
       title: 主題排名詳細
 
     topic:
-      create_in: '創建一個 {{categoryName}} 分類的主題'
       create: '創建主題'
       create_long: '創建一個新主題'
       private_message: '開啓一段私下交流'
@@ -666,8 +660,8 @@ zh_TW:
           one: "一個指定用戶"
           other: "{{count}} 個用戶中的"
 
-        best_of: "你在浏覽 {{n_best_posts}} {{of_n_posts}}."
-        n_best_posts:
+        summary: "你在浏覽 {{n_summarized_posts}} {{of_n_posts}}."
+        n_summarized_posts:
           one: "一個優秀帖子"
           other: "{{count}} 優秀帖子"
         of_n_posts:
@@ -848,7 +842,6 @@ zh_TW:
       none: '（未分類）'
       edit: '編輯'
       edit_long: "編輯分類"
-      edit_uncategorized: "編輯未分類的"
       view: '浏覽分類下的主題'
       general: '通常'
       settings: '設置'
@@ -896,11 +889,10 @@ zh_TW:
         more: "還差 {{n}} 個……"
         left: "還剩下 {{n}}"
 
-    topic_summary:
+    topic_map:
       title: "主題概要"
       links_shown: "顯示所有 {{totalLinks}} 個鏈接……"
       clicks: "點擊"
-      topic_link: "主題鏈接"
 
     topic_statuses:
       locked:
@@ -920,7 +912,7 @@ zh_TW:
     views_long: "本主題已經被浏覽過 {{number}} 次"
     activity: "活動"
     likes: "贊"
-    top_contributors: "參與者"
+    users: "參與者"
     category_title: "分類"
     history: "曆史"
     changed_by: "由 {{author}}"
@@ -987,8 +979,8 @@ zh_TW:
         critical_available: "有一個關鍵更新可用。"
         updates_available: "目前有可用更新。"
         please_upgrade: "請升級！"
-        no_check_performed: "沒有檢查更新. 請確定 clockwork 及 sidekiq 正在運行."
-        stale_data: "A check for updates has not been performed lately. Ensure clockwork and sidekiq are running."
+        no_check_performed: "沒有檢查更新. 請確定 sidekiq 正在運行."
+        stale_data: "A check for updates has not been performed lately. Ensure sidekiq is running."
         installed_version: "已安裝"
         latest_version: "最新版本"
         problems_found: "你安裝的論壇目前有以下問題："
@@ -998,7 +990,7 @@ zh_TW:
         moderators: '版主：'
         admins: '管理員：'
         blocked: '已封鎖:'
-        banned: '已禁止:'
+        suspended: '已禁止:'
         private_messages_short: "私信"
         private_messages_title: "私密信息"
 
@@ -1158,7 +1150,7 @@ zh_TW:
           pending: "待定"
           admins: '管理員'
           moderators: '版主'
-          banned: '已禁止'
+          suspended: '已禁止'
           blocked: '已封鎖'
         approved: "已批准？"
         approved_selected:
@@ -1175,17 +1167,17 @@ zh_TW:
           elder: '信用等級爲4的用戶（年長用戶）'
           admins: '管理員'
           moderators: '版主'
-          banned: '已禁止的用戶'
+          suspended: '已禁止的用戶'
           blocked: '已封鎖的用戶'
 
       user:
-        ban_failed: "禁止此用戶時發生了錯誤 {{error}}"
-        unban_failed: "解禁此用戶時發生了錯誤 {{error}}"
-        ban_duration: "你計劃禁止該用戶多久？（天）"
+        suspend_failed: "禁止此用戶時發生了錯誤 {{error}}"
+        unsuspend_failed: "解禁此用戶時發生了錯誤 {{error}}"
+        suspend_duration: "你計劃禁止該用戶多久？（天）"
         delete_all_posts: "刪除所有帖子"
-        ban: "禁止"
-        unban: "解禁"
-        banned: "已禁止？"
+        suspend: "禁止"
+        unsuspend: "解禁"
+        suspended: "已禁止？"
         moderator: "版主？"
         admin: "管理員？"
         show_admin_profile: "管理員"

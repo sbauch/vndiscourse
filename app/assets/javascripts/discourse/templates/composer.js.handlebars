@@ -2,30 +2,25 @@
 
 <div class='contents'>
 
-  <div class='composer-popup-container'>
-    <div id='new-user-education' class='composer-popup' style='display: none'>
-      <a href='#' {{action closeEducation}} class='close'><i class='icon icon-remove-sign'></i></a>
-      {{{educationContents}}}
-    </div>
-
-    <div id='similar-topics' class='composer-popup' style='display: none'>
-      <a href='#' {{action closeSimilar}} class='close'><i class='icon icon-remove-sign'></i></a>
-      <h3>{{i18n composer.similar_topics}}<h3>
-
-      <ul class='topics'>
-        {{#each similarTopics}}
-          <li>{{{topicLink this}}} <span class='posts-count'>({{{i18n topic.filters.n_posts count="posts_count"}}})</span></li>
-        {{/each}}
-      </ul>
-    </div>
-  </div>
+  {{render composerMessages}}
 
   <div class='control'>
     <a href='#' class='toggler' {{action toggle bubbles=false}} title='{{i18n composer.toggler}}'></a>
 
     {{#if model.viewOpen}}
       <div class='control-row reply-area'>
-        <div class='reply-to'>{{{model.actionTitle}}}:</div>
+        <div class='reply-to'>
+          {{{model.actionTitle}}}:
+          {{#if canEdit}}
+            {{#if showEditReason}}
+              <div class="edit-reason-input">
+                {{textField value=editReason tabindex="5" id="edit-reason" maxlength="255" placeholderKey="composer.edit_reason_placeholder"}}
+              </div>
+            {{else}}
+              <a {{action displayEditReason}}>{{i18n composer.show_edit_reason}}</a>
+            {{/if}}
+          {{/if}}
+        </div>
 
         {{#if model.canEditTitle}}
           <div class='form-element clearfix'>
@@ -40,13 +35,13 @@
             {{/if}}
 
             <div class="title-input">
-              {{textField value=model.title tabindex="2" id="reply-title" maxlength="255" class="span8" placeholderKey="composer.title_placeholder"}}
+              {{textField value=model.title tabindex="2" id="reply-title" maxlength="255" placeholderKey="composer.title_placeholder"}}
               {{popupInputTip validation=view.titleValidation shownAt=view.showTitleTip}}
             </div>
 
-            {{#unless model.creatingPrivateMessage}}
+            {{#unless model.privateMessage}}
               <div class="category-input">
-                {{categoryChooser valueAttribute="name" value=model.categoryName}}
+                {{categoryChooser valueAttribute="id" value=model.categoryId}}
                 {{popupInputTip validation=view.categoryValidation shownAt=view.showCategoryTip}}
               </div>
               {{#if model.archetype.hasOptions}}
