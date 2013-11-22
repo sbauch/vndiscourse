@@ -1,5 +1,5 @@
 class Tag < ActiveRecord::Base
-  attr_accessible :count, :term
+  # attr_accessible :count, :term
 
   def self.search(term)
     sql = Tag.sql_builder("select id, term from tags
