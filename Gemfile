@@ -24,7 +24,7 @@ module ::Kernel
 end
 
 if rails4?
-  Bundler::SharedHelpers.default_lockfile = Pathname.new("#{Bundler::SharedHelpers.default_gemfile}_rails4.lock")
+  Bundler::SharedHelpers.default_lockfile = Pathname.new("#{Bundler::SharedHelpers.default_gemfile}.lock")
 
   # Bundler::Dsl.evaluate already called with an incorrect lockfile ... fix it
   class Bundler::Dsl
