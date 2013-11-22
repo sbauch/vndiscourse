@@ -1,2 +1,2 @@
-worker: bundle exec sidekiq
-web: bundle exec puma -p $PORT -e $RAILS_ENV -t 0:5
+web: bundle exec unicorn -p $PORT -c ./config/unicorn.rb
+worker: bundle exec sidekiq -e $RAILS_ENV -c $WORKER_CONCURRENCY
