@@ -14,7 +14,7 @@ dump.rdb
 public/plugins/*
 
 # Ignore bundler config
-/bin
+# /bin
 /.bundle
 /.vagrant
 /.vagrantfile
