@@ -46,7 +46,7 @@ basic:
     default: true
   top_menu:
     client: true
-    default: 'latest|new|unread|favorited|categories'
+    default: 'latest|new|unread|favorited|categories|directory'
   post_menu:
     client: true
     default: 'like|edit|flag|delete|share|bookmark|reply'
