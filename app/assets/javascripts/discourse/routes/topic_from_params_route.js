@@ -9,14 +9,13 @@
 Discourse.TopicFromParamsRoute = Discourse.Route.extend({
 
   setupController: function(controller, params) {
-
     params = params || {};
     params.track_visit = true;
 
-    var topic = this.modelFor('topic');
-    var postStream = topic.get('postStream');
+    var topic = this.modelFor('topic'),
+        postStream = topic.get('postStream'),
+        queryParams = Discourse.URL.get('queryParams');
 
-    var queryParams = Discourse.URL.get('queryParams');
     if (queryParams) {
       // Set summary on the postStream if present
       postStream.set('summary', Em.get(queryParams, 'filter') === 'summary');
@@ -41,8 +40,11 @@ Discourse.TopicFromParamsRoute = Discourse.Route.extend({
       topicController.setProperties({
         currentPost: closest,
         progressPosition: closest,
-        enteredAt: new Date().getTime()
+        enteredAt: new Date().getTime().toString(),
+        highlightOnInsert: closest
       });
+
+      Discourse.TopicView.jumpToPost(closest);
 
       if (topic.present('draft')) {
         composerController.open({

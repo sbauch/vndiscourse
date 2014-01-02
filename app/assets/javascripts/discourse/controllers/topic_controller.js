@@ -200,13 +200,13 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
     },
 
     replyAsNewTopic: function(post) {
-      var composerController = this.get('controllers.composer');
-      var promise = composerController.open({
-        action: Discourse.Composer.CREATE_TOPIC,
-        draftKey: Discourse.Composer.REPLY_AS_NEW_TOPIC_KEY
-      });
-      var postUrl = "" + location.protocol + "//" + location.host + (post.get('url'));
-      var postLink = "[" + (this.get('title')) + "](" + postUrl + ")";
+      var composerController = this.get('controllers.composer'),
+          promise = composerController.open({
+            action: Discourse.Composer.CREATE_TOPIC,
+            draftKey: Discourse.Composer.REPLY_AS_NEW_TOPIC_KEY
+          }),
+          postUrl = "" + location.protocol + "//" + location.host + (post.get('url')),
+          postLink = "[" + (this.get('title')) + "](" + postUrl + ")";
 
       promise.then(function() {
         Discourse.Post.loadQuote(post.get('id')).then(function(q) {
@@ -219,13 +219,18 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
 
   },
 
+  slackRatio: function() {
+    return Discourse.Capabilities.currentProp('slackRatio');
+  }.property(),
+
   jumpTopDisabled: function() {
-    return (this.get('progressPosition') === 1);
-  }.property('postStream.filteredPostsCount', 'progressPosition'),
+    return (this.get('progressPosition') <= 3);
+  }.property('progressPosition'),
 
   jumpBottomDisabled: function() {
-    return this.get('progressPosition') >= this.get('postStream.filteredPostsCount');
-  }.property('postStream.filteredPostsCount', 'progressPosition'),
+    return this.get('progressPosition') >= this.get('postStream.filteredPostsCount') ||
+           this.get('progressPosition') >= this.get('highest_post_number');
+  }.property('postStream.filteredPostsCount', 'highest_post_number', 'progressPosition'),
 
   canMergeTopic: function() {
     if (!this.get('details.can_move_posts')) return false;
@@ -269,9 +274,10 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
 
   streamPercentage: function() {
     if (!this.get('postStream.loaded')) { return 0; }
-    if (this.get('postStream.filteredPostsCount') === 0) { return 0; }
-    return this.get('progressPosition') / this.get('postStream.filteredPostsCount');
-  }.property('postStream.loaded', 'progressPosition', 'postStream.filteredPostsCount'),
+    if (this.get('postStream.highest_post_number') === 0) { return 0; }
+    var perc = this.get('progressPosition') / this.get('highest_post_number');
+    return (perc > 1.0) ? 1.0 : perc;
+  }.property('postStream.loaded', 'progressPosition', 'highest_post_number'),
 
   multiSelectChanged: function() {
     // Deselect all posts when multi select is turned off
@@ -458,6 +464,65 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
         this.set('allPostsSelected', true);
       }
       return true;
+    }
+  },
+
+  // If our current post is changed, notify the router
+  _currentPostChanged: function() {
+    var currentPost = this.get('currentPost');
+    if (currentPost) {
+      this.send('postChangedRoute', currentPost);
+    }
+  }.observes('currentPost'),
+
+  sawObjects: function(posts) {
+    if (posts) {
+      var self = this,
+          lastReadPostNumber = this.get('last_read_post_number');
+
+      posts.forEach(function(post) {
+        var postNumber = post.get('post_number');
+        if (postNumber > lastReadPostNumber) {
+          lastReadPostNumber = postNumber;
+        }
+        post.set('read', true);
+      });
+      self.set('last_read_post_number', lastReadPostNumber);
+
+    }
+  },
+
+  topVisibleChanged: function(post) {
+    var postStream = this.get('postStream'),
+        firstLoadedPost = postStream.get('firstLoadedPost');
+
+    this.set('currentPost', post.get('post_number'));
+
+    if (firstLoadedPost && firstLoadedPost === post) {
+      // Note: jQuery shouldn't be done in a controller, but how else can we
+      // trigger a scroll after a promise resolves in a controller? We need
+      // to do this to preserve upwards infinte scrolling.
+      var $body = $('body'),
+          $elem = $('#post-cloak-' + post.get('post_number')),
+          distToElement = $body.scrollTop() - $elem.position().top;
+
+      postStream.prependMore().then(function() {
+        Em.run.next(function () {
+          $elem = $('#post-cloak-' + post.get('post_number'));
+          $('html, body').scrollTop($elem.position().top + distToElement);
+        });
+      });
+    }
+  },
+
+  bottomVisibleChanged: function(post) {
+    this.set('progressPosition', post.get('post_number'));
+
+    var postStream = this.get('postStream'),
+        lastLoadedPost = postStream.get('lastLoadedPost');
+
+    if (lastLoadedPost && lastLoadedPost === post) {
+      postStream.appendMore();
     }
   }
 

@@ -8,12 +8,6 @@ module("Discourse.Markdown", {
 
 var cooked = function(input, expected, text) {
   var result = Discourse.Markdown.cook(input, {mentionLookup: false, sanitize: true});
-
-  if (result !== expected) {
-    console.log(JSON.stringify(result));
-    console.log(JSON.stringify(expected));
-  }
-
   equal(result, expected, text);
 };
 
@@ -335,8 +329,15 @@ test("sanitize", function() {
          "<p><a href=\"http://disneyland.disney.go.com/\">disney</a> <a href=\"http://reddit.com\">reddit</a></p>",
          "we can embed proper links");
 
+  cooked("<center>hello</center>", "<p>hello</p>", "it does not allow centering");
   cooked("<table><tr><td>hello</td></tr></table>\nafter", "<p>after</p>", "it does not allow tables");
   cooked("<blockquote>a\n</blockquote>\n", "<blockquote>a\n\n<br/>\n\n</blockquote>", "it does not double sanitize");
+
+  cooked("<iframe src=\"http://discourse.org\" width=\"100\" height=\"42\"></iframe>", "", "it does not allow most iframe");
+
+  cooked("<iframe src=\"https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d2624.9983685732213!2d2.29432085!3d48.85824149999999!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1385737436368\" width=\"100\" height=\"42\"></iframe>",
+         "<iframe src=\"https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d2624.9983685732213!2d2.29432085!3d48.85824149999999!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1385737436368\" width=\"100\" height=\"42\"></iframe>",
+         "it allows iframe to google maps");
 });
 
 test("URLs in BBCode tags", function() {

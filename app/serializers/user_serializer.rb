@@ -24,10 +24,13 @@ class UserSerializer < BasicUserSerializer
              :moderator,
              :admin,
              :title,
+<<<<<<< HEAD
              :teams,
              :team_hash,
              :all_teams,
              :suspended,
+=======
+>>>>>>> 13da653f2b6d4bfb69b72bab4ca72449bd8a49c3
              :suspend_reason,
              :suspended_till
 
@@ -119,10 +122,6 @@ class UserSerializer < BasicUserSerializer
 
   def include_name?
     SiteSetting.enable_names?
-  end
-
-  def suspended
-    object.suspended?
   end
 
   def include_suspended?

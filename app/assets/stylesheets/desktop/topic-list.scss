@@ -152,14 +152,18 @@
 
   @include medium-width {
     .main-link {
-      width: 380px;
+      width: 300px;
     }
   }
-  @include small-width {
+
+   @include small-width {
     .main-link {
-      width: 335px;
+     width: 300px;
+
     }
+
   }
+
   .topic-statuses:empty {
     display: none;
   }
@@ -178,7 +182,8 @@
     width: 140px;
   }
   .posters {
-    width: 170px;
+    max-width: 220px;
+    min-width: 150px;
     > a {
       float: left;
       margin-right: 4px;
@@ -468,11 +473,11 @@ ol.category-breadcrumb {
   position: absolute;
   border: 1px solid #ccc;
   background-color: white;
-  height: 200px;
+  max-height: 350px;
   padding: 8px 7px 0 7px;
   z-index: 100;
   margin-top: 30px;
-  min-width: 116px;
+  min-width: 138px;
 
 
   a.badge-category {

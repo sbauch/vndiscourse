@@ -8,9 +8,11 @@ require_dependency 'post_destroyer'
 require_dependency 'user_name_suggester'
 require_dependency 'roleable'
 require_dependency 'pretty_text'
+require_dependency 'url_helper'
 
 class User < ActiveRecord::Base
   include Roleable
+  include UrlHelper
 
   # attr_accessible :name, :username, :password, :email, :bio_raw, :website, :teams, :position, :short_position,
   #                  :fact_one, :fact_two, :fact_three, :start_date, :custom_avatar_url, :teams, :team_hash
@@ -33,7 +35,7 @@ class User < ActiveRecord::Base
   has_many :user_visits, dependent: :destroy
   has_many :invites, dependent: :destroy
   has_many :topic_links, dependent: :destroy
-  has_many :uploads, dependent: :destroy
+  has_many :uploads
 
   has_one :facebook_user_info, dependent: :destroy
   has_one :twitter_user_info, dependent: :destroy
@@ -371,20 +373,20 @@ class User < ActiveRecord::Base
   #   - emails
   def small_avatar_url
     template = avatar_template
-    template.gsub("{size}", "45")
+    schemaless template.gsub("{size}", "45")
   end
 
   # the avatars might take a while to generate
   # so return the url of the original image in the meantime
   def uploaded_avatar_path
     return unless SiteSetting.allow_uploaded_avatars? && use_uploaded_avatar
-    uploaded_avatar_template.present? ? uploaded_avatar_template : uploaded_avatar.try(:url)
+    avatar_template = uploaded_avatar_template.present? ? uploaded_avatar_template : uploaded_avatar.try(:url)
+    schemaless avatar_template
   end
 
   def avatar_template
     uploaded_avatar_path || User.gravatar_template(email)
   end
-
 
   # Updates the denormalized view counts for all users
   def self.update_view_counts
@@ -738,7 +740,7 @@ end
 #  auto_track_topics_after_msecs :integer
 #  views                         :integer          default(0), not null
 #  flag_level                    :integer          default(0), not null
-#  ip_address                    :string
+#  ip_address                    :inet
 #  new_topic_duration_minutes    :integer
 #  external_links_in_new_tab     :boolean          default(FALSE), not null
 #  enable_quoting                :boolean          default(TRUE), not null
@@ -759,4 +761,3 @@ end
 #  index_users_on_username        (username) UNIQUE
 #  index_users_on_username_lower  (username_lower) UNIQUE
 #
-

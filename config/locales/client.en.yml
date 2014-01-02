@@ -516,8 +516,10 @@ en:
       toggler: "hide or show the composer panel"
 
       admin_options_title: "Optional staff settings for this topic"
-      auto_close_label: "Auto-close topic after:"
-      auto_close_units: "days"
+      auto_close_label: "Auto-close topic time:"
+      auto_close_units: "(# of hours, a time, or a timestamp)"
+      auto_close_examples: 'Examples: 24, 17:00, 2013-11-22 14:00'
+      auto_close_error: "Please enter a valid value."
 
     notifications:
       title: "notifications of @name mentions, replies to your posts and topics, private messages, etc"
@@ -775,7 +777,7 @@ en:
           one: "made by 1 specific user"
           other: "made by {{count}} specific users"
 
-        summary: "You're viewing the {{n_summarized_posts}} {{of_n_posts}}."
+        summary: "You're viewing {{n_summarized_posts}} {{of_n_posts}}. "
         n_summarized_posts:
           one: "1 summarized post"
           other: "{{count}} summarized posts"
@@ -998,6 +1000,7 @@ en:
       already_used: 'This color has been used by another category'
       security: "Security"
       auto_close_label: "Auto-close topics after:"
+      auto_close_units: "days"
       edit_permissions: "Edit Permissions"
       add_permission: "Add Permission"
       this_year: "this year"
@@ -1172,6 +1175,7 @@ en:
         delete_spammer_title: "Delete the user and all its posts and topics."
 
         flagged_by: "Flagged by"
+        system: "System"
         error: "Something went wrong"
         view_message: "Reply"
         no_results: "There are no flags."
@@ -1460,3 +1464,6 @@ en:
           rate_limits: 'Rate Limits'
           developer: 'Developer'
           uncategorized: 'Uncategorized'
+
+    lightbox:
+      download: "download"

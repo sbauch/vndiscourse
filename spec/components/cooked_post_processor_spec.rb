@@ -42,12 +42,20 @@ describe CookedPostProcessor do
 
     context "with image_sizes" do
 
-      let(:post) { build(:post_with_image_url) }
+      let(:post) { build(:post_with_image_urls) }
       let(:cpp) { CookedPostProcessor.new(post, image_sizes: {"http://foo.bar/image.png" => {"width" => 111, "height" => 222}}) }
 
+      before { cpp.post_process_images }
+
+      it "adds the width from the image sizes provided when no dimension is provided" do
+        cpp.html.should =~ /src="http:\/\/foo.bar\/image.png" width="111" height="222"/
+      end
+
       it "adds the width from the image sizes provided" do
-        cpp.post_process_images
-        cpp.html.should =~ /width=\"111\"/
+        cpp.html.should =~ /src="http:\/\/domain.com\/picture.jpg" width="50" height="42"/
+      end
+
+      it "should be dirty" do
         cpp.should be_dirty
       end
 
@@ -86,7 +94,7 @@ describe CookedPostProcessor do
 
       it "generates overlay information" do
         cpp.post_process_images
-        cpp.html.should match_html '<div><a href="/uploads/default/1/1234567890123456.jpg" class="lightbox"><img src="/uploads/default/_optimized/da3/9a3/ee5e6b4b0d_690x1380.jpg" width="690" height="1380"><div class="meta">
+        cpp.html.should match_html '<div class="lightbox-wrapper"><a href="/uploads/default/1/1234567890123456.jpg" class="lightbox" title="uploaded.jpg"><img src="/uploads/default/_optimized/da3/9a3/ee5e6b4b0d_690x1380.jpg" width="690" height="1380"><div class="meta">
 <span class="filename">uploaded.jpg</span><span class="informations">1000x2000 1.21 KB</span><span class="expand"></span>
 </div></a></div>'
         cpp.should be_dirty

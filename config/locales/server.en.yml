@@ -80,7 +80,7 @@ en:
 
   education:
     until_posts:
-      one: "post"
+      one: "1 post"
       other: "%{count} posts"
 
     'new-topic': |
@@ -634,7 +634,8 @@ en:
     suggested_topics: "Number of suggested topics shown at the bottom of a topic"
 
     clean_up_uploads: "Remove orphaned uploads to prevent illegal hosting. WARNING: you might want to make a backup of your /uploads directory before enabled this setting."
-    uploads_grace_period_in_hours: "Grace period (in hours) before an orphan upload is removed."
+    clean_orphan_uploads_grace_period_hours: "Grace period (in hours) before an orphan upload is removed."
+    purge_deleted_uploads_grace_period_days: "Grace period (in days) before a deleted upload is erased."
     enable_s3_uploads: "Place uploads on Amazon S3"
     s3_upload_bucket: "The Amazon S3 bucket name that files will be uploaded into"    
     custom_avatars: "Allow users to upload custom avatars. WRANING: will disable Gravatar and requires S3 uploads to be configured"
@@ -1078,7 +1079,7 @@ en:
       text_body_template: |
         There are new user signups waiting to be approved (or rejected) before they can access this forum.
 
-        [Please review them in the admin section](/admin/users/list/pending).
+        [Please review them in the admin section](%{base_url}/admin/users/list/pending).
 
   unsubscribe_link: "To unsubscribe from these emails, visit your [user preferences](%{user_preferences_url})."
 
@@ -1151,6 +1152,10 @@ en:
       from: "%{site_name} digest"
       read_more: "Read More"
 
+      posts:
+        one: "1 post"
+        other: "%{count} posts"
+
     forgot_password:
       subject_template: "[%{site_name}] Password reset"
       text_body_template: |
@@ -1220,7 +1225,7 @@ en:
   deleted: 'deleted'
 
   upload:
-    edit_reason: "We have downloaded a copy of the remotes images"
+    edit_reason: "We have downloaded copies of the remote images"
     unauthorized: "Sorry, the file you are trying to upload is not authorized (authorized extensions: %{authorized_extensions})."
     pasted_image_filename: "Pasted image"
     attachments:

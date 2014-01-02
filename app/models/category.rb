@@ -151,6 +151,7 @@ SQL
   def create_category_definition
     t = Topic.new(title: I18n.t("category.topic_prefix", category: name), user: user, pinned_at: Time.now, category_id: id)
     t.skip_callbacks = true
+    t.auto_close_days = nil
     t.save!
     update_column(:topic_id, t.id)
     t.posts.create(raw: post_template, user: user)
@@ -292,27 +293,31 @@ end
 #
 # Table name: categories
 #
-#  id              :integer          not null, primary key
-#  name            :string(50)       not null
-#  color           :string(6)        default("AB9364"), not null
-#  topic_id        :integer
-#  topic_count     :integer          default(0), not null
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  user_id         :integer          not null
-#  topics_year     :integer
-#  topics_month    :integer
-#  topics_week     :integer
-#  slug            :string(255)      not null
-#  description     :text
-#  text_color      :string(6)        default("FFFFFF"), not null
-#  hotness         :float            default(5.0), not null
-#  read_restricted :boolean          default(FALSE), not null
-#  auto_close_days :float
+#  id                 :integer          not null, primary key
+#  name               :string(50)       not null
+#  color              :string(6)        default("AB9364"), not null
+#  topic_id           :integer
+#  topic_count        :integer          default(0), not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  user_id            :integer          not null
+#  topics_year        :integer
+#  topics_month       :integer
+#  topics_week        :integer
+#  slug               :string(255)      not null
+#  description        :text
+#  text_color         :string(6)        default("FFFFFF"), not null
+#  hotness            :float            default(5.0), not null
+#  read_restricted    :boolean          default(FALSE), not null
+#  auto_close_days    :float
+#  post_count         :integer          default(0), not null
+#  latest_post_id     :integer
+#  latest_topic_id    :integer
+#  position           :integer          not null
+#  parent_category_id :integer
 #
 # Indexes
 #
 #  index_categories_on_forum_thread_count  (topic_count)
 #  index_categories_on_name                (name) UNIQUE
 #
-

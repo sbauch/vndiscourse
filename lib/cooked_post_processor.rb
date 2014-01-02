@@ -70,9 +70,20 @@ class CookedPostProcessor
   end
 
   def limit_size!(img)
-    w, h = get_size_from_image_sizes(img["src"], @opts[:image_sizes]) || get_size(img["src"])
+    # retrieve the size from
+    #  1) the width/height attributes
+    #  2) the dimension from the preview (image_sizes)
+    #  3) the dimension of the original image (HTTP request)
+    w, h = get_size_from_attributes(img) ||
+           get_size_from_image_sizes(img["src"], @opts[:image_sizes]) ||
+           get_size(img["src"])
     # limit the size of the thumbnail
     img["width"], img["height"] = ImageSizer.resize(w, h)
+  end
+
+  def get_size_from_attributes(img)
+    w, h = img["width"].to_i, img["height"].to_i
+    return [w, h] if w > 0 && h > 0
   end
 
   def get_size_from_image_sizes(src, image_sizes)
@@ -136,6 +147,7 @@ class CookedPostProcessor
   def add_lightbox!(img, original_width, original_height, upload=nil)
     # first, create a div to hold our lightbox
     lightbox = Nokogiri::XML::Node.new("div", @doc)
+    lightbox["class"] = "lightbox-wrapper"
     img.add_next_sibling(lightbox)
     lightbox.add_child(img)
 
@@ -158,6 +170,12 @@ class CookedPostProcessor
     filename = get_filename(upload, img["src"])
     informations = "#{original_width}x#{original_height}"
     informations << " #{number_to_human_size(upload.filesize)}" if upload
+<<<<<<< HEAD
+=======
+
+    a["title"] = filename
+
+>>>>>>> 13da653f2b6d4bfb69b72bab4ca72449bd8a49c3
     meta.add_child create_span_node("filename", filename)
     meta.add_child create_span_node("informations", informations)
     meta.add_child create_span_node("expand")
