@@ -57,7 +57,8 @@ class Auth::OpenIdAuthenticator < Auth::Authenticator
 
 
   def register_middleware(omniauth)
-    omniauth.provider :open_id,
+    omniauth.provider :open_id, 
+           :client_options => {:ssl => {:ca_file => '/usr/lib/ssl/certs/ca-certificates.crt'}},
            :setup => lambda { |env|
               strategy = env["omniauth.strategy"]
               strategy.options[:store] = OpenID::Store::Redis.new($redis)

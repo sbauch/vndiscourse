@@ -421,7 +421,7 @@ Discourse.Composer = Discourse.Model.extend({
     this.set('composeState', CLOSED);
 
     return Ember.Deferred.promise(function(promise) {
-      post.save(function(savedPost) {
+      post.save(function() {
         composer.clearState();
       }, function(error) {
         var response = $.parseJSON(error.responseText);
@@ -487,8 +487,7 @@ Discourse.Composer = Discourse.Model.extend({
 
       composer.set('composeState', SAVING);
       createdPost.save(function(result) {
-        var addedPost = false,
-            saving = true;
+        var saving = true;
 
         createdPost.updateFromJson(result);
 

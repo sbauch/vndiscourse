@@ -1,3 +1,27 @@
+# defaults: &defaults
+#   host: <%= GlobalSetting.redis_host %>
+#   port: <%= GlobalSetting.redis_port %>
+#   password: <%= GlobalSetting.redis_password %>
+#   db: <%= GlobalSetting.redis_db %>
+#   cache_db: <%= GlobalSetting.redis_cache_db %>
+# 
+# development:
+#   <<: *defaults
+# 
+# profile:
+#   <<: *defaults
+# 
+# test:
+#   <<: *defaults
+#   db: 1
+# 
+# staging:
+#   <<: *defaults
+# 
+# production:
+#   <<: *defaults
+  
+# mine:
 production: 
   port: 9531
   host: barreleye.redistogo.com

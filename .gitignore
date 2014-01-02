@@ -28,7 +28,7 @@ config/database.yml
 # config/discourse.pill
 config/redis.yml
 config/discourse.pill
-config/environments/production.rb
+config/discourse.conf
 
 
 # Ignore the default SQLite database and db dumps
@@ -58,7 +58,7 @@ log/
 # Ignore gem that is copied in
 MiniProfiler/Ruby/rack-mini-profiler-2.0.1a.gem
 
-sublime-project.sublime-workspace
+discourse.sublime-workspace
 
 # Vim temp files
 *~
@@ -89,12 +89,6 @@ chef/tmp/*
 
 # exclude our git version file for now
 config/version.rb
-
-<<<<<<< HEAD
-# ignore the Ruby Version manager (rvm) file
-=======
-# ignore the Ruby Version manager (rvm)
->>>>>>> f980b4d16e786ac3909b11d5f1926fdd735464ef
 .rvmrc
 .ruby-version
 .ruby-gemset

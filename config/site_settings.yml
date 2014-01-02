@@ -8,14 +8,14 @@ required:
   site_contact_username: ''
   logo_url:
     client: true
-    default: '/assets/d-logo-sketch.png'
+    default: '/images/d-logo-sketch.png'
   logo_small_url:
     client: true
-    default: '/assets/d-logo-sketch-small.png'
+    default: '/images/d-logo-sketch-small.png'
   favicon_url:
     client: true
-    default: '/assets/default-favicon.ico'
-  apple_touch_icon_url: /assets/default-apple-touch-icon.png'
+    default: '/images/default-favicon.ico'
+  apple_touch_icon_url: '/images/default-apple-touch-icon.png'
   company_full_name: 'My Unconfigured Forum Ltd.'
   company_short_name: 'Unconfigured Forum'
   company_domain: 'www.example.com'
@@ -32,10 +32,10 @@ basic:
     default: ''
   enable_wide_category_list:
     client: true
-    default: false
+    default: true
   category_featured_topics:
     client: true
-    default: 6
+    default: 3
   topics_per_page: 30
   posts_per_page:
     client: true
@@ -59,6 +59,8 @@ basic:
   relative_date_duration:
     client: true
     default: 30
+  topics_per_period_in_summary:
+    default: 10
 
 users:
   enable_local_logins:
@@ -76,6 +78,10 @@ users:
   must_approve_users:
     client: true
     default: false
+  min_password_length:
+    client: true
+    default: 8
+  block_common_passwords: true
   enable_google_logins:
     client: true
     default: true
@@ -134,7 +140,7 @@ posting:
       default: 10
   max_post_length:
     client: true
-    default: 
+    default:
       test: 4000
       default: 32000
   min_topic_title_length:
@@ -177,6 +183,7 @@ posting:
     default: true
   post_undo_action_window_mins: 10
   max_mentions_per_post: 10
+  newuser_max_replies_per_topic: 3
   newuser_max_mentions_per_post: 2
   onebox_max_chars: 5000
   title_min_entropy: 10
@@ -197,6 +204,12 @@ posting:
   display_name_on_posts:
     client: true
     default: false
+  short_progress_text_threshold:
+    client: true
+    default: 1000
+  default_code_lang:
+    client: true
+    default: "lang-auto"
 
 email:
   email_time_window_mins: 10
@@ -212,6 +225,9 @@ email:
   pop3s_polling_port: 995
   pop3s_polling_username: ''
   pop3s_polling_password: ''
+  enable_watch_new_topics:
+    default: false
+    client: true
 
 files:
   max_image_size_kb:
@@ -333,6 +349,12 @@ developer:
     default:
       test: false
       default: true
+
+embedding:
+  embeddable_host: ''
+  feed_polling_enabled: false
+  feed_polling_url: ''
+  embed_by_username: ''
 
 uncategorized:
   tos_url:

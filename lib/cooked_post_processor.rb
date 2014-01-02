@@ -12,6 +12,7 @@ class CookedPostProcessor
     @dirty = false
     @opts = opts
     @post = post
+    @previous_cooked = (@post.cooked || "").dup
     @doc = Nokogiri::HTML::fragment(post.cooked)
     @size_cache = {}
   end
@@ -58,7 +59,6 @@ class CookedPostProcessor
       src, width, height = img["src"], img["width"], img["height"]
       limit_size!(img)
       convert_to_link!(img)
-      @dirty |= (src != img["src"]) || (width.to_i != img["width"].to_i) || (height.to_i != img["height"].to_i)
     end
 
     update_topic_image(images)
@@ -98,7 +98,7 @@ class CookedPostProcessor
     absolute_url = url
     absolute_url = Discourse.base_url_no_prefix + absolute_url if absolute_url =~ /^\/[^\/]/
     # FastImage fails when there's no scheme
-    absolute_url = (SiteSetting.use_ssl? ? "https:" : "http:") + absolute_url if absolute_url.start_with?("//")
+    absolute_url = SiteSetting.scheme + ":" + absolute_url if absolute_url.start_with?("//")
     return unless is_valid_image_url?(absolute_url)
     # we can *always* crawl our own images
     return unless SiteSetting.crawl_images? || Discourse.store.has_been_uploaded?(url)
@@ -130,8 +130,6 @@ class CookedPostProcessor
     end
 
     add_lightbox!(img, original_width, original_height, upload)
-
-    @dirty = true
   end
 
   def is_a_hyperlink?(img)
@@ -170,12 +168,7 @@ class CookedPostProcessor
     filename = get_filename(upload, img["src"])
     informations = "#{original_width}x#{original_height}"
     informations << " #{number_to_human_size(upload.filesize)}" if upload
-<<<<<<< HEAD
-=======
-
     a["title"] = filename
-
->>>>>>> 13da653f2b6d4bfb69b72bab4ca72449bd8a49c3
     meta.add_child create_span_node("filename", filename)
     meta.add_child create_span_node("informations", informations)
     meta.add_child create_span_node("expand")
@@ -210,8 +203,6 @@ class CookedPostProcessor
     result = Oneboxer.apply(@doc) do |url, element|
       Oneboxer.onebox(url, args)
     end
-
-    @dirty |= result.changed?
   end
 
   def optimize_urls
@@ -233,7 +224,7 @@ class CookedPostProcessor
     # have we enough disk space?
     return if disable_if_low_on_disk_space
     # we only want to run the job whenever it's changed by a user
-    return if @post.updated_by == Discourse.system_user
+    return if @post.last_editor_id == Discourse.system_user.id
     # make sure no other job is scheduled
     Jobs.cancel_scheduled_job(:pull_hotlinked_images, post_id: @post.id)
     # schedule the job
@@ -254,7 +245,7 @@ class CookedPostProcessor
   end
 
   def dirty?
-    @dirty
+    @previous_cooked != html
   end
 
   def html

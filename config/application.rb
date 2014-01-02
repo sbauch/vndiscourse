@@ -5,6 +5,9 @@ require 'redis-store' # HACK
 # Plugin related stuff
 require_relative '../lib/discourse_plugin_registry'
 
+# Global config
+require_relative '../app/models/global_setting'
+
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
   Bundler.require(*Rails.groups(assets: %w(development test profile)))
@@ -56,7 +59,7 @@ module Discourse
       path =~ /assets\/images/ && !%w(.js .css).include?(File.extname(filename))
     end]
 
-    config.assets.precompile += ['common.css', 'desktop.css', 'mobile.css', 'admin.js', 'admin.css', 'shiny/shiny.css', 'preload_store.js', 'browser-update.js']
+    config.assets.precompile += ['vendor.js', 'common.css', 'desktop.css', 'mobile.css', 'admin.js', 'admin.css', 'shiny/shiny.css', 'preload_store.js', 'browser-update.js', 'embed.css']
 
     # Precompile all defer
     Dir.glob("#{config.root}/app/assets/javascripts/defer/*.js").each do |file|
@@ -161,7 +164,9 @@ module Discourse
     # This is not really required per-se, but we do not want to support
     # XML params, we see errors in our logs about malformed XML and there
     # absolutly no spot in our app were we use XML as opposed to JSON endpoints
-    ActionDispatch::ParamsParser::DEFAULT_PARSERS.delete(Mime::XML)
+    #
+    # Rails 4 no longer includes this by default
+    ActionDispatch::ParamsParser::DEFAULT_PARSERS.delete(Mime::XML) unless rails4?
 
     if ENV['RBTRACE'] == "1"
       require 'rbtrace'

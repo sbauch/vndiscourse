@@ -53,7 +53,7 @@ Discourse.TopicRoute = Discourse.Route.extend({
 
     showHistory: function(post) {
       Discourse.Route.showModal(this, 'history', post);
-      this.controllerFor('history').refresh();
+      this.controllerFor('history').refresh(post.get("id"), post.get("version"));
       this.controllerFor('modal').set('modalClass', 'history-modal');
     },
 
@@ -132,10 +132,13 @@ Discourse.TopicRoute = Discourse.Route.extend({
       editingTopic: false
     });
 
+    Discourse.TopicRoute.trigger('setupTopicController', this);
+
     this.controllerFor('header').setProperties({
       topic: model,
       showExtraInfo: false
     });
+
     this.controllerFor('composer').set('topic', model);
     Discourse.TopicTrackingState.current().trackIncoming('all');
     controller.subscribe();
@@ -146,4 +149,4 @@ Discourse.TopicRoute = Discourse.Route.extend({
 
 });
 
-
+RSVP.EventTarget.mixin(Discourse.TopicRoute);

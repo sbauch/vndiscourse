@@ -27,8 +27,6 @@ class Topic < ActiveRecord::Base
     2**31 - 1
   end
 
-  versioned if: :new_version_required?
-
   def featured_users
     @featured_users ||= TopicFeaturedUsers.new(self)
   end
@@ -87,6 +85,7 @@ class Topic < ActiveRecord::Base
   has_many :alerts
 
   has_one :hot_topic
+  has_one :top_topic
   belongs_to :user
   belongs_to :last_poster, class_name: 'User', foreign_key: :last_post_user_id
   belongs_to :featured_user1, class_name: 'User', foreign_key: :featured_user1_id
@@ -98,11 +97,12 @@ class Topic < ActiveRecord::Base
   has_many :topic_users
   has_many :topic_links
   has_many :topic_invites
-  has_many :invites, through: :topic_invites, source: :invite
-  
+  has_many :invites, through: :topic_invites, source: :invite  
   has_many :reservations
   has_many :attendees, through: :reservations, source: :user
-  
+  has_many :topic_revisions
+  has_many :revisions, foreign_key: :topic_id, class_name: 'TopicRevision'
+
   # When we want to temporarily attach some data to a forum topic (usually before serialization)
   attr_accessor :user_data
   attr_accessor :posters  # TODO: can replace with posters_summary once we remove old list code
@@ -151,43 +151,63 @@ class Topic < ActiveRecord::Base
   before_create do
     self.bumped_at ||= Time.now
     self.last_post_user_id ||= user_id
-    if !@ignore_category_auto_close and self.category and self.category.auto_close_days and self.auto_close_at.nil?
-      set_auto_close(self.category.auto_close_days * 24)
+    if !@ignore_category_auto_close and self.category and self.category.auto_close_hours and self.auto_close_at.nil?
+      set_auto_close(self.category.auto_close_hours)
     end
   end
 
   attr_accessor :skip_callbacks
 
   after_create do
-    return if skip_callbacks
 
-    changed_to_category(category)
-    if archetype == Archetype.private_message
-      DraftSequence.next!(user, Draft::NEW_PRIVATE_MESSAGE)
-    else
-      DraftSequence.next!(user, Draft::NEW_TOPIC)
+    unless skip_callbacks
+      changed_to_category(category)
+      if archetype == Archetype.private_message
+        DraftSequence.next!(user, Draft::NEW_PRIVATE_MESSAGE)
+      else
+        DraftSequence.next!(user, Draft::NEW_TOPIC)
+      end
     end
+
   end
 
   before_save do
-    return if skip_callbacks
 
-    if (auto_close_at_changed? and !auto_close_at_was.nil?) or (auto_close_user_id_changed? and auto_close_at)
-      self.auto_close_started_at ||= Time.zone.now if auto_close_at
-      Jobs.cancel_scheduled_job(:close_topic, {topic_id: id})
-      true
+    unless skip_callbacks
+      if (auto_close_at_changed? and !auto_close_at_was.nil?) or (auto_close_user_id_changed? and auto_close_at)
+        self.auto_close_started_at ||= Time.zone.now if auto_close_at
+        Jobs.cancel_scheduled_job(:close_topic, {topic_id: id})
+        true
+      end
+      if category_id.nil? && (archetype.nil? || archetype == Archetype.default)
+        self.category_id = SiteSetting.uncategorized_category_id
+      end
     end
-    if category_id.nil? && (archetype.nil? || archetype == Archetype.default)
-      self.category_id = SiteSetting.uncategorized_category_id
-    end
+
   end
 
   after_save do
-    return if skip_callbacks
+    save_revision if should_create_new_version?
 
-    if auto_close_at and (auto_close_at_changed? or auto_close_user_id_changed?)
-      Jobs.enqueue_at(auto_close_at, :close_topic, {topic_id: id, user_id: auto_close_user_id || user_id})
+    unless skip_callbacks
+      if auto_close_at and (auto_close_at_changed? or auto_close_user_id_changed?)
+        Jobs.enqueue_at(auto_close_at, :close_topic, {topic_id: id, user_id: auto_close_user_id || user_id})
+      end
     end
+
+  end
+
+  def save_revision
+    TopicRevision.create!(
+      user_id: acting_user.id,
+      topic_id: id,
+      number: TopicRevision.where(topic_id: id).count + 2,
+      modifications: changes.extract!(:category, :title)
+    )
+  end
+
+  def should_create_new_version?
+    !new_record? && (category_id_changed? || title_changed?)
   end
 
   def self.top_viewed(max = 10)
@@ -274,8 +294,8 @@ class Topic < ActiveRecord::Base
     @post_numbers ||= posts.order(:post_number).pluck(:post_number)
   end
 
-  def age_in_days
-    ((Time.zone.now - created_at) / 1.day).round
+  def age_in_minutes
+    ((Time.zone.now - created_at) / 1.minute).round
   end
 
   def has_meta_data_boolean?(key)
@@ -608,14 +628,13 @@ class Topic < ActiveRecord::Base
     end
   end
 
-  # TODO: change this method, along with category's auto_close_days. Use hours.
-  def auto_close_days=(num_days)
+  def auto_close_hours=(num_hours)
     @ignore_category_auto_close = true
-    set_auto_close( num_days ? num_days * 24 : nil)
+    set_auto_close( num_hours )
   end
 
   def self.auto_close
-    Topic.where("NOT closed AND auto_close_at < ? AND auto_close_user_id IS NOT NULL", 5.minutes.from_now).each do |t|
+    Topic.where("NOT closed AND auto_close_at < ? AND auto_close_user_id IS NOT NULL", 1.minute.ago).each do |t|
       t.auto_close
     end
   end
@@ -664,6 +683,14 @@ class Topic < ActiveRecord::Base
 
   def read_restricted_category?
     category && category.read_restricted
+  end
+
+  def acting_user
+    @acting_user || user
+  end
+
+  def acting_user=(u)
+    @acting_user = u
   end
 
   private

@@ -17,7 +17,11 @@
       <label class="control-label">{{i18n user.avatar.title}}</label>
       <div class="controls">
         {{boundAvatar model imageSize="large"}}
-        <button {{action showAvatarSelector}} class="btn pad-left"><i class="icon-pencil"></i></button>
+        {{#if allowAvatarUpload}}
+          <button {{action showAvatarSelector}} class="btn pad-left no-text"><i class="fa fa-pencil"></i></button>
+        {{else}}
+          <a href="//gravatar.com/emails" target="_blank" title="{{i18n user.change_avatar.gravatar_title}}" class="btn no-text"><i class="fa fa-pencil"></i></a>
+        {{/if}}
       </div>
     </div>
   
@@ -81,12 +85,26 @@
   </div>
 
   <div class="control-group other">
+      <div class="controls">
+        <label>{{i18n user.new_topic_duration.label}}</label>
+        {{combobox valueAttribute="value" content=considerNewTopicOptions value=new_topic_duration_minutes}}
+      </div>
 
-    <label class="control-label">{{i18n user.other_settings}}</label>
-    <div class="controls">
-      <label>{{i18n user.auto_track_topics}}</label>
-      {{combobox valueAttribute="value" content=autoTrackDurations value=auto_track_topics_after_msecs}}
-    </div>
+      {{#if Discourse.SiteSettings.enable_watch_new_topics}}
+      <div class="controls">
+        <label>
+          {{view Ember.Checkbox checkedBinding="watch_new_topics"}}
+          {{i18n user.watch_new_topics}}
+        </label>
+      </div>
+      {{/if}}
+
+      <div class="controls">
+        <label>{{view Ember.Checkbox checkedBinding="external_links_in_new_tab"}}
+        {{i18n user.external_links_in_new_tab}}</label>
+        <label>{{view Ember.Checkbox checkedBinding="enable_quoting"}}
+        {{i18n user.enable_quoting}}</label>
+      </div>
 
     <div class="controls">
       <label>{{i18n user.new_topic_duration.label}}</label>
@@ -100,11 +118,25 @@
       {{i18n user.enable_quoting}}</label>
     </div>
 
-    <div class="controls">
-      <label>
-        {{view Ember.Checkbox checkedBinding="dynamic_favicon"}}
-        {{i18n user.dynamic_favicon}}
-      </label>
+    <div class="control-group category">
+      <label class="control-label">{{i18n user.categories_settings}}</label>
+      <div class="controls">
+        <label>{{i18n user.watched_categories}}</label>
+        {{category-group categories=watchedCategories}}
+        <div class="instructions">{{i18n user.watched_categories_instructions}}</div>
+      </div>
+      <div class="controls">
+        <label>{{i18n user.muted_categories}}</label>
+        {{category-group categories=mutedCategories}}
+        <div class="instructions">{{i18n user.muted_categories_instructions}}</div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="controls">
+          <button {{action save}} {{bindAttr disabled="saveDisabled"}} class="btn btn-primary">{{saveButtonText}}</button>
+          {{#if saved}}{{i18n saved}}{{/if}}
+      </div>
     </div>
 
   </div>

@@ -161,7 +161,7 @@ it:
 
       user_mentioned_user: "<a href='{{user1Url}}'>{{user}}</a> ha menzionato <a href='{{user2Url}}'>{{another_user}}</a>"
       user_mentioned_you: "<a href='{{user1Url}}'>{{user}}</a> ha menzionato <a href='{{user2Url}}'>te</a>"
-      you_mentioned_user: "<a href='{{user1Url}}'>Tu</a> hai menzionato <a href='{{user2Url}}'>{{user}}</a>"
+      you_mentioned_user: "<a href='{{user1Url}}'>Tu</a> hai menzionato <a href='{{user2Url}}'>{{another_user}}</a>"
 
       posted_by_user: "Pubblicato da <a href='{{userUrl}}'>{{user}}</a>"
       posted_by_you: "Pubblicato da <a href='{{userUrl}}'>te</a>"
@@ -181,6 +181,17 @@ it:
       "11": "Modifiche"
       "12": "Oggetti inviati"
       "13": "Inbox"
+
+    categories:
+      all: "tutte le categorie"
+      only_category: "solo {{categoryName}}"
+      category: "Categoria"
+      posts: "Post"
+      topics: "Topic"
+      latest: "Ultimi"
+      latest_by: "ultimi da"
+      toggle_ordering: "alterna l'ordine"
+      subcategories: "Sottocategorie:"
 
     user:
       said: "{{username}} ha detto:"
@@ -502,15 +513,15 @@ it:
       none: "Non hai notifiche in questo momento."
       more: "guarda notifiche più vecchie"
       mentioned: "<span title='menzionato' class='icon'>@</span> {{username}} {{link}}"
-      quoted: "<i title='citato' class='icon icon-quote-right'></i> {{username}} {{link}}"
-      replied: "<i title='risposto' class='icon icon-reply'></i> {{username}} {{link}}"
-      posted: "<i title='risposto' class='icon icon-reply'></i> {{username}} {{link}}"
-      edited: "<i title='modificato' class='icon icon-pencil'></i> {{username}} {{link}}"
-      liked: "<i title='liked' class='icon icon-heart'></i> {{username}} {{link}}"
-      private_message: "<i class='icon icon-envelope-alt' title='messaggio privato'></i> {{username}} ti ha mandato un messaggio privato: {{link}}"
+      quoted: "<i title='citato' class='fa fa-quote-right'></i> {{username}} {{link}}"
+      replied: "<i title='risposto' class='fa fa-reply'></i> {{username}} {{link}}"
+      posted: "<i title='risposto' class='fa fa-reply'></i> {{username}} {{link}}"
+      edited: "<i title='modificato' class='fa fa-pencil'></i> {{username}} {{link}}"
+      liked: "<i title='liked' class='fa fa-heart'></i> {{username}} {{link}}"
+      private_message: "<i class='fa fa-envelope-o' title='messaggio privato'></i> {{username}} ti ha mandato un messaggio privato: {{link}}"
       invited_to_private_message: "{{username}} ti ha invitato ad una conversazione privata: {{link}}"
-      invitee_accepted: "<i title='ha accettato il tuo invito' class='icon icon-signin'></i> {{username}} ha accettato il tuo invito"
-      moved_post: "<i title='post spostato' class='icon icon-arrow-right'></i> {{username}} ha spostato il post qui {{link}}"
+      invitee_accepted: "<i title='ha accettato il tuo invito' class='fa fa-sign-in'></i> {{username}} ha accettato il tuo invito"
+      moved_post: "<i title='post spostato' class='fa fa-arrow-right'></i> {{username}} ha spostato il post qui {{link}}"
       total_flagged: "totale post segnalati"
 
     upload_selector:
@@ -696,21 +707,9 @@ it:
       login_reply: 'Log In per Rispondere'
 
       filters:
-        user: "Stai vedendo solo {{n_posts}} {{by_n_users}}."
         n_posts:
           one: "1 post"
           other: "{{count}} post"
-        by_n_users:
-          one: "da 1 utente specifico"
-          other: "da {{count}} utenti specifici"
-
-        summary: "Stai vedendo i {{n_summarized_posts}} {{of_n_posts}}."
-        n_summarized_posts:
-          one: "1 best post"
-          other: "{{count}} best post"
-        of_n_posts:
-          one: "di 1 nel topic"
-          other: "di {{count}} nel topic"
         cancel: "Mostra nuovamente tutti i post di questo topic."
 
       split_topic:

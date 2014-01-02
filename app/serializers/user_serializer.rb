@@ -24,13 +24,10 @@ class UserSerializer < BasicUserSerializer
              :moderator,
              :admin,
              :title,
-<<<<<<< HEAD
              :teams,
              :team_hash,
              :all_teams,
              :suspended,
-=======
->>>>>>> 13da653f2b6d4bfb69b72bab4ca72449bd8a49c3
              :suspend_reason,
              :suspended_till
 
@@ -50,7 +47,7 @@ class UserSerializer < BasicUserSerializer
   end    
 
   def self.private_attributes(*attrs)
-    attributes *attrs
+    attributes(*attrs)
     attrs.each do |attr|
       define_method "include_#{attr}?" do
         can_edit
@@ -78,6 +75,7 @@ class UserSerializer < BasicUserSerializer
                      :email_direct,
                      :email_always,
                      :digest_after_days,
+                     :watch_new_topics,
                      :auto_track_topics_after_msecs,
                      :new_topic_duration_minutes,
                      :external_links_in_new_tab,
@@ -86,7 +84,9 @@ class UserSerializer < BasicUserSerializer
                      :use_uploaded_avatar,
                      :has_uploaded_avatar,
                      :gravatar_template,
-                     :uploaded_avatar_template
+                     :uploaded_avatar_template,
+                     :muted_category_ids,
+                     :watched_category_ids
 
   def auto_track_topics_after_msecs
     object.auto_track_topics_after_msecs || SiteSetting.auto_track_topics_after
@@ -120,18 +120,22 @@ class UserSerializer < BasicUserSerializer
     User.gravatar_template(object.email)
   end
 
-  def include_name?
-    SiteSetting.enable_names?
-  end
-
   def include_suspended?
     object.suspended?
   end
   def include_suspend_reason?
     object.suspended?
   end
+
   def include_suspended_till?
     object.suspended?
   end
 
+  def muted_category_ids
+    CategoryUser.lookup(object, :muted).pluck(:category_id)
+  end
+
+  def watched_category_ids
+    CategoryUser.lookup(object, :watching).pluck(:category_id)
+  end
 end
