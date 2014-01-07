@@ -43,7 +43,7 @@ module Discourse
   end
 
   def self.top_menu_items
-    @top_menu_items ||= Discourse.filters.concat([:category, :categories, :top])
+    @top_menu_items ||= Discourse.filters.concat([:category, :categories, :top, :directory])
   end
 
   def self.anonymous_top_menu_items
