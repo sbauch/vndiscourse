@@ -33,22 +33,22 @@ Discourse::Application.configure do
   # the I18n.default_locale when a translation can not be found)
   config.i18n.fallbacks = true
 
-  if GlobalSetting.smtp_address
-    settings = {
-      address:              GlobalSetting.smtp_address,
-      port:                 GlobalSetting.smtp_port,
-      domain:               GlobalSetting.smtp_domain,
-      user_name:            GlobalSetting.smtp_user_name,
-      password:             GlobalSetting.smtp_password,
-      authentication:       'plain',
-      enable_starttls_auto: GlobalSetting.smtp_enable_start_tls
-    }
-
-    config.action_mailer.smtp_settings = settings.reject{|x,y| y.nil?}
-  else
-    config.action_mailer.delivery_method = :sendmail
-    config.action_mailer.sendmail_settings = {arguments: '-i'}
-  end
+  # if GlobalSetting.smtp_address
+  #   settings = {
+  #     address:              GlobalSetting.smtp_address,
+  #     port:                 GlobalSetting.smtp_port,
+  #     domain:               GlobalSetting.smtp_domain,
+  #     user_name:            GlobalSetting.smtp_user_name,
+  #     password:             GlobalSetting.smtp_password,
+  #     authentication:       'plain',
+  #     enable_starttls_auto: GlobalSetting.smtp_enable_start_tls
+  #   }
+  # 
+  #   config.action_mailer.smtp_settings = settings.reject{|x,y| y.nil?}
+  # else
+  #   config.action_mailer.delivery_method = :sendmail
+  #   config.action_mailer.sendmail_settings = {arguments: '-i'}
+  # end
 
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
@@ -56,16 +56,16 @@ Discourse::Application.configure do
   # this will cause all handlebars templates to be pre-compiles, making your page faster
   config.handlebars.precompile = true
   
-  # config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.default_url_options = { :host => 'vaynermedia.com' }
-  # ActionMailer::Base.smtp_settings = {
-  #   :address        => "smtp.sendgrid.net",
-  #   :port           => "25",
-  #   :authentication => :plain,
-  #   :user_name      => ENV['SENDGRID_USERNAME'],
-  #   :password       => ENV['SENDGRID_PASSWORD'],
-  #   :domain => 'heroku.com'
-  # }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.default_url_options = { :host => 'vaynermedia.com' }
+  ActionMailer::Base.smtp_settings = {
+    :address        => "smtp.sendgrid.net",
+    :port           => "25",
+    :authentication => :plain,
+    :user_name      => ENV['SENDGRID_USERNAME'],
+    :password       => ENV['SENDGRID_PASSWORD'],
+    :domain => 'heroku.com'
+  }
 
   # allows admins to use mini profiler
   config.enable_mini_profiler = GlobalSetting.enable_mini_profiler
